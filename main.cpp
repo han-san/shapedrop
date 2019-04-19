@@ -212,6 +212,8 @@ auto score = 0.0;
 auto lost = false;
 
 auto currentclock = (decltype(clock())) 0;
+auto dropclock = (decltype(clock())) 0;
+
 auto delta = 0.0;
 
 auto highScore = 0;
@@ -239,6 +241,7 @@ auto init()
 
     delta = 0.0;
     currentclock = clock();
+    dropclock = currentclock;
 
     srand(time(NULL));
 }
@@ -262,15 +265,6 @@ auto run() -> void
     };
 
     std::array<Block, rows * columns> board = {};
-
-    auto is_valid_spot = [&](V2 pos) {
-        if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
-            return true;
-        } else {
-            auto index = pos.y * columns + pos.x;
-            return !board[index].isActive;
-        }
-    };
 
     struct Shape {
         std::vector<Block> blocks;
@@ -339,7 +333,35 @@ auto run() -> void
 
     auto currentShape = shapes[0];
 
-    auto dropclock = clock();
+    auto is_valid_spot = [&board](V2 pos) {
+        if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
+            return false;
+        } else {
+            auto index = pos.y * columns + pos.x;
+            return !board[index].isActive;
+        }
+    };
+
+    auto is_valid_move = [is_valid_spot](Shape& shape, V2 move) {
+        for (auto& block : shape.blocks) {
+            auto x = block.pos.x + move.x;
+            auto y = block.pos.y + move.y;
+            if (!is_valid_spot({x, y})) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    auto try_move = [is_valid_move](Shape& shape, V2 move) {
+        if (is_valid_move(shape, move)) {
+            for (auto& block : shape.blocks) {
+                block.pos.x += move.x;
+                block.pos.y += move.y;
+            }
+            dropclock = currentclock;
+        }
+    };
 
     while (gRunning) {
         auto newclock = clock();
@@ -359,39 +381,9 @@ auto run() -> void
             } else if (message == Message::RESET) {
                 init();
             } else if (message == Message::MOVE_RIGHT) {
-                auto canMove = true;
-                for (auto& block : currentShape.blocks) {
-                    // check if block to the right is available
-                    auto x = block.pos.x + 1;
-                    auto boardIndex = block.pos.y * columns + x;
-                    if (x >= columns || board[boardIndex].isActive) {
-                        canMove = false;
-                    }
-                }
-                if (canMove) {
-                    for (auto& block : currentShape.blocks) {
-                        ++block.pos.x;
-                    }
-                    // reset drop clock
-                    dropclock = currentclock;
-                }
+                try_move(currentShape, {1, 0});
             } else if (message == Message::MOVE_LEFT) {
-                auto canMove = true;
-                for (auto& block : currentShape.blocks) {
-                    // check if block to the left is available
-                    auto x = block.pos.x - 1;
-                    auto boardIndex = block.pos.y * columns + x;
-                    if (block.pos.x <= 0 || board[boardIndex].isActive) {
-                        canMove = false;
-                    }
-                }
-                if (canMove) {
-                    for (auto& block : currentShape.blocks) {
-                        --block.pos.x;
-                    }
-                    // reset drop clock
-                    dropclock = currentclock;
-                }
+                try_move(currentShape, {-1, 0});
             } else if (message == Message::INCREASE_SPEED) {
                 dropSpeed = maxDropSpeed;
             } else if (message == Message::RESET_SPEED) {
@@ -449,6 +441,18 @@ auto run() -> void
                         board[boardIndex] = block;
                     }
                     currentShape = shapes[rand() % shapes.size()];
+                    // game over if there is block occupying spawn location
+                    auto gameOver = false;
+                    for (auto& block : currentShape.blocks) {
+                        if (!is_valid_spot(block.pos)) {
+                            gameOver = true;
+                            break;
+                        }
+                    }
+
+                    if (gameOver) {
+                        std::cout << "Game Over!\n";
+                    }
                 }
             }
         }
