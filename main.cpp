@@ -24,14 +24,36 @@ struct V2 {
         int h;
         int y;
     };
+
+    V2(int a = 0, int b = 0): x{a}, y{b} {}
 };
 
-enum Message {
+struct V3 {
+    union {
+        int x;
+        int r;
+    };
+    union {
+        int y;
+        int g;
+    };
+    union {
+        int z;
+        int b;
+    };
+
+    V3(int a = 0, int b = 0, int c = 0): x{a}, y{b}, z{c} {}
+};
+
+enum class Message {
     NONE,
     QUIT,
     RESET,
     MOVE_RIGHT,
     MOVE_LEFT,
+    INCREASE_SPEED,
+    RESET_SPEED,
+    DROP,
 };
 
 struct Square {
@@ -44,8 +66,8 @@ struct Square {
 auto constexpr rows = 20;
 auto constexpr columns = 10;
 auto constexpr scale = 40;
-auto constexpr windoww = columns * scale;
-auto constexpr windowh = rows * scale;
+auto constexpr windoww = (columns + 2) * scale;
+auto constexpr windowh = (rows + 2) * scale;
 auto gRunning = true;
 
 SDL_Surface* gBBSurface;
@@ -75,31 +97,43 @@ auto sdl_get_back_buffer() -> BackBuffer
     return bbuf;
 }
 
-auto sdl_handle_input(Message* outMsg) -> bool
+auto sdl_handle_input() -> Message
 {
-    *outMsg = NONE;
+    auto msg = Message {};
     SDL_Event e;
     if (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) {
-            *outMsg = QUIT;
+            msg = Message::QUIT;
         } else if (e.type == SDL_KEYDOWN) {
             switch (e.key.keysym.sym) {
             case SDLK_RIGHT: {
-                *outMsg = MOVE_RIGHT;
+                msg = Message::MOVE_RIGHT;
             } break;
             case SDLK_LEFT: {
-                *outMsg = MOVE_LEFT;
+                msg = Message::MOVE_LEFT;
             } break;
             case SDLK_r: {
-                *outMsg = RESET;
+                msg = Message::RESET;
+            } break;
+            case SDLK_DOWN: {
+                msg = Message::INCREASE_SPEED;
+            } break;
+            case SDLK_UP: {
+                msg = Message::DROP;
             } break;
             default: {
+            } break;
+            }
+        } else if (e.type == SDL_KEYUP) {
+            switch (e.key.keysym.sym) {
+            case SDLK_DOWN: {
+                msg = Message::RESET_SPEED;
             } break;
             }
         }
     }
 
-    return *outMsg ? true : false;
+    return msg;
 }
 
 struct Point {
@@ -182,6 +216,9 @@ auto delta = 0.0;
 
 auto highScore = 0;
 
+auto dropSpeed = 1.0;
+auto maxDropSpeed = 0.1;
+
 auto init()
 {
     auto winDimensions = sdl_get_window_dimensions();
@@ -215,34 +252,92 @@ auto run() -> void
 
     init();
 
-    std::array<bool, rows * columns> board = {};
+    using Position = V2;
+    using Color = V3;
+
+    struct Block {
+        Position pos;
+        Color color;
+        bool isActive = false;
+    };
+
+    std::array<Block, rows * columns> board = {};
 
     auto is_valid_spot = [&](V2 pos) {
         if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
             return true;
         } else {
             auto index = pos.y * columns + pos.x;
-            return !board[index];
+            return !board[index].isActive;
         }
     };
 
     struct Shape {
-        std::vector<V2> blocks;
-    };
+        std::vector<Block> blocks;
 
-    auto baseX = 0;
-    auto baseY = 0;
-    auto LPiece = Shape {
-        {
-            // l-piece
-            { {baseX + 0}, {baseY + 0} },
-            /* { {baseX + 0}, {baseY + 1} }, */
-            /* { {baseX + 0}, {baseY + 2} }, */
-            /* { {baseX + 0}, {baseY + 3} }, */
+        Shape(Color color, std::initializer_list<Position> positions) {
+            blocks.reserve(positions.size());
+            for (auto& pos : positions) {
+                blocks.push_back({ pos, color, true });
+            }
         }
     };
 
-    auto currentShape = LPiece;
+    auto baseX = columns / 2;
+    auto baseY = 0;
+    auto IPiece = Shape(Color(0x00, 0xf0, 0xf0), {
+                            { baseX + 0, baseY + 0 },
+                            { baseX + 0, baseY + 1 },
+                            { baseX + 0, baseY + 2 },
+                            { baseX + 0, baseY + 3 }
+                        });
+    auto LPiece = Shape(Color(0xf0, 0xa0, 0x00), {
+                            { baseX + 0, baseY + 0 },
+                            { baseX + 0, baseY + 1 },
+                            { baseX + 0, baseY + 2 },
+                            { baseX + 1, baseY + 2 },
+                        });
+    auto JPiece = Shape(Color(0x00, 0x00, 0xf0), {
+                            { baseX + 1, baseY + 0 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 1, baseY + 2 },
+                            { baseX + 0, baseY + 2 },
+                        });
+    auto OPiece = Shape(Color(0xf0, 0xf0, 0x00), {
+                            { baseX + 0, baseY + 0 },
+                            { baseX + 1, baseY + 0 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
+                        });
+    auto SPiece = Shape(Color(0x00, 0xf0, 0x00), {
+                            { baseX + 1, baseY + 0 },
+                            { baseX + 2, baseY + 0 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
+                        });
+    auto ZPiece = Shape(Color(0xf0, 0x00, 0x00), {
+                            { baseX + 0, baseY + 0 },
+                            { baseX + 1, baseY + 0 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 2, baseY + 1 },
+                        });
+    auto TPiece = Shape(Color(0xa0, 0x00, 0xf0), {
+                            { baseX + 0, baseY + 0 },
+                            { baseX + 1, baseY + 0 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 2, baseY + 0 },
+                        });
+    std::array<Shape, 7> shapes = {
+        IPiece,
+        LPiece,
+        JPiece,
+        OPiece,
+        SPiece,
+        ZPiece,
+        TPiece,
+    };
+
+    auto currentShape = shapes[0];
 
     auto dropclock = clock();
 
@@ -257,68 +352,111 @@ auto run() -> void
         // TODO: sleep so cpu doesn't melt
 
         // input
-        auto message = Message{};
-        while (sdl_handle_input(&message)) {
-            if (message == QUIT) {
+        Message message;
+        while ((message = sdl_handle_input()) != Message::NONE) {
+            if (message == Message::QUIT) {
                 gRunning = false;
-            } else if (message == RESET) {
+            } else if (message == Message::RESET) {
                 init();
-            } else if (message == MOVE_RIGHT) {
+            } else if (message == Message::MOVE_RIGHT) {
                 auto canMove = true;
                 for (auto& block : currentShape.blocks) {
                     // check if block to the right is available
-                    if (block.x + 1 >= columns) {
+                    auto x = block.pos.x + 1;
+                    auto boardIndex = block.pos.y * columns + x;
+                    if (x >= columns || board[boardIndex].isActive) {
                         canMove = false;
                     }
                 }
                 if (canMove) {
                     for (auto& block : currentShape.blocks) {
-                        ++block.x;
+                        ++block.pos.x;
                     }
+                    // reset drop clock
+                    dropclock = currentclock;
                 }
-            } else if (message == MOVE_LEFT) {
+            } else if (message == Message::MOVE_LEFT) {
                 auto canMove = true;
                 for (auto& block : currentShape.blocks) {
                     // check if block to the left is available
-                    if (block.x <= 0) {
+                    auto x = block.pos.x - 1;
+                    auto boardIndex = block.pos.y * columns + x;
+                    if (block.pos.x <= 0 || board[boardIndex].isActive) {
                         canMove = false;
                     }
                 }
                 if (canMove) {
                     for (auto& block : currentShape.blocks) {
-                        --block.x;
+                        --block.pos.x;
+                    }
+                    // reset drop clock
+                    dropclock = currentclock;
+                }
+            } else if (message == Message::INCREASE_SPEED) {
+                dropSpeed = maxDropSpeed;
+            } else if (message == Message::RESET_SPEED) {
+                dropSpeed = 1.0;
+
+                // reset drop clock
+                dropclock = currentclock;
+            } else if (message == Message::DROP) {
+                auto canDrop = true;
+                while (canDrop) {
+                    for (auto& block : currentShape.blocks) {
+                        // check if the block below is occupied or not
+                        auto boardIndex = (block.pos.y + 1) * columns + block.pos.x;
+                        if (board[boardIndex].isActive) {
+                            canDrop = false;
+                        } else if (block.pos.y + 1 >= rows) {
+                            canDrop = false;
+                        }
+                    }
+                    if (canDrop) {
+                        for (auto& block : currentShape.blocks) {
+                            ++block.pos.y;
+                        }
                     }
                 }
+
+                // reset drop clock
+                dropclock = currentclock;
             }
         }
 
         // sim
         {
             // 1 drop per second
-            auto nextdropclock = dropclock + 1 * CLOCKS_PER_SEC;
+            auto nextdropclock = dropclock + dropSpeed * CLOCKS_PER_SEC;
             if (currentclock > nextdropclock) {
                 dropclock = currentclock;
                 auto canDrop = true;
                 for (auto& block : currentShape.blocks) {
                     // check if the block below is occupied or not
-                    auto boardIndex = (block.y + 1) * columns + block.x;
-                    if (board[boardIndex]) {
+                    auto boardIndex = (block.pos.y + 1) * columns + block.pos.x;
+                    if (board[boardIndex].isActive) {
                         canDrop = false;
-                    } else if (block.y + 1 >= rows) {
+                    } else if (block.pos.y + 1 >= rows) {
                         canDrop = false;
                     }
                 }
                 if (canDrop) {
                     for (auto& block : currentShape.blocks) {
-                        ++block.y;
+                        ++block.pos.y;
                     }
                 } else {
                     for (auto& block : currentShape.blocks) {
-                        auto boardIndex = block.y * columns + block.x;
-                        board[boardIndex] = true;
+                        auto boardIndex = block.pos.y * columns + block.pos.x;
+                        board[boardIndex] = block;
                     }
-                    currentShape = LPiece;
+                    currentShape = shapes[rand() % shapes.size()];
                 }
+            }
+        }
+
+        // draw border
+        for (auto y = 0; y < windowh; ++y) {
+            for (auto x = 0; x < windoww; ++x) {
+                draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windoww), 0xff * (1 - (float(x) / windoww) * (float(y) / windowh)), 0xff * (float(y) / windowh));
             }
         }
 
@@ -326,21 +464,46 @@ auto run() -> void
         for (auto y = 0; y < rows; ++y) {
             for (auto x = 0; x < columns; ++x) {
                 auto currindex = y * columns + x;
-                auto color = board[currindex] ? 0xff : 0;
-                draw_solid_square(&bb, {float(x * scale), float(y * scale), scale, scale}, color, color, color);
+                auto& block = board[currindex];
+                auto color = block.isActive ? block.color : Color { 0, 0, 0 };
+                draw_solid_square(&bb, {float((x + 1) * scale), float((y + 1) * scale), scale, scale}, color.r, color.g, color.b);
             }
+        }
+
+        // draw shadow (could be calculated once when moved horizontally or rotated instead of every frame)
+        auto currentShapeShadow = currentShape;
+        auto canDrop = true;
+        while (canDrop) {
+            for (auto& block : currentShapeShadow.blocks) {
+                // check if the block below is occupied or not
+                auto boardIndex = (block.pos.y + 1) * columns + block.pos.x;
+                if (board[boardIndex].isActive) {
+                    canDrop = false;
+                } else if (block.pos.y + 1 >= rows) {
+                    canDrop = false;
+                }
+            }
+            if (canDrop) {
+                for (auto& block : currentShapeShadow.blocks) {
+                    ++block.pos.y;
+                }
+            }
+        }
+
+        for (auto& block : currentShapeShadow.blocks) {
+            draw_solid_square(&bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, 0x20, 0x20, 0x20);
         }
 
         // draw current shape
         for (auto& block : currentShape.blocks) {
-            draw_solid_square(&bb, {float(block.x * scale), float(block.y * scale), scale, scale}, 0xff, 0xff, 0xff);
+            draw_solid_square(&bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b);
         }
 
         sdl_swap_buffer();
     }
 }
 
-auto main(int argc, char** argv) -> int{
+auto main(int argc, char** argv) -> int {
     SDL_Init(SDL_INIT_EVERYTHING);
 
     gWindow = SDL_CreateWindow("Tetris",
