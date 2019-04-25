@@ -259,7 +259,7 @@ auto run() -> void
     auto bb = sdl_get_back_buffer();
     gRunning = true;
 
-    auto winDimensions = sdl_get_window_dimensions();
+    /* auto winDimensions = sdl_get_window_dimensions(); */
 
     init();
 
@@ -377,7 +377,7 @@ auto run() -> void
         currentclock = newclock;
 
         delta = (double)frameclocktime / CLOCKS_PER_SEC;
-        auto framemstime = 1000.0 * delta;
+        /* auto framemstime = 1000.0 * delta; */
 
         // TODO: sleep so cpu doesn't melt
 
@@ -480,6 +480,54 @@ auto run() -> void
                         auto boardIndex = block.pos.y * columns + block.pos.x;
                         board[boardIndex] = block;
                     }
+
+                    // check if a row can be cleared
+                    std::vector<int> clearRows;
+                    // a maximum of 4 rows can be cleared at once with default shapes
+                    clearRows.reserve(4);
+                    for (auto y = 0; y < rows; ++y) {
+                        auto canClear = true;
+                        for (auto x = 0; x < columns; ++x) {
+                            auto boardIndex = y * columns + x;
+                            if (!board[boardIndex].isActive) {
+                                canClear = false;
+                                break;
+                            }
+                        }
+                        if (canClear) {
+                            clearRows.push_back(y);
+                        }
+                    }
+
+                    if (!clearRows.empty()) {
+                        auto topRow = clearRows.front();
+                        auto botRow = clearRows.back();
+                        assert(botRow >= topRow);
+
+                        // remove rows
+                        for (auto y = topRow; y <= botRow; ++y) {
+                            for (auto x = 0; x < columns; ++x) {
+                                 auto index = y * columns + x;
+                                 board[index].isActive = false;
+                            }
+                        }
+
+                        // move rows above removed rows
+                        for (auto y = topRow - 1; y >= 0; --y) {
+                            for (auto x = 0; x < columns; ++x) {
+                                 auto index = y * columns + x;
+                                 auto newIndex = (y + clearRows.size()) * columns + x;
+                                 auto& oldBlock = board[index];
+                                 auto& newBlock = board[newIndex];
+                                 if (oldBlock.isActive) {
+                                     newBlock = oldBlock;
+                                     oldBlock.isActive = false;
+                                 }
+                            }
+                        }
+                    }
+
+
                     currentShape = shapes[rand() % shapes.size()];
                     // game over if there is block occupying spawn location
                     auto gameOver = false;
@@ -548,6 +596,7 @@ auto run() -> void
 }
 
 auto main(int argc, char** argv) -> int {
+    if (argc || argv) {}
     SDL_Init(SDL_INIT_EVERYTHING);
 
     gWindow = SDL_CreateWindow("Tetris",
