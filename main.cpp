@@ -54,6 +54,8 @@ enum class Message {
     INCREASE_SPEED,
     RESET_SPEED,
     DROP,
+    ROTATE_LEFT,
+    ROTATE_RIGHT,
 };
 
 struct Square {
@@ -120,6 +122,12 @@ auto sdl_handle_input() -> Message
             } break;
             case SDLK_UP: {
                 msg = Message::DROP;
+            } break;
+            case SDLK_z: {
+                msg = Message::ROTATE_LEFT;
+            } break;
+            case SDLK_x: {
+                msg = Message::ROTATE_RIGHT;
             } break;
             default: {
             } break;
@@ -412,6 +420,38 @@ auto run() -> void
 
                 // reset drop clock
                 dropclock = currentclock;
+            } else if (message == Message::ROTATE_LEFT) {
+                auto xSum = 0;
+                auto ySum = 0;
+                for (auto& block : currentShape.blocks) {
+                    xSum += block.pos.x;
+                    ySum += block.pos.y;
+                }
+                auto xAvg = xSum / currentShape.blocks.size();
+                auto yAvg = ySum / currentShape.blocks.size();
+
+                for (auto& block : currentShape.blocks) {
+                    auto x = block.pos.x;
+                    auto y = block.pos.y;
+                    block.pos.y = yAvg + (xAvg - x);
+                    block.pos.x = xAvg - (yAvg - y);
+                }
+            } else if (message == Message::ROTATE_RIGHT) {
+                auto xSum = 0;
+                auto ySum = 0;
+                for (auto& block : currentShape.blocks) {
+                    xSum += block.pos.x;
+                    ySum += block.pos.y;
+                }
+                auto xAvg = xSum / currentShape.blocks.size();
+                auto yAvg = ySum / currentShape.blocks.size();
+
+                for (auto& block : currentShape.blocks) {
+                    auto x = block.pos.x;
+                    auto y = block.pos.y;
+                    block.pos.y = yAvg - (xAvg - x);
+                    block.pos.x = xAvg + (yAvg - y);
+                }
             }
         }
 
