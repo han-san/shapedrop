@@ -3,7 +3,6 @@
 #include <ctime>
 #include <iostream>
 #include <array>
-#include <vector>
 
 #include <SDL2/SDL.h>
 #include <jlib/jint.h>
@@ -44,6 +43,40 @@ struct V3 {
     };
 
     V3(int a = 0, int b = 0, int c = 0): x{a}, y{b}, z{c} {}
+};
+
+template <typename T, size_t I>
+class ArrayStack {
+public:
+    using value_type = T;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    using pointer = value_type*;
+    using const_pointer = const value_type*;
+    using iterator = pointer;
+    using const_iterator = const pointer;
+    using size_type = size_t;
+    using difference_type = ptrdiff_t;
+
+    auto constexpr begin() noexcept -> iterator { return &m_data[0]; }
+    auto constexpr begin() const noexcept -> const_iterator { return &m_data[0]; }
+    auto constexpr end() noexcept -> iterator { return &m_data[m_size]; }
+    auto constexpr end() const noexcept -> const_iterator { return &m_data[m_size]; }
+    auto constexpr cbegin() const noexcept -> const_iterator { return &m_data[0]; }
+    auto constexpr cend() const noexcept -> const_iterator { return &m_data[m_size]; }
+    auto constexpr front() -> reference { return m_data[0]; }
+    auto constexpr front() const -> const_reference { return m_data[0]; }
+    auto constexpr back() -> reference { return m_data[m_size - 1]; }
+    auto constexpr back() const -> const_reference { return m_data[m_size - 1]; }
+    auto constexpr size() noexcept -> size_type { return m_size; }
+    auto constexpr max_size() noexcept -> size_type { return I; }
+    auto constexpr push_back(value_type i) -> void { m_data[m_size++] = i; }
+    auto constexpr pop_back() -> void { m_data[--m_size].~T(); }
+    auto constexpr empty() -> bool { return !m_size; }
+
+private:
+    std::array<value_type, I> m_data = {};
+    size_t m_size = 0;
 };
 
 enum class Message {
@@ -276,10 +309,10 @@ auto run() -> void
     std::array<Block, rows * columns> board = {};
 
     struct Shape {
-        std::vector<Block> blocks;
+        ArrayStack<Block, 4> blocks;
 
         Shape(Color color, std::initializer_list<Position> positions) {
-            blocks.reserve(positions.size());
+            assert(positions.size() == 4);
             for (auto& pos : positions) {
                 blocks.push_back({ pos, color, true });
             }
@@ -411,16 +444,7 @@ auto run() -> void
     auto remove_full_rows = [](std::array<Block, rows * columns>& board) {
         // check if a row can be cleared
         // a maximum of 4 rows can be cleared at once with default shapes
-        class {
-            std::array<int, 4> m_data = {};
-            size_t m_size = 0;
-        public:
-            int& front() { return m_data[0]; }
-            int& back() { return m_data[m_size - 1]; }
-            size_t size() { return m_size; }
-            void push(int i) { m_data[m_size++] = i; }
-            bool empty() { return !m_size; }
-        } rowsCleared;
+        ArrayStack<int, 4> rowsCleared;
 
         for (auto y = 0; y < rows; ++y) {
             auto rowIsFull = true;
@@ -432,7 +456,7 @@ auto run() -> void
                 }
             }
             if (rowIsFull) {
-                rowsCleared.push(y);
+                rowsCleared.push_back(y);
             }
         }
         assert(rowsCleared.size() <= 4);
@@ -547,7 +571,6 @@ auto run() -> void
             auto nextdropclock = dropclock + dropSpeed * CLOCKS_PER_SEC;
             if (currentclock > nextdropclock) {
                 dropclock = currentclock;
-                auto canDrop = true;
                 if (is_valid_move(currentShape, {0, 1})) {
                     for (auto& block : currentShape.blocks) {
                         ++block.pos.y;
