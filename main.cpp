@@ -371,6 +371,64 @@ auto run() -> void
         }
     };
 
+    auto remove_full_rows = [](std::array<Block, rows * columns>& board) {
+        // check if a row can be cleared
+        // a maximum of 4 rows can be cleared at once with default shapes
+        class {
+            std::array<int, 4> m_data = {};
+            size_t m_size = 0;
+        public:
+            int& front() { return m_data[0]; }
+            int& back() { return m_data[m_size - 1]; }
+            size_t size() { return m_size; }
+            void push(int i) { m_data[m_size++] = i; }
+            bool empty() { return !m_size; }
+        } rowsCleared;
+
+        for (auto y = 0; y < rows; ++y) {
+            auto rowIsFull = true;
+            for (auto x = 0; x < columns; ++x) {
+                auto boardIndex = y * columns + x;
+                if (!board[boardIndex].isActive) {
+                    rowIsFull = false;
+                    break;
+                }
+            }
+            if (rowIsFull) {
+                rowsCleared.push(y);
+            }
+        }
+        assert(rowsCleared.size() <= 4);
+
+        if (!rowsCleared.empty()) {
+            auto topRow = rowsCleared.front();
+            auto botRow = rowsCleared.back();
+            assert(botRow >= topRow);
+
+            // remove rows
+            for (auto y = topRow; y <= botRow; ++y) {
+                for (auto x = 0; x < columns; ++x) {
+                    auto index = y * columns + x;
+                    board[index].isActive = false;
+                }
+            }
+
+            // move rows above removed rows
+            for (auto y = topRow - 1; y >= 0; --y) {
+                for (auto x = 0; x < columns; ++x) {
+                    auto index = y * columns + x;
+                    auto newIndex = (y + rowsCleared.size()) * columns + x;
+                    auto& oldBlock = board[index];
+                    auto& newBlock = board[newIndex];
+                    if (oldBlock.isActive) {
+                        newBlock = oldBlock;
+                        oldBlock.isActive = false;
+                    }
+                }
+            }
+        }
+    };
+
     while (gRunning) {
         auto newclock = clock();
         auto frameclocktime = newclock - currentclock;
@@ -476,57 +534,13 @@ auto run() -> void
                         ++block.pos.y;
                     }
                 } else {
+                    // fix currentBlocks position on board
                     for (auto& block : currentShape.blocks) {
                         auto boardIndex = block.pos.y * columns + block.pos.x;
                         board[boardIndex] = block;
                     }
 
-                    // check if a row can be cleared
-                    std::vector<int> clearRows;
-                    // a maximum of 4 rows can be cleared at once with default shapes
-                    clearRows.reserve(4);
-                    for (auto y = 0; y < rows; ++y) {
-                        auto canClear = true;
-                        for (auto x = 0; x < columns; ++x) {
-                            auto boardIndex = y * columns + x;
-                            if (!board[boardIndex].isActive) {
-                                canClear = false;
-                                break;
-                            }
-                        }
-                        if (canClear) {
-                            clearRows.push_back(y);
-                        }
-                    }
-
-                    if (!clearRows.empty()) {
-                        auto topRow = clearRows.front();
-                        auto botRow = clearRows.back();
-                        assert(botRow >= topRow);
-
-                        // remove rows
-                        for (auto y = topRow; y <= botRow; ++y) {
-                            for (auto x = 0; x < columns; ++x) {
-                                 auto index = y * columns + x;
-                                 board[index].isActive = false;
-                            }
-                        }
-
-                        // move rows above removed rows
-                        for (auto y = topRow - 1; y >= 0; --y) {
-                            for (auto x = 0; x < columns; ++x) {
-                                 auto index = y * columns + x;
-                                 auto newIndex = (y + clearRows.size()) * columns + x;
-                                 auto& oldBlock = board[index];
-                                 auto& newBlock = board[newIndex];
-                                 if (oldBlock.isActive) {
-                                     newBlock = oldBlock;
-                                     oldBlock.isActive = false;
-                                 }
-                            }
-                        }
-                    }
-
+                    remove_full_rows(board);
 
                     currentShape = shapes[rand() % shapes.size()];
                     // game over if there is block occupying spawn location
