@@ -66,7 +66,7 @@ struct Square {
     int h;
 };
 
-auto constexpr rows = 20;
+auto constexpr rows = 22;
 auto constexpr columns = 10;
 auto constexpr scale = 40;
 auto constexpr windoww = (columns + 2) * scale;
@@ -287,7 +287,7 @@ auto run() -> void
     };
 
     auto baseX = columns / 2 - 1;
-    auto baseY = -2;
+    auto baseY = 0;
     auto IPiece = Shape(Color(0x00, 0xf0, 0xf0), {
                             { baseX - 1, baseY + 1 },
                             { baseX + 0, baseY + 1 },
@@ -440,6 +440,8 @@ auto run() -> void
         if (!rowsCleared.empty()) {
             auto topRow = rowsCleared.front();
             auto botRow = rowsCleared.back();
+            assert(topRow >= 0 && topRow < rows);
+            assert(botRow >= 0 && botRow < rows);
             assert(botRow >= topRow);
 
             // remove rows
@@ -455,6 +457,7 @@ auto run() -> void
                 for (auto x = 0; x < columns; ++x) {
                     auto index = y * columns + x;
                     auto newIndex = (y + rowsCleared.size()) * columns + x;
+                    assert((y + rowsCleared.size()) < rows);
                     auto& oldBlock = board[index];
                     auto& newBlock = board[newIndex];
                     if (oldBlock.isActive) {
@@ -495,21 +498,9 @@ auto run() -> void
                 // reset drop clock
                 dropclock = currentclock;
             } else if (message == Message::DROP) {
-                auto canDrop = true;
-                while (canDrop) {
+                while (is_valid_move(currentShape, {0, 1})) {
                     for (auto& block : currentShape.blocks) {
-                        // check if the block below is occupied or not
-                        auto boardIndex = (block.pos.y + 1) * columns + block.pos.x;
-                        if (board[boardIndex].isActive) {
-                            canDrop = false;
-                        } else if (block.pos.y + 1 >= rows) {
-                            canDrop = false;
-                        }
-                    }
-                    if (canDrop) {
-                        for (auto& block : currentShape.blocks) {
-                            ++block.pos.y;
-                        }
+                        ++block.pos.y;
                     }
                 }
 
@@ -557,30 +548,11 @@ auto run() -> void
             if (currentclock > nextdropclock) {
                 dropclock = currentclock;
                 auto canDrop = true;
-                for (auto& block : currentShape.blocks) {
-                    // check if the block below is occupied or not
-                    auto boardIndex = (block.pos.y + 1) * columns + block.pos.x;
-                    if (board[boardIndex].isActive) {
-                        canDrop = false;
-                    } else if (block.pos.y + 1 >= rows) {
-                        canDrop = false;
-                    }
-                }
-                if (canDrop) {
+                if (is_valid_move(currentShape, {0, 1})) {
                     for (auto& block : currentShape.blocks) {
                         ++block.pos.y;
                     }
                 } else {
-                    // fix currentBlocks position on board
-                    for (auto& block : currentShape.blocks) {
-                        auto boardIndex = block.pos.y * columns + block.pos.x;
-                        board[boardIndex] = block;
-                    }
-
-                    remove_full_rows(board);
-
-                    currentShape = shapePool.next_shape();
-
                     // game over if there is block occupying spawn location
                     auto gameOver = false;
                     for (auto& block : currentShape.blocks) {
@@ -592,7 +564,18 @@ auto run() -> void
 
                     if (gameOver) {
                         std::cout << "Game Over!\n";
+                        continue;
                     }
+
+                    // fix currentBlocks position on board
+                    for (auto& block : currentShape.blocks) {
+                        assert(is_valid_spot(block.pos));
+                        auto boardIndex = block.pos.y * columns + block.pos.x;
+                        board[boardIndex] = block;
+                    }
+
+                    remove_full_rows(board);
+                    currentShape = shapePool.next_shape();
                 }
             }
         }
@@ -616,21 +599,9 @@ auto run() -> void
 
         // draw shadow (could be calculated once when moved horizontally or rotated instead of every frame)
         auto currentShapeShadow = currentShape;
-        auto canDrop = true;
-        while (canDrop) {
+        while (is_valid_move(currentShapeShadow, {0, 1})) {
             for (auto& block : currentShapeShadow.blocks) {
-                // check if the block below is occupied or not
-                auto boardIndex = (block.pos.y + 1) * columns + block.pos.x;
-                if (board[boardIndex].isActive) {
-                    canDrop = false;
-                } else if (block.pos.y + 1 >= rows) {
-                    canDrop = false;
-                }
-            }
-            if (canDrop) {
-                for (auto& block : currentShapeShadow.blocks) {
-                    ++block.pos.y;
-                }
+                ++block.pos.y;
             }
         }
 
