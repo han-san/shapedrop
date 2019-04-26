@@ -183,7 +183,7 @@ struct Point {
     float y;
 };
 
-auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b)
+auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint a = 0xff)
 {
     for (auto y = 0; y < sqr.h; ++y) {
         auto pixely = (int)sqr.y + y;
@@ -199,9 +199,16 @@ auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b)
             auto currbyteindex = pixely * buf->w + pixelx;
             auto currbyte = ((u8*)buf->memory + currbyteindex * buf->bpp);
 
-            *currbyte++ = b;
-            *currbyte++ = g;
-            *currbyte++ = r;
+            auto alpha_blend = [](uint bg, uint fg, uint alpha) {
+                auto alphaRatio = alpha / 255.0;
+                return fg * alphaRatio + bg * (1 - alphaRatio);
+            };
+
+            *currbyte = alpha_blend(*currbyte, b, a);
+            ++currbyte;
+            *currbyte = alpha_blend(*currbyte, g, a);
+            ++currbyte;
+            *currbyte = alpha_blend(*currbyte, r, a);
         }
     }
 }
@@ -611,7 +618,7 @@ auto run() -> void
         }
 
         // draw background
-        for (auto y = 0; y < rows; ++y) {
+        for (auto y = 2; y < rows; ++y) {
             for (auto x = 0; x < columns; ++x) {
                 auto currindex = y * columns + x;
                 auto& block = board[currindex];
@@ -629,7 +636,7 @@ auto run() -> void
         }
 
         for (auto& block : currentShapeShadow.blocks) {
-            draw_solid_square(&bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, 0x20, 0x20, 0x20);
+            draw_solid_square(&bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b, 0xff / 2);
         }
 
         // draw current shape
