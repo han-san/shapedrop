@@ -1,4 +1,5 @@
 #include <cassert>
+#include <algorithm>
 #include <ctime>
 #include <iostream>
 #include <array>
@@ -339,7 +340,43 @@ auto run() -> void
         TPiece,
     };
 
-    auto currentShape = shapes[0];
+    class ShapePool {
+        std::array<const Shape*, 7> shapePool;
+        decltype(shapePool) previewPool;
+        decltype(shapePool.begin()) currentShapeIterator;
+
+    public:
+        ShapePool(const std::array<Shape, 7>& shapes) {
+            shapePool = {
+                &shapes[0], &shapes[1], &shapes[2],
+                &shapes[3], &shapes[4], &shapes[5],
+                &shapes[6],
+            };
+            previewPool = shapePool;
+
+            std::random_shuffle(shapePool.begin(), shapePool.end());
+            std::random_shuffle(previewPool.begin(), previewPool.end());
+            currentShapeIterator = shapePool.begin();
+        }
+
+        auto next_shape() -> Shape {
+            ++currentShapeIterator;
+            if (currentShapeIterator == shapePool.end()) {
+                shapePool = previewPool;
+                currentShapeIterator = shapePool.begin();
+                std::random_shuffle(previewPool.begin(), previewPool.end());
+            }
+            return **currentShapeIterator;
+        }
+
+        auto current_shape() -> Shape {
+            return **currentShapeIterator;
+        }
+
+    };
+    ShapePool shapePool{shapes};
+
+    auto currentShape = shapePool.current_shape();
 
     auto is_valid_spot = [&board](V2 pos) {
         if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
@@ -542,7 +579,8 @@ auto run() -> void
 
                     remove_full_rows(board);
 
-                    currentShape = shapes[rand() % shapes.size()];
+                    currentShape = shapePool.next_shape();
+
                     // game over if there is block occupying spawn location
                     auto gameOver = false;
                     for (auto& block : currentShape.blocks) {
