@@ -285,25 +285,25 @@ auto run() -> void
         }
     };
 
-    auto baseX = columns / 2;
-    auto baseY = 0;
+    auto baseX = columns / 2 - 1;
+    auto baseY = -2;
     auto IPiece = Shape(Color(0x00, 0xf0, 0xf0), {
-                            { baseX + 0, baseY + 0 },
+                            { baseX - 1, baseY + 1 },
                             { baseX + 0, baseY + 1 },
-                            { baseX + 0, baseY + 2 },
-                            { baseX + 0, baseY + 3 }
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 2, baseY + 1 }
                         });
     auto LPiece = Shape(Color(0xf0, 0xa0, 0x00), {
-                            { baseX + 0, baseY + 0 },
+                            { baseX - 1, baseY + 1 },
                             { baseX + 0, baseY + 1 },
-                            { baseX + 0, baseY + 2 },
-                            { baseX + 1, baseY + 2 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 1, baseY + 0 },
                         });
     auto JPiece = Shape(Color(0x00, 0x00, 0xf0), {
-                            { baseX + 1, baseY + 0 },
+                            { baseX - 1, baseY + 0 },
+                            { baseX - 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
                             { baseX + 1, baseY + 1 },
-                            { baseX + 1, baseY + 2 },
-                            { baseX + 0, baseY + 2 },
                         });
     auto OPiece = Shape(Color(0xf0, 0xf0, 0x00), {
                             { baseX + 0, baseY + 0 },
@@ -313,21 +313,21 @@ auto run() -> void
                         });
     auto SPiece = Shape(Color(0x00, 0xf0, 0x00), {
                             { baseX + 1, baseY + 0 },
-                            { baseX + 2, baseY + 0 },
-                            { baseX + 1, baseY + 1 },
+                            { baseX + 0, baseY + 0 },
                             { baseX + 0, baseY + 1 },
+                            { baseX - 1, baseY + 1 },
                         });
     auto ZPiece = Shape(Color(0xf0, 0x00, 0x00), {
                             { baseX + 0, baseY + 0 },
-                            { baseX + 1, baseY + 0 },
+                            { baseX - 1, baseY + 0 },
+                            { baseX + 0, baseY + 1 },
                             { baseX + 1, baseY + 1 },
-                            { baseX + 2, baseY + 1 },
                         });
     auto TPiece = Shape(Color(0xa0, 0x00, 0xf0), {
+                            { baseX - 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
                             { baseX + 0, baseY + 0 },
-                            { baseX + 1, baseY + 0 },
                             { baseX + 1, baseY + 1 },
-                            { baseX + 2, baseY + 0 },
                         });
     std::array<Shape, 7> shapes = {
         IPiece,
