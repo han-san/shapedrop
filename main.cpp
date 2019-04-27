@@ -90,6 +90,8 @@ enum class Message {
     DROP,
     ROTATE_LEFT,
     ROTATE_RIGHT,
+    INCREASE_WINDOW_SIZE,
+    DECREASE_WINDOW_SIZE,
 };
 
 struct Square {
@@ -101,16 +103,20 @@ struct Square {
 
 auto constexpr rows = 22;
 auto constexpr columns = 10;
-auto constexpr scale = 40;
-auto constexpr windoww = (columns + 2) * scale;
-auto constexpr windowh = (rows + 2) * scale;
+auto constexpr baseWindowWidth = columns + 2;
+auto constexpr baseWindowHeight = rows + 2;
+auto scale = 1;
+auto windoww = baseWindowWidth;
+auto windowh = baseWindowHeight;
 auto gRunning = true;
+
+BackBuffer bb = {};
 
 SDL_Surface* gBBSurface;
 SDL_Surface* gWinSurface;
 SDL_Window* gWindow;
 
-auto sdl_get_window_dimensions() -> V2
+auto get_window_dimensions() -> V2
 {
     return { windoww, windowh };
 }
@@ -131,6 +137,40 @@ auto sdl_get_back_buffer() -> BackBuffer
     bbuf.bpp = gBBSurface->format->BytesPerPixel;
 
     return bbuf;
+}
+
+auto window_fits_on_screen(V2 windowDimensions) -> bool {
+    SDL_Rect displayBounds = {};
+    SDL_GetDisplayUsableBounds(0, &displayBounds);
+
+    return windowDimensions.w < displayBounds.w && windowDimensions.h < displayBounds.h;
+}
+
+auto resize_window(V2 dimensions) {
+    SDL_SetWindowSize(gWindow, dimensions.w, dimensions.h);
+    windoww = dimensions.w;
+    windowh = dimensions.h;
+
+    gWinSurface = SDL_GetWindowSurface(gWindow);
+    assert(gWinSurface);
+    SDL_FreeSurface(gBBSurface);
+    gBBSurface = SDL_CreateRGBSurface(0, gWinSurface->w, gWinSurface->h,
+                                      gWinSurface->format->BitsPerPixel,
+                                      gWinSurface->format->Rmask,
+                                      gWinSurface->format->Gmask,
+                                      gWinSurface->format->Bmask,
+                                      gWinSurface->format->Amask);
+    assert(gBBSurface);
+    bb = sdl_get_back_buffer();
+}
+
+auto change_window_scale(int newScale) {
+    if (newScale < 1) newScale = 1;
+    if (scale == newScale) return;
+    scale = newScale;
+    windoww = baseWindowWidth * scale;
+    windowh = baseWindowHeight * scale;
+    resize_window({windoww, windowh});
 }
 
 auto sdl_handle_input() -> Message
@@ -162,6 +202,12 @@ auto sdl_handle_input() -> Message
             } break;
             case SDLK_x: {
                 msg = Message::ROTATE_RIGHT;
+            } break;
+            case SDLK_2: {
+                msg = Message::INCREASE_WINDOW_SIZE;
+            } break;
+            case SDLK_1: {
+                msg = Message::DECREASE_WINDOW_SIZE;
             } break;
             default: {
             } break;
@@ -272,7 +318,7 @@ auto maxDropSpeed = 0.1;
 
 auto init()
 {
-    auto winDimensions = sdl_get_window_dimensions();
+    auto winDimensions = get_window_dimensions();
     guy.w = 10;
     guy.h = 10;
     guy.x = winDimensions.w / 3;
@@ -297,10 +343,10 @@ auto init()
 
 auto run() -> void
 {
-    auto bb = sdl_get_back_buffer();
+    bb = sdl_get_back_buffer();
     gRunning = true;
 
-    /* auto winDimensions = sdl_get_window_dimensions(); */
+    /* auto winDimensions = get_window_dimensions(); */
 
     init();
 
@@ -521,6 +567,10 @@ auto run() -> void
                 try_move(currentShape, {1, 0});
             } else if (message == Message::MOVE_LEFT) {
                 try_move(currentShape, {-1, 0});
+            } else if (message == Message::INCREASE_WINDOW_SIZE) {
+                change_window_scale(scale + 1);
+            } else if (message == Message::DECREASE_WINDOW_SIZE) {
+                change_window_scale(scale - 1);
             } else if (message == Message::INCREASE_SPEED) {
                 dropSpeed = maxDropSpeed;
             } else if (message == Message::RESET_SPEED) {
@@ -651,6 +701,19 @@ auto run() -> void
 auto main(int argc, char** argv) -> int {
     if (argc || argv) {}
     SDL_Init(SDL_INIT_EVERYTHING);
+
+    auto newScale = scale;
+    {
+        auto dim = V2 {};
+        do {
+            ++newScale;
+            dim = V2 {baseWindowWidth * newScale, baseWindowHeight * newScale};
+        } while (window_fits_on_screen(dim));
+    }
+    --newScale;
+    scale = newScale;
+    windoww = baseWindowWidth * scale;
+    windowh = baseWindowHeight * scale;
 
     gWindow = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
