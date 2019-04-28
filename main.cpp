@@ -76,7 +76,7 @@ public:
 
 private:
     std::array<value_type, I> m_data = {};
-    size_t m_size = 0;
+    size_type m_size = 0;
 };
 
 enum class Message {
@@ -106,35 +106,30 @@ auto constexpr columns = 10;
 auto constexpr baseWindowWidth = columns + 2;
 auto constexpr baseWindowHeight = rows + 2;
 auto scale = 1;
-auto windoww = baseWindowWidth;
-auto windowh = baseWindowHeight;
 auto gRunning = true;
 
-BackBuffer bb = {};
-
-SDL_Surface* gBBSurface;
-SDL_Surface* gWinSurface;
-SDL_Window* gWindow;
-
-auto get_window_dimensions() -> V2
-{
-    return { windoww, windowh };
-}
+struct {
+    SDL_Window* handle;
+    SDL_Surface* surface;
+    SDL_Surface* bbSurface;
+    V2 dim;
+    BackBuffer bb;
+} window = {};
 
 auto sdl_swap_buffer() -> void
 {
-    SDL_BlitSurface(gBBSurface, NULL, gWinSurface, NULL);
-    SDL_UpdateWindowSurface(gWindow);
+    SDL_BlitSurface(window.bbSurface, NULL, window.surface, NULL);
+    SDL_UpdateWindowSurface(window.handle);
 }
 
 auto sdl_get_back_buffer() -> BackBuffer
 {
     auto bbuf = BackBuffer{};
-    bbuf.memory = gBBSurface->pixels;
-    bbuf.w = gBBSurface->w;
-    bbuf.h = gBBSurface->h;
-    bbuf.pitch = gBBSurface->pitch;
-    bbuf.bpp = gBBSurface->format->BytesPerPixel;
+    bbuf.memory = window.bbSurface->pixels;
+    bbuf.w = window.bbSurface->w;
+    bbuf.h = window.bbSurface->h;
+    bbuf.pitch = window.bbSurface->pitch;
+    bbuf.bpp = window.bbSurface->format->BytesPerPixel;
 
     return bbuf;
 }
@@ -147,30 +142,28 @@ auto window_fits_on_screen(V2 windowDimensions) -> bool {
 }
 
 auto resize_window(V2 dimensions) {
-    SDL_SetWindowSize(gWindow, dimensions.w, dimensions.h);
-    windoww = dimensions.w;
-    windowh = dimensions.h;
+    SDL_SetWindowSize(window.handle, dimensions.w, dimensions.h);
+    window.dim.w = dimensions.w;
+    window.dim.h = dimensions.h;
 
-    gWinSurface = SDL_GetWindowSurface(gWindow);
-    assert(gWinSurface);
-    SDL_FreeSurface(gBBSurface);
-    gBBSurface = SDL_CreateRGBSurface(0, gWinSurface->w, gWinSurface->h,
-                                      gWinSurface->format->BitsPerPixel,
-                                      gWinSurface->format->Rmask,
-                                      gWinSurface->format->Gmask,
-                                      gWinSurface->format->Bmask,
-                                      gWinSurface->format->Amask);
-    assert(gBBSurface);
-    bb = sdl_get_back_buffer();
+    window.surface = SDL_GetWindowSurface(window.handle);
+    assert(window.surface);
+    SDL_FreeSurface(window.bbSurface);
+    window.bbSurface = SDL_CreateRGBSurface(0, window.surface->w, window.surface->h,
+                                      window.surface->format->BitsPerPixel,
+                                      window.surface->format->Rmask,
+                                      window.surface->format->Gmask,
+                                      window.surface->format->Bmask,
+                                      window.surface->format->Amask);
+    assert(window.bbSurface);
+    window.bb = sdl_get_back_buffer();
 }
 
 auto change_window_scale(int newScale) {
     if (newScale < 1) newScale = 1;
     if (scale == newScale) return;
     scale = newScale;
-    windoww = baseWindowWidth * scale;
-    windowh = baseWindowHeight * scale;
-    resize_window({windoww, windowh});
+    resize_window({baseWindowWidth * scale, baseWindowHeight * scale});
 }
 
 auto sdl_handle_input() -> Message
@@ -318,11 +311,10 @@ auto maxDropSpeed = 0.1;
 
 auto init()
 {
-    auto winDimensions = get_window_dimensions();
     guy.w = 10;
     guy.h = 10;
-    guy.x = winDimensions.w / 3;
-    guy.y = winDimensions.h / 3;
+    guy.x = window.dim.w / 3;
+    guy.y = window.dim.h / 3;
 
     jumpspeed = 600;
     velocity = 0.0;
@@ -343,10 +335,8 @@ auto init()
 
 auto run() -> void
 {
-    bb = sdl_get_back_buffer();
+    window.bb = sdl_get_back_buffer();
     gRunning = true;
-
-    /* auto winDimensions = get_window_dimensions(); */
 
     init();
 
@@ -661,9 +651,9 @@ auto run() -> void
         }
 
         // draw border
-        for (auto y = 0; y < windowh; ++y) {
-            for (auto x = 0; x < windoww; ++x) {
-                draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windoww), 0xff * (1 - (float(x) / windoww) * (float(y) / windowh)), 0xff * (float(y) / windowh));
+        for (auto y = 0; y < window.dim.h; ++y) {
+            for (auto x = 0; x < window.dim.w; ++x) {
+                draw_solid_square(&window.bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / window.dim.w), 0xff * (1 - (float(x) / window.dim.w) * (float(y) / window.dim.h)), 0xff * (float(y) / window.dim.h));
             }
         }
 
@@ -673,7 +663,7 @@ auto run() -> void
                 auto currindex = y * columns + x;
                 auto& block = board[currindex];
                 auto color = block.isActive ? block.color : Color { 0, 0, 0 };
-                draw_solid_square(&bb, {float((x + 1) * scale), float((y + 1) * scale), scale, scale}, color.r, color.g, color.b);
+                draw_solid_square(&window.bb, {float((x + 1) * scale), float((y + 1) * scale), scale, scale}, color.r, color.g, color.b);
             }
         }
 
@@ -686,12 +676,12 @@ auto run() -> void
         }
 
         for (auto& block : currentShapeShadow.blocks) {
-            draw_solid_square(&bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b, 0xff / 2);
+            draw_solid_square(&window.bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b, 0xff / 2);
         }
 
         // draw current shape
         for (auto& block : currentShape.blocks) {
-            draw_solid_square(&bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b);
+            draw_solid_square(&window.bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b);
         }
 
         sdl_swap_buffer();
@@ -712,24 +702,24 @@ auto main(int argc, char** argv) -> int {
     }
     --newScale;
     scale = newScale;
-    windoww = baseWindowWidth * scale;
-    windowh = baseWindowHeight * scale;
+    window.dim.w = baseWindowWidth * scale;
+    window.dim.h = baseWindowHeight * scale;
 
-    gWindow = SDL_CreateWindow("Tetris",
+    window.handle = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                               windoww, windowh, SDL_WINDOW_SHOWN);
-    assert(gWindow);
+                               window.dim.w, window.dim.h, SDL_WINDOW_SHOWN);
+    assert(window.handle);
 
-    gWinSurface = SDL_GetWindowSurface(gWindow);
-    assert(gWinSurface);
+    window.surface = SDL_GetWindowSurface(window.handle);
+    assert(window.surface);
 
-    gBBSurface = SDL_CreateRGBSurface(0, gWinSurface->w, gWinSurface->h,
-                                      gWinSurface->format->BitsPerPixel,
-                                      gWinSurface->format->Rmask,
-                                      gWinSurface->format->Gmask,
-                                      gWinSurface->format->Bmask,
-                                      gWinSurface->format->Amask);
-    assert(gBBSurface);
+    window.bbSurface = SDL_CreateRGBSurface(0, window.surface->w, window.surface->h,
+                                      window.surface->format->BitsPerPixel,
+                                      window.surface->format->Rmask,
+                                      window.surface->format->Gmask,
+                                      window.surface->format->Bmask,
+                                      window.surface->format->Amask);
+    assert(window.bbSurface);
 
     run();
 
