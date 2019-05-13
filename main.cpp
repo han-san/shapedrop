@@ -543,6 +543,16 @@ auto run() -> void
         }
     }
 
+    auto calculateShapeShadow = [is_valid_move](Shape shape) {
+        auto shapeShadow = shape;
+        while (is_valid_move(shapeShadow, {0, 1})) {
+            for (auto& block : shapeShadow.blocks) {
+                ++block.pos.y;
+            }
+        }
+        return shapeShadow;
+    };
+
     while (gRunning) {
         auto newclock = clock();
         auto frameclocktime = newclock - currentclock;
@@ -563,21 +573,11 @@ auto run() -> void
             } else if (message == Message::MOVE_RIGHT) {
                 try_move(currentShape, {1, 0});
                 // update shape shadow
-                currentShapeShadow = currentShape;
-                while (is_valid_move(currentShapeShadow, {0, 1})) {
-                    for (auto& block : currentShapeShadow.blocks) {
-                        ++block.pos.y;
-                    }
-                }
+                currentShapeShadow = calculateShapeShadow(currentShape);
             } else if (message == Message::MOVE_LEFT) {
                 try_move(currentShape, {-1, 0});
                 // update shape shadow
-                currentShapeShadow = currentShape;
-                while (is_valid_move(currentShapeShadow, {0, 1})) {
-                    for (auto& block : currentShapeShadow.blocks) {
-                        ++block.pos.y;
-                    }
-                }
+                currentShapeShadow = calculateShapeShadow(currentShape);
             } else if (message == Message::INCREASE_WINDOW_SIZE) {
                 change_window_scale(scale + 1);
             } else if (message == Message::DECREASE_WINDOW_SIZE) {
@@ -616,12 +616,7 @@ auto run() -> void
                 }
 
                 // update shape shadow
-                currentShapeShadow = currentShape;
-                while (is_valid_move(currentShapeShadow, {0, 1})) {
-                    for (auto& block : currentShapeShadow.blocks) {
-                        ++block.pos.y;
-                    }
-                }
+                currentShapeShadow = calculateShapeShadow(currentShape);
             } else if (message == Message::ROTATE_RIGHT) {
                 auto xSum = 0;
                 auto ySum = 0;
@@ -639,12 +634,7 @@ auto run() -> void
                     block.pos.x = xAvg + (yAvg - y);
                 }
                 // update shape shadow
-                currentShapeShadow = currentShape;
-                while (is_valid_move(currentShapeShadow, {0, 1})) {
-                    for (auto& block : currentShapeShadow.blocks) {
-                        ++block.pos.y;
-                    }
-                }
+                currentShapeShadow = calculateShapeShadow(currentShape);
             }
         }
 
@@ -683,12 +673,7 @@ auto run() -> void
                     remove_full_rows(board);
                     currentShape = shapePool.next_shape();
                     // update shape shadow
-                    currentShapeShadow = currentShape;
-                    while (is_valid_move(currentShapeShadow, {0, 1})) {
-                        for (auto& block : currentShapeShadow.blocks) {
-                            ++block.pos.y;
-                        }
-                    }
+                    currentShapeShadow = calculateShapeShadow(currentShape);
                 }
             }
         }
