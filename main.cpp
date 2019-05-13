@@ -362,98 +362,6 @@ auto run() -> void
         }
     };
 
-    auto baseX = columns / 2 - 1;
-    auto baseY = 0;
-    auto IPiece = Shape(Color(0x00, 0xf0, 0xf0), {
-                            { baseX - 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 1, baseY + 1 },
-                            { baseX + 2, baseY + 1 }
-                        });
-    auto LPiece = Shape(Color(0xf0, 0xa0, 0x00), {
-                            { baseX - 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 1, baseY + 1 },
-                            { baseX + 1, baseY + 0 },
-                        });
-    auto JPiece = Shape(Color(0x00, 0x00, 0xf0), {
-                            { baseX - 1, baseY + 0 },
-                            { baseX - 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 1, baseY + 1 },
-                        });
-    auto OPiece = Shape(Color(0xf0, 0xf0, 0x00), {
-                            { baseX + 0, baseY + 0 },
-                            { baseX + 1, baseY + 0 },
-                            { baseX + 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                        });
-    auto SPiece = Shape(Color(0x00, 0xf0, 0x00), {
-                            { baseX + 1, baseY + 0 },
-                            { baseX + 0, baseY + 0 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX - 1, baseY + 1 },
-                        });
-    auto ZPiece = Shape(Color(0xf0, 0x00, 0x00), {
-                            { baseX + 0, baseY + 0 },
-                            { baseX - 1, baseY + 0 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 1, baseY + 1 },
-                        });
-    auto TPiece = Shape(Color(0xa0, 0x00, 0xf0), {
-                            { baseX - 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 0, baseY + 0 },
-                            { baseX + 1, baseY + 1 },
-                        });
-    std::array<Shape, 7> shapes = {
-        IPiece,
-        LPiece,
-        JPiece,
-        OPiece,
-        SPiece,
-        ZPiece,
-        TPiece,
-    };
-
-    class ShapePool {
-        std::array<const Shape*, 7> shapePool;
-        decltype(shapePool) previewPool;
-        decltype(shapePool.begin()) currentShapeIterator;
-
-    public:
-        ShapePool(const std::array<Shape, 7>& shapes) {
-            shapePool = {
-                &shapes[0], &shapes[1], &shapes[2],
-                &shapes[3], &shapes[4], &shapes[5],
-                &shapes[6],
-            };
-            previewPool = shapePool;
-
-            std::random_shuffle(shapePool.begin(), shapePool.end());
-            std::random_shuffle(previewPool.begin(), previewPool.end());
-            currentShapeIterator = shapePool.begin();
-        }
-
-        auto next_shape() -> Shape {
-            ++currentShapeIterator;
-            if (currentShapeIterator == shapePool.end()) {
-                shapePool = previewPool;
-                currentShapeIterator = shapePool.begin();
-                std::random_shuffle(previewPool.begin(), previewPool.end());
-            }
-            return **currentShapeIterator;
-        }
-
-        auto current_shape() -> Shape {
-            return **currentShapeIterator;
-        }
-
-    };
-    ShapePool shapePool{shapes};
-
-    auto currentShape = shapePool.current_shape();
-
     auto is_valid_spot = [&board](V2 pos) {
         if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
             return false;
@@ -536,6 +444,105 @@ auto run() -> void
         }
     };
 
+    auto baseX = columns / 2 - 1;
+    auto baseY = 0;
+    auto IPiece = Shape(Color(0x00, 0xf0, 0xf0), {
+                            { baseX - 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 2, baseY + 1 }
+                        });
+    auto LPiece = Shape(Color(0xf0, 0xa0, 0x00), {
+                            { baseX - 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 1, baseY + 0 },
+                        });
+    auto JPiece = Shape(Color(0x00, 0x00, 0xf0), {
+                            { baseX - 1, baseY + 0 },
+                            { baseX - 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
+                            { baseX + 1, baseY + 1 },
+                        });
+    auto OPiece = Shape(Color(0xf0, 0xf0, 0x00), {
+                            { baseX + 0, baseY + 0 },
+                            { baseX + 1, baseY + 0 },
+                            { baseX + 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
+                        });
+    auto SPiece = Shape(Color(0x00, 0xf0, 0x00), {
+                            { baseX + 1, baseY + 0 },
+                            { baseX + 0, baseY + 0 },
+                            { baseX + 0, baseY + 1 },
+                            { baseX - 1, baseY + 1 },
+                        });
+    auto ZPiece = Shape(Color(0xf0, 0x00, 0x00), {
+                            { baseX + 0, baseY + 0 },
+                            { baseX - 1, baseY + 0 },
+                            { baseX + 0, baseY + 1 },
+                            { baseX + 1, baseY + 1 },
+                        });
+    auto TPiece = Shape(Color(0xa0, 0x00, 0xf0), {
+                            { baseX - 1, baseY + 1 },
+                            { baseX + 0, baseY + 1 },
+                            { baseX + 0, baseY + 0 },
+                            { baseX + 1, baseY + 1 },
+                        });
+
+    std::array<Shape, 7> shapes = {
+        IPiece,
+        LPiece,
+        JPiece,
+        OPiece,
+        SPiece,
+        ZPiece,
+        TPiece,
+    };
+
+    class ShapePool {
+        std::array<const Shape*, 7> shapePool;
+        decltype(shapePool) previewPool;
+        decltype(shapePool.begin()) currentShapeIterator;
+
+    public:
+        ShapePool(const std::array<Shape, 7>& shapes) {
+            shapePool = {
+                &shapes[0], &shapes[1], &shapes[2],
+                &shapes[3], &shapes[4], &shapes[5],
+                &shapes[6],
+            };
+            previewPool = shapePool;
+
+            std::random_shuffle(shapePool.begin(), shapePool.end());
+            std::random_shuffle(previewPool.begin(), previewPool.end());
+            currentShapeIterator = shapePool.begin();
+        }
+
+        auto next_shape() -> Shape {
+            ++currentShapeIterator;
+            if (currentShapeIterator == shapePool.end()) {
+                shapePool = previewPool;
+                currentShapeIterator = shapePool.begin();
+                std::random_shuffle(previewPool.begin(), previewPool.end());
+            }
+            return **currentShapeIterator;
+        }
+
+        auto current_shape() -> Shape {
+            return **currentShapeIterator;
+        }
+
+    };
+    ShapePool shapePool{shapes};
+
+    auto currentShape = shapePool.current_shape();
+    auto currentShapeShadow = currentShape;
+    while (is_valid_move(currentShapeShadow, {0, 1})) {
+        for (auto& block : currentShapeShadow.blocks) {
+            ++block.pos.y;
+        }
+    }
+
     while (gRunning) {
         auto newclock = clock();
         auto frameclocktime = newclock - currentclock;
@@ -555,8 +562,22 @@ auto run() -> void
                 init();
             } else if (message == Message::MOVE_RIGHT) {
                 try_move(currentShape, {1, 0});
+                // update shape shadow
+                currentShapeShadow = currentShape;
+                while (is_valid_move(currentShapeShadow, {0, 1})) {
+                    for (auto& block : currentShapeShadow.blocks) {
+                        ++block.pos.y;
+                    }
+                }
             } else if (message == Message::MOVE_LEFT) {
                 try_move(currentShape, {-1, 0});
+                // update shape shadow
+                currentShapeShadow = currentShape;
+                while (is_valid_move(currentShapeShadow, {0, 1})) {
+                    for (auto& block : currentShapeShadow.blocks) {
+                        ++block.pos.y;
+                    }
+                }
             } else if (message == Message::INCREASE_WINDOW_SIZE) {
                 change_window_scale(scale + 1);
             } else if (message == Message::DECREASE_WINDOW_SIZE) {
@@ -593,6 +614,14 @@ auto run() -> void
                     block.pos.y = yAvg + (xAvg - x);
                     block.pos.x = xAvg - (yAvg - y);
                 }
+
+                // update shape shadow
+                currentShapeShadow = currentShape;
+                while (is_valid_move(currentShapeShadow, {0, 1})) {
+                    for (auto& block : currentShapeShadow.blocks) {
+                        ++block.pos.y;
+                    }
+                }
             } else if (message == Message::ROTATE_RIGHT) {
                 auto xSum = 0;
                 auto ySum = 0;
@@ -608,6 +637,13 @@ auto run() -> void
                     auto y = block.pos.y;
                     block.pos.y = yAvg - (xAvg - x);
                     block.pos.x = xAvg + (yAvg - y);
+                }
+                // update shape shadow
+                currentShapeShadow = currentShape;
+                while (is_valid_move(currentShapeShadow, {0, 1})) {
+                    for (auto& block : currentShapeShadow.blocks) {
+                        ++block.pos.y;
+                    }
                 }
             }
         }
@@ -646,6 +682,13 @@ auto run() -> void
 
                     remove_full_rows(board);
                     currentShape = shapePool.next_shape();
+                    // update shape shadow
+                    currentShapeShadow = currentShape;
+                    while (is_valid_move(currentShapeShadow, {0, 1})) {
+                        for (auto& block : currentShapeShadow.blocks) {
+                            ++block.pos.y;
+                        }
+                    }
                 }
             }
         }
@@ -667,14 +710,7 @@ auto run() -> void
             }
         }
 
-        // draw shadow (could be calculated once when moved horizontally or rotated instead of every frame)
-        auto currentShapeShadow = currentShape;
-        while (is_valid_move(currentShapeShadow, {0, 1})) {
-            for (auto& block : currentShapeShadow.blocks) {
-                ++block.pos.y;
-            }
-        }
-
+        // draw shadow
         for (auto& block : currentShapeShadow.blocks) {
             draw_solid_square(&window.bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b, 0xff / 2);
         }
