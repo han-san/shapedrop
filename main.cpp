@@ -45,6 +45,28 @@ struct V3 {
     V3(int a = 0, int b = 0, int c = 0): x{a}, y{b}, z{c} {}
 };
 
+using Position = V2;
+using Color = V3;
+
+struct Block {
+    Color color;
+    bool isActive = false;
+};
+
+auto constexpr rows = 22;
+auto constexpr columns = 10;
+
+using Board = std::array<Block, rows * columns>;
+
+auto is_valid_spot(Board& board, V2 pos) -> bool {
+    if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
+        return false;
+    } else {
+        auto index = pos.y * columns + pos.x;
+        return !board[index].isActive;
+    }
+}
+
 template <typename T, size_t I>
 class ArrayStack {
 public:
@@ -79,6 +101,314 @@ private:
     size_type m_size = 0;
 };
 
+struct Shape {
+    using ShapeLayout = std::array<bool, 16>;
+    using RotationMap = std::array<ShapeLayout, 4>;
+
+    RotationMap static constexpr IRotationMap = {
+        ShapeLayout {
+            0, 0, 0, 0,
+            1, 1, 1, 1,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 0, 1, 0,
+            0, 0, 1, 0,
+            0, 0, 1, 0,
+            0, 0, 1, 0,
+        },
+        ShapeLayout {
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            1, 1, 1, 1,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+        },
+    };
+    RotationMap static constexpr LRotationMap = {
+        ShapeLayout {
+            0, 0, 1, 0,
+            1, 1, 1, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 1, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 0, 0, 0,
+            1, 1, 1, 0,
+            1, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            1, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+    };
+    RotationMap static constexpr JRotationMap = {
+        ShapeLayout {
+            1, 0, 0, 0,
+            1, 1, 1, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 1, 0,
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 0, 0, 0,
+            1, 1, 1, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+            1, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+    };
+    RotationMap static constexpr ORotationMap = {
+        ShapeLayout {
+            0, 1, 1, 0,
+            0, 1, 1, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 1, 0,
+            0, 1, 1, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 1, 0,
+            0, 1, 1, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 1, 0,
+            0, 1, 1, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+    };
+    RotationMap static constexpr SRotationMap = {
+        ShapeLayout {
+            0, 1, 1, 0,
+            1, 1, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 0, 0,
+            0, 1, 1, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 0, 0, 0,
+            0, 1, 1, 0,
+            1, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            1, 0, 0, 0,
+            1, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+    };
+    RotationMap static constexpr ZRotationMap = {
+        ShapeLayout {
+            1, 1, 0, 0,
+            0, 1, 1, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 0, 1, 0,
+            0, 1, 1, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 0, 0, 0,
+            1, 1, 0, 0,
+            0, 1, 1, 1,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 0, 0,
+            1, 1, 0, 0,
+            1, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+    };
+    RotationMap static constexpr TRotationMap = {
+        ShapeLayout {
+            0, 1, 0, 0,
+            1, 1, 1, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 0, 0,
+            0, 1, 1, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 0, 0, 0,
+            1, 1, 1, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+        ShapeLayout {
+            0, 1, 0, 0,
+            1, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 0,
+        },
+    };
+
+    enum class Type {
+        I, O, L, J, S, Z, T
+    };
+
+    RotationMap const* rotations = nullptr;
+    int rotationIndex = 0;
+    Position pos = columns / 2 - 2; // spawn centrally
+    Color color;
+
+    Shape(Type type) {
+        switch (type) {
+            case Type::I: {
+                color = Color(0x00, 0xf0, 0xf0);
+                rotations = &IRotationMap;
+            } break;
+            case Type::O: {
+                color = Color(0xf0, 0xf0, 0x00);
+                rotations = &ORotationMap;
+            } break;
+            case Type::L: {
+                color = Color(0xf0, 0xa0, 0x00);
+                rotations = &LRotationMap;
+            } break;
+            case Type::J: {
+                color = Color(0x00, 0x00, 0xf0);
+                rotations = &JRotationMap;
+            } break;
+            case Type::S: {
+                color = Color(0x00, 0xf0, 0x00);
+                rotations = &SRotationMap;
+            } break;
+            case Type::Z: {
+                color = Color(0xf0, 0x00, 0x00);
+                rotations = &ZRotationMap;
+            } break;
+            case Type::T: {
+                color = Color(0xa0, 0x00, 0xf0);
+                rotations = &TRotationMap;
+            } break;
+            default: {
+                // shouldn't be possible
+                assert(false);
+            } break;
+        }
+    }
+
+    auto get_block_positions() -> ArrayStack<Position, 4> {
+        ArrayStack<Position, 4> positions = {};
+        auto& layout = (*rotations)[rotationIndex];
+        auto constexpr size = 4;
+        for (auto y = 0; y < size; ++y) {
+            for (auto x = 0; x < size; ++x) {
+                auto index = y * size + x;
+                if (layout[index]) {
+                    positions.push_back({x, y});
+                    if (positions.size() == 4) {
+                        return positions;
+                    }
+                }
+            }
+        }
+        assert(false);
+    }
+
+    auto get_absolute_block_positions() -> ArrayStack<Position, 4> {
+        auto positions = get_block_positions();
+        for (auto& position : positions) {
+            position.x += pos.x;
+            position.y += pos.y;
+        }
+        return positions;
+    }
+
+    auto is_valid(Board& board) -> bool {
+        for (auto position : get_absolute_block_positions()) {
+            if (!is_valid_spot(board, position)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    auto rotate_right(Board& board) -> bool {
+        auto oldRotationIndex = rotationIndex;
+        rotationIndex += rotationIndex == 3 ? -3 : 1;
+        if (!is_valid(board)) {
+            rotationIndex = oldRotationIndex;
+            return false;
+        }
+        return true;
+    }
+
+    auto rotate_left(Board& board) -> bool {
+        auto oldRotationIndex = rotationIndex;
+        rotationIndex -= rotationIndex == 0 ? -3 : 1;
+        if (!is_valid(board)) {
+            rotationIndex = oldRotationIndex;
+            return false;
+        }
+        return true;
+    }
+};
+
+auto is_valid_move(Board& board, Shape& shape, V2 move) -> bool {
+    shape.pos.x += move.x;
+    shape.pos.y += move.y;
+    auto valid = shape.is_valid(board);
+    shape.pos.x -= move.x;
+    shape.pos.y -= move.y;
+    return valid;
+}
+
+auto try_move(Board& board, Shape& shape, V2 move) {
+    if (is_valid_move(board, shape, move)) {
+        shape.pos.x += move.x;
+        shape.pos.y += move.y;
+        return true;
+    }
+    return false;
+}
+
 enum class Message {
     NONE,
     QUIT,
@@ -101,8 +431,6 @@ struct Square {
     int h;
 };
 
-auto constexpr rows = 22;
-auto constexpr columns = 10;
 auto constexpr baseWindowWidth = columns + 2;
 auto constexpr baseWindowHeight = rows + 2;
 auto scale = 1;
@@ -340,57 +668,7 @@ auto run() -> void
 
     init();
 
-    using Position = V2;
-    using Color = V3;
-
-    struct Block {
-        Position pos;
-        Color color;
-        bool isActive = false;
-    };
-
-    std::array<Block, rows * columns> board = {};
-
-    struct Shape {
-        ArrayStack<Block, 4> blocks;
-
-        Shape(Color color, std::initializer_list<Position> positions) {
-            assert(positions.size() == 4);
-            for (auto& pos : positions) {
-                blocks.push_back({ pos, color, true });
-            }
-        }
-    };
-
-    auto is_valid_spot = [&board](V2 pos) {
-        if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
-            return false;
-        } else {
-            auto index = pos.y * columns + pos.x;
-            return !board[index].isActive;
-        }
-    };
-
-    auto is_valid_move = [is_valid_spot](Shape& shape, V2 move) {
-        for (auto& block : shape.blocks) {
-            auto x = block.pos.x + move.x;
-            auto y = block.pos.y + move.y;
-            if (!is_valid_spot({x, y})) {
-                return false;
-            }
-        }
-        return true;
-    };
-
-    auto try_move = [is_valid_move](Shape& shape, V2 move) {
-        if (is_valid_move(shape, move)) {
-            for (auto& block : shape.blocks) {
-                block.pos.x += move.x;
-                block.pos.y += move.y;
-            }
-            dropclock = currentclock;
-        }
-    };
+    Board board = {};
 
     auto remove_full_rows = [](std::array<Block, rows * columns>& board) {
         // check if a row can be cleared
@@ -444,59 +722,14 @@ auto run() -> void
         }
     };
 
-    auto baseX = columns / 2 - 1;
-    auto baseY = 0;
-    auto IPiece = Shape(Color(0x00, 0xf0, 0xf0), {
-                            { baseX - 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 1, baseY + 1 },
-                            { baseX + 2, baseY + 1 }
-                        });
-    auto LPiece = Shape(Color(0xf0, 0xa0, 0x00), {
-                            { baseX - 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 1, baseY + 1 },
-                            { baseX + 1, baseY + 0 },
-                        });
-    auto JPiece = Shape(Color(0x00, 0x00, 0xf0), {
-                            { baseX - 1, baseY + 0 },
-                            { baseX - 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 1, baseY + 1 },
-                        });
-    auto OPiece = Shape(Color(0xf0, 0xf0, 0x00), {
-                            { baseX + 0, baseY + 0 },
-                            { baseX + 1, baseY + 0 },
-                            { baseX + 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                        });
-    auto SPiece = Shape(Color(0x00, 0xf0, 0x00), {
-                            { baseX + 1, baseY + 0 },
-                            { baseX + 0, baseY + 0 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX - 1, baseY + 1 },
-                        });
-    auto ZPiece = Shape(Color(0xf0, 0x00, 0x00), {
-                            { baseX + 0, baseY + 0 },
-                            { baseX - 1, baseY + 0 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 1, baseY + 1 },
-                        });
-    auto TPiece = Shape(Color(0xa0, 0x00, 0xf0), {
-                            { baseX - 1, baseY + 1 },
-                            { baseX + 0, baseY + 1 },
-                            { baseX + 0, baseY + 0 },
-                            { baseX + 1, baseY + 1 },
-                        });
-
-    std::array<Shape, 7> shapes = {
-        IPiece,
-        LPiece,
-        JPiece,
-        OPiece,
-        SPiece,
-        ZPiece,
-        TPiece,
+    std::array<Shape, 7> const shapes = {
+        Shape(Shape::Type::I),
+        Shape(Shape::Type::L),
+        Shape(Shape::Type::J),
+        Shape(Shape::Type::O),
+        Shape(Shape::Type::S),
+        Shape(Shape::Type::Z),
+        Shape(Shape::Type::T),
     };
 
     class ShapePool {
@@ -535,23 +768,16 @@ auto run() -> void
     };
     ShapePool shapePool{shapes};
 
-    auto currentShape = shapePool.current_shape();
-    auto currentShapeShadow = currentShape;
-    while (is_valid_move(currentShapeShadow, {0, 1})) {
-        for (auto& block : currentShapeShadow.blocks) {
-            ++block.pos.y;
-        }
-    }
-
-    auto calculateShapeShadow = [is_valid_move](Shape shape) {
+    auto calculateShapeShadow = [&board](Shape& shape) {
         auto shapeShadow = shape;
-        while (is_valid_move(shapeShadow, {0, 1})) {
-            for (auto& block : shapeShadow.blocks) {
-                ++block.pos.y;
-            }
+        while (is_valid_move(board, shapeShadow, {0, 1})) {
+            ++shapeShadow.pos.y;
         }
         return shapeShadow;
     };
+
+    auto currentShape = shapePool.current_shape();
+    auto currentShapeShadow = calculateShapeShadow(currentShape);
 
     while (gRunning) {
         auto newclock = clock();
@@ -571,13 +797,17 @@ auto run() -> void
             } else if (message == Message::RESET) {
                 init();
             } else if (message == Message::MOVE_RIGHT) {
-                try_move(currentShape, {1, 0});
-                // update shape shadow
-                currentShapeShadow = calculateShapeShadow(currentShape);
+                if (try_move(board, currentShape, {1, 0})) {
+                    dropclock = currentclock;
+                    // update shape shadow
+                    currentShapeShadow = calculateShapeShadow(currentShape);
+                }
             } else if (message == Message::MOVE_LEFT) {
-                try_move(currentShape, {-1, 0});
-                // update shape shadow
-                currentShapeShadow = calculateShapeShadow(currentShape);
+                if (try_move(board, currentShape, {-1, 0})) {
+                    dropclock = currentclock;
+                    // update shape shadow
+                    currentShapeShadow = calculateShapeShadow(currentShape);
+                }
             } else if (message == Message::INCREASE_WINDOW_SIZE) {
                 change_window_scale(scale + 1);
             } else if (message == Message::DECREASE_WINDOW_SIZE) {
@@ -590,51 +820,22 @@ auto run() -> void
                 // reset drop clock
                 dropclock = currentclock;
             } else if (message == Message::DROP) {
-                while (is_valid_move(currentShape, {0, 1})) {
-                    for (auto& block : currentShape.blocks) {
-                        ++block.pos.y;
-                    }
+                while (is_valid_move(board, currentShape, {0, 1})) {
+                    ++currentShape.pos.y;
                 }
 
                 // reset drop clock
                 dropclock = currentclock;
             } else if (message == Message::ROTATE_LEFT) {
-                auto xSum = 0;
-                auto ySum = 0;
-                for (auto& block : currentShape.blocks) {
-                    xSum += block.pos.x;
-                    ySum += block.pos.y;
+                if (currentShape.rotate_left(board)) {
+                    // update shape shadow
+                    currentShapeShadow = calculateShapeShadow(currentShape);
                 }
-                auto xAvg = xSum / currentShape.blocks.size();
-                auto yAvg = ySum / currentShape.blocks.size();
-
-                for (auto& block : currentShape.blocks) {
-                    auto x = block.pos.x;
-                    auto y = block.pos.y;
-                    block.pos.y = yAvg + (xAvg - x);
-                    block.pos.x = xAvg - (yAvg - y);
-                }
-
-                // update shape shadow
-                currentShapeShadow = calculateShapeShadow(currentShape);
             } else if (message == Message::ROTATE_RIGHT) {
-                auto xSum = 0;
-                auto ySum = 0;
-                for (auto& block : currentShape.blocks) {
-                    xSum += block.pos.x;
-                    ySum += block.pos.y;
+                if (currentShape.rotate_right(board)) {
+                    // update shape shadow
+                    currentShapeShadow = calculateShapeShadow(currentShape);
                 }
-                auto xAvg = xSum / currentShape.blocks.size();
-                auto yAvg = ySum / currentShape.blocks.size();
-
-                for (auto& block : currentShape.blocks) {
-                    auto x = block.pos.x;
-                    auto y = block.pos.y;
-                    block.pos.y = yAvg - (xAvg - x);
-                    block.pos.x = xAvg + (yAvg - y);
-                }
-                // update shape shadow
-                currentShapeShadow = calculateShapeShadow(currentShape);
             }
         }
 
@@ -644,19 +845,11 @@ auto run() -> void
             auto nextdropclock = dropclock + dropSpeed * CLOCKS_PER_SEC;
             if (currentclock > nextdropclock) {
                 dropclock = currentclock;
-                if (is_valid_move(currentShape, {0, 1})) {
-                    for (auto& block : currentShape.blocks) {
-                        ++block.pos.y;
-                    }
+                if (is_valid_move(board, currentShape, {0, 1})) {
+                    ++currentShape.pos.y;
                 } else {
                     // game over if there is block occupying spawn location
-                    auto gameOver = false;
-                    for (auto& block : currentShape.blocks) {
-                        if (!is_valid_spot(block.pos)) {
-                            gameOver = true;
-                            break;
-                        }
-                    }
+                    auto gameOver = !currentShape.is_valid(board);
 
                     if (gameOver) {
                         std::cout << "Game Over!\n";
@@ -664,10 +857,10 @@ auto run() -> void
                     }
 
                     // fix currentBlocks position on board
-                    for (auto& block : currentShape.blocks) {
-                        assert(is_valid_spot(block.pos));
-                        auto boardIndex = block.pos.y * columns + block.pos.x;
-                        board[boardIndex] = block;
+                    for (auto position : currentShape.get_absolute_block_positions()) {
+                        assert(is_valid_spot(board, position));
+                        auto boardIndex = position.y * columns + position.x;
+                        board[boardIndex] = {currentShape.color, true};
                     }
 
                     remove_full_rows(board);
@@ -696,13 +889,13 @@ auto run() -> void
         }
 
         // draw shadow
-        for (auto& block : currentShapeShadow.blocks) {
-            draw_solid_square(&window.bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b, 0xff / 2);
+        for (auto& position : currentShapeShadow.get_absolute_block_positions()) {
+            draw_solid_square(&window.bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
         }
 
         // draw current shape
-        for (auto& block : currentShape.blocks) {
-            draw_solid_square(&window.bb, {float((block.pos.x + 1) * scale), float((block.pos.y + 1) * scale), scale, scale}, block.color.r, block.color.g, block.color.b);
+        for (auto& position : currentShape.get_absolute_block_positions()) {
+            draw_solid_square(&window.bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
         }
 
         sdl_swap_buffer();
