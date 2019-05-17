@@ -292,12 +292,14 @@ struct Shape {
         I, O, L, J, S, Z, T
     };
 
+    Type type;
     RotationMap const* rotations = nullptr;
     int rotationIndex = 0;
     Position pos = columns / 2 - 2; // spawn centrally
     Color color;
 
     Shape(Type type) {
+        this->type = type;
         switch (type) {
             case Type::I: {
                 color = Color(0x00, 0xf0, 0xf0);
@@ -370,24 +372,115 @@ struct Shape {
         return true;
     }
 
-    auto rotate_right(Board& board) -> bool {
-        auto oldRotationIndex = rotationIndex;
-        rotationIndex += rotationIndex == 3 ? -3 : 1;
-        if (!is_valid(board)) {
-            rotationIndex = oldRotationIndex;
-            return false;
-        }
-        return true;
-    }
+    enum class Rotation {
+        LEFT,
+        RIGHT
+    };
 
-    auto rotate_left(Board& board) -> bool {
-        auto oldRotationIndex = rotationIndex;
-        rotationIndex -= rotationIndex == 0 ? -3 : 1;
-        if (!is_valid(board)) {
-            rotationIndex = oldRotationIndex;
-            return false;
+    auto rotate(Board& board, Rotation dir) -> bool {
+        auto rotatingShape = *this;
+        rotatingShape.rotationIndex += dir == Rotation::RIGHT ? 1 : -1;
+        if (rotatingShape.rotationIndex == -1) rotatingShape.rotationIndex = 3;
+        else if (rotatingShape.rotationIndex == 4) rotatingShape.rotationIndex = 0;
+        if (rotatingShape.is_valid(board)) {
+            *this = rotatingShape;
+            return true;
         }
-        return true;
+
+        std::array<V2, 4> kicks = {};
+
+        // do wall kicks to see if valid
+        switch (type) {
+            case Type::J:
+            case Type::L:
+            case Type::S:
+            case Type::T:
+            case Type::Z: {
+                switch (rotationIndex) {
+                    case 0: {
+                        if (dir == Rotation::RIGHT) {
+                            kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
+                        } else {
+                            kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
+                        }
+                    } break;
+                    case 1: {
+                        // both directions check same positions
+                        kicks = { V2 {1, 0}, {1, -1}, {0, 2}, {1, 2} };
+                    } break;
+                    case 2: {
+                        if (dir == Rotation::RIGHT) {
+                            kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
+                        } else {
+                            kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
+                        }
+                    } break;
+                    case 3: {
+                        // both directions check same positions
+                        kicks = { V2 {-1, 0}, {-1, -1}, {0, 2}, {-1, 2} };
+                    } break;
+                    default: {
+                        assert(false);
+                    } break;
+                }
+            } break;
+            case Type::I: {
+                switch (rotationIndex) {
+                    case 0: {
+                        if (dir == Rotation::RIGHT) {
+                            kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
+                        } else {
+                            kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
+                        }
+                    } break;
+                    case 1: {
+                        if (dir == Rotation::RIGHT) {
+                            kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
+                        } else {
+                            kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
+                        }
+                    } break;
+                    case 2: {
+                        if (dir == Rotation::RIGHT) {
+                            kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
+                        } else {
+                            kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
+                        }
+                    } break;
+                    case 3: {
+                        if (dir == Rotation::RIGHT) {
+                            kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
+                        } else {
+                            kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
+                        }
+                    } break;
+                    default: {
+                        assert(false);
+                    } break;
+                }
+
+            } break;
+            case Type::O: {
+                // should have already returned true in the is_valid() check
+                assert(false);
+            } break;
+            default: {
+                assert(false);
+            }
+        }
+
+        for (auto kickMove : kicks) {
+            rotatingShape.pos = pos;
+            rotatingShape.pos.x += kickMove.x;
+            // the y in kicks is bottom up while it's top down for the shape position
+            // so we have to invert it by subtracting instead of adding
+            rotatingShape.pos.y -= kickMove.y;
+            if (rotatingShape.is_valid(board)) {
+                *this = rotatingShape;
+                return true;
+            }
+        }
+        return false;
     }
 };
 
@@ -827,12 +920,12 @@ auto run() -> void
                 // reset drop clock
                 dropclock = currentclock;
             } else if (message == Message::ROTATE_LEFT) {
-                if (currentShape.rotate_left(board)) {
+                if (currentShape.rotate(board, Shape::Rotation::LEFT)) {
                     // update shape shadow
                     currentShapeShadow = calculateShapeShadow(currentShape);
                 }
             } else if (message == Message::ROTATE_RIGHT) {
-                if (currentShape.rotate_right(board)) {
+                if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
                     // update shape shadow
                     currentShapeShadow = calculateShapeShadow(currentShape);
                 }
