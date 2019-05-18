@@ -722,6 +722,8 @@ auto lost = false;
 
 auto currentclock = (decltype(clock())) 0;
 auto dropclock = (decltype(clock())) 0;
+auto constexpr lockdelay = (decltype(clock())) CLOCKS_PER_SEC / 2;
+auto lockclock = (decltype(clock())) 0;
 
 auto delta = 0.0;
 
@@ -750,6 +752,7 @@ auto init()
     delta = 0.0;
     currentclock = clock();
     dropclock = currentclock;
+    lockclock = currentclock;
 
     srand(time(NULL));
 }
@@ -890,16 +893,26 @@ auto run() -> void
             } else if (message == Message::RESET) {
                 init();
             } else if (message == Message::MOVE_RIGHT) {
+                // if currentShape is on top of a block before move,
+                // the drop clock needs to be reset
+                auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
                 if (try_move(board, currentShape, {1, 0})) {
-                    dropclock = currentclock;
-                    // update shape shadow
                     currentShapeShadow = calculateShapeShadow(currentShape);
+                    lockclock = currentclock;
+                    if (isGrounded) {
+                        dropclock = currentclock;
+                    }
                 }
             } else if (message == Message::MOVE_LEFT) {
+                // if currentShape is on top of a block before move,
+                // the drop clock needs to be reset
+                auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
                 if (try_move(board, currentShape, {-1, 0})) {
-                    dropclock = currentclock;
-                    // update shape shadow
                     currentShapeShadow = calculateShapeShadow(currentShape);
+                    lockclock = currentclock;
+                    if (isGrounded) {
+                        dropclock = currentclock;
+                    }
                 }
             } else if (message == Message::INCREASE_WINDOW_SIZE) {
                 change_window_scale(scale + 1);
@@ -909,25 +922,31 @@ auto run() -> void
                 dropSpeed = maxDropSpeed;
             } else if (message == Message::RESET_SPEED) {
                 dropSpeed = 1.0;
-
-                // reset drop clock
-                dropclock = currentclock;
             } else if (message == Message::DROP) {
-                while (is_valid_move(board, currentShape, {0, 1})) {
-                    ++currentShape.pos.y;
+                while (try_move(board, currentShape, {0, 1})) {
+                    lockclock = currentclock;
                 }
-
-                // reset drop clock
-                dropclock = currentclock;
             } else if (message == Message::ROTATE_LEFT) {
+                // if currentShape is on top of a block before rotation,
+                // the drop clock needs to be reset
+                auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
                 if (currentShape.rotate(board, Shape::Rotation::LEFT)) {
-                    // update shape shadow
                     currentShapeShadow = calculateShapeShadow(currentShape);
+                    lockclock = currentclock;
+                    if (isGrounded) {
+                        dropclock = currentclock;
+                    }
                 }
             } else if (message == Message::ROTATE_RIGHT) {
+                // if currentShape is on top of a block before rotation,
+                // the drop clock needs to be reset
+                auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
                 if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
-                    // update shape shadow
                     currentShapeShadow = calculateShapeShadow(currentShape);
+                    lockclock = currentclock;
+                    if (isGrounded) {
+                        dropclock = currentclock;
+                    }
                 }
             }
         }
@@ -938,15 +957,21 @@ auto run() -> void
             auto nextdropclock = dropclock + dropSpeed * CLOCKS_PER_SEC;
             if (currentclock > nextdropclock) {
                 dropclock = currentclock;
-                if (is_valid_move(board, currentShape, {0, 1})) {
-                    ++currentShape.pos.y;
-                } else {
-                    // game over if there is block occupying spawn location
-                    auto gameOver = !currentShape.is_valid(board);
+                if (try_move(board, currentShape, {0, 1})) {
+                    lockclock = currentclock;
+                }
+            }
 
-                    if (gameOver) {
-                        std::cout << "Game Over!\n";
-                        continue;
+            if (currentclock > lockclock + lockdelay) {
+                // only care about locking if currentShape is on top of a block
+                if (!is_valid_move(board, currentShape, {0, 1})) {
+                    // game over if entire piece is above visible portion
+                    // of board
+                    auto gameOver = true;
+                    for (auto pos : currentShape.get_absolute_block_positions()) {
+                        if (pos.y > 1) {
+                            gameOver = false;
+                        }
                     }
 
                     // fix currentBlocks position on board
@@ -960,6 +985,17 @@ auto run() -> void
                     currentShape = shapePool.next_shape();
                     // update shape shadow
                     currentShapeShadow = calculateShapeShadow(currentShape);
+                    lockclock = currentclock;
+
+                    // game over if the new shape spawned on top of another shape
+                    if (!currentShape.is_valid(board)) {
+                        gameOver = true;
+                    }
+
+                    if (gameOver) {
+                        std::cout << "Game Over!\n";
+                        gRunning = false;
+                    }
                 }
             }
         }
