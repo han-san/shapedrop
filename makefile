@@ -2,7 +2,7 @@ CC = clang++
 LIBS = -lSDL2
 BINDIR = bin
 BIN = tetris
-SRC = *.cpp
+SRC = sdlmain.cpp core.cpp
 CFLAGS = -std=c++17 -fno-rtti -Wall -Wextra -Wpedantic -Wshadow
 
 ifeq ($(OS),Windows_NT)

@@ -7,43 +7,8 @@
 #include <SDL2/SDL.h>
 #include <jlib/jint.h>
 
-struct BackBuffer {
-    void* memory;
-    int w;
-    int h;
-    int pitch;
-    int bpp;
-};
-
-struct V2 {
-    union {
-        int w;
-        int x;
-    };
-    union {
-        int h;
-        int y;
-    };
-
-    V2(int a = 0, int b = 0): x{a}, y{b} {}
-};
-
-struct V3 {
-    union {
-        int x;
-        int r;
-    };
-    union {
-        int y;
-        int g;
-    };
-    union {
-        int z;
-        int b;
-    };
-
-    V3(int a = 0, int b = 0, int c = 0): x{a}, y{b}, z{c} {}
-};
+#include "core.hpp"
+#include "platform.hpp"
 
 using Position = V2;
 using Color = V3;
@@ -53,8 +18,7 @@ struct Block {
     bool isActive = false;
 };
 
-auto constexpr rows = 22;
-auto constexpr columns = 10;
+auto gRunning = true;
 
 using Board = std::array<Block, rows * columns>;
 
@@ -502,141 +466,12 @@ auto try_move(Board& board, Shape& shape, V2 move) {
     return false;
 }
 
-enum class Message {
-    NONE,
-    QUIT,
-    RESET,
-    MOVE_RIGHT,
-    MOVE_LEFT,
-    INCREASE_SPEED,
-    RESET_SPEED,
-    DROP,
-    ROTATE_LEFT,
-    ROTATE_RIGHT,
-    INCREASE_WINDOW_SIZE,
-    DECREASE_WINDOW_SIZE,
-};
-
 struct Square {
     float x;
     float y;
     int w;
     int h;
 };
-
-auto constexpr baseWindowWidth = columns + 2;
-auto constexpr baseWindowHeight = rows + 2;
-auto scale = 1;
-auto gRunning = true;
-
-struct {
-    SDL_Window* handle;
-    SDL_Surface* surface;
-    SDL_Surface* bbSurface;
-    V2 dim;
-    BackBuffer bb;
-} window = {};
-
-auto sdl_swap_buffer() -> void
-{
-    SDL_BlitSurface(window.bbSurface, NULL, window.surface, NULL);
-    SDL_UpdateWindowSurface(window.handle);
-}
-
-auto sdl_get_back_buffer() -> BackBuffer
-{
-    auto bbuf = BackBuffer{};
-    bbuf.memory = window.bbSurface->pixels;
-    bbuf.w = window.bbSurface->w;
-    bbuf.h = window.bbSurface->h;
-    bbuf.pitch = window.bbSurface->pitch;
-    bbuf.bpp = window.bbSurface->format->BytesPerPixel;
-
-    return bbuf;
-}
-
-auto window_fits_on_screen(V2 windowDimensions) -> bool {
-    SDL_Rect displayBounds = {};
-    SDL_GetDisplayUsableBounds(0, &displayBounds);
-
-    return windowDimensions.w < displayBounds.w && windowDimensions.h < displayBounds.h;
-}
-
-auto resize_window(V2 dimensions) {
-    SDL_SetWindowSize(window.handle, dimensions.w, dimensions.h);
-    window.dim.w = dimensions.w;
-    window.dim.h = dimensions.h;
-
-    window.surface = SDL_GetWindowSurface(window.handle);
-    assert(window.surface);
-    SDL_FreeSurface(window.bbSurface);
-    window.bbSurface = SDL_CreateRGBSurface(0, window.surface->w, window.surface->h,
-                                      window.surface->format->BitsPerPixel,
-                                      window.surface->format->Rmask,
-                                      window.surface->format->Gmask,
-                                      window.surface->format->Bmask,
-                                      window.surface->format->Amask);
-    assert(window.bbSurface);
-    window.bb = sdl_get_back_buffer();
-}
-
-auto change_window_scale(int newScale) {
-    if (newScale < 1) newScale = 1;
-    if (scale == newScale) return;
-    scale = newScale;
-    resize_window({baseWindowWidth * scale, baseWindowHeight * scale});
-}
-
-auto sdl_handle_input() -> Message
-{
-    auto msg = Message {};
-    SDL_Event e;
-    if (SDL_PollEvent(&e)) {
-        if (e.type == SDL_QUIT) {
-            msg = Message::QUIT;
-        } else if (e.type == SDL_KEYDOWN) {
-            switch (e.key.keysym.sym) {
-            case SDLK_RIGHT: {
-                msg = Message::MOVE_RIGHT;
-            } break;
-            case SDLK_LEFT: {
-                msg = Message::MOVE_LEFT;
-            } break;
-            case SDLK_r: {
-                msg = Message::RESET;
-            } break;
-            case SDLK_DOWN: {
-                msg = Message::INCREASE_SPEED;
-            } break;
-            case SDLK_UP: {
-                msg = Message::DROP;
-            } break;
-            case SDLK_z: {
-                msg = Message::ROTATE_LEFT;
-            } break;
-            case SDLK_x: {
-                msg = Message::ROTATE_RIGHT;
-            } break;
-            case SDLK_2: {
-                msg = Message::INCREASE_WINDOW_SIZE;
-            } break;
-            case SDLK_1: {
-                msg = Message::DECREASE_WINDOW_SIZE;
-            } break;
-            default: {
-            } break;
-            }
-        } else if (e.type == SDL_KEYUP) {
-            switch (e.key.keysym.sym) {
-            case SDLK_DOWN: {
-                msg = Message::RESET_SPEED;
-            } break;
-            }
-        }
-    }
-
-    return msg;
-}
 
 struct Point {
     float x;
@@ -708,24 +543,10 @@ auto draw_image(BackBuffer* backBuf, Point dest, BackBuffer* img)
     }
 }
 
-
-auto guy = Square{};
-auto jumpspeed = 0;
-auto velocity = 0.0;
-auto gravity = 0;
-
-auto scroll = 0.0;
-auto scrollspeed = 0;
-
-auto score = 0.0;
-auto lost = false;
-
 auto currentclock = (decltype(clock())) 0;
 auto dropclock = (decltype(clock())) 0;
 auto constexpr lockdelay = (decltype(clock())) CLOCKS_PER_SEC / 2;
 auto lockclock = (decltype(clock())) 0;
-
-auto delta = 0.0;
 
 auto highScore = 0;
 
@@ -734,22 +555,6 @@ auto maxDropSpeed = 0.1;
 
 auto init()
 {
-    guy.w = 10;
-    guy.h = 10;
-    guy.x = window.dim.w / 3;
-    guy.y = window.dim.h / 3;
-
-    jumpspeed = 600;
-    velocity = 0.0;
-    gravity = 1500;
-
-    scroll = 0.0;
-    scrollspeed = 200;
-
-    score = 0.0;
-    lost = false;
-
-    delta = 0.0;
     currentclock = clock();
     dropclock = currentclock;
     lockclock = currentclock;
@@ -759,7 +564,6 @@ auto init()
 
 auto run() -> void
 {
-    window.bb = sdl_get_back_buffer();
     gRunning = true;
 
     init();
@@ -880,14 +684,14 @@ auto run() -> void
         auto frameclocktime = newclock - currentclock;
         currentclock = newclock;
 
-        delta = (double)frameclocktime / CLOCKS_PER_SEC;
+        // delta = (double)frameclocktime / CLOCKS_PER_SEC;
         /* auto framemstime = 1000.0 * delta; */
 
         // TODO: sleep so cpu doesn't melt
 
         // input
         Message message;
-        while ((message = sdl_handle_input()) != Message::NONE) {
+        while ((message = handle_input()) != Message::NONE) {
             if (message == Message::QUIT) {
                 gRunning = false;
             } else if (message == Message::RESET) {
@@ -915,9 +719,9 @@ auto run() -> void
                     }
                 }
             } else if (message == Message::INCREASE_WINDOW_SIZE) {
-                change_window_scale(scale + 1);
+                change_window_scale(get_window_scale() + 1);
             } else if (message == Message::DECREASE_WINDOW_SIZE) {
-                change_window_scale(scale - 1);
+                change_window_scale(get_window_scale() - 1);
             } else if (message == Message::INCREASE_SPEED) {
                 dropSpeed = maxDropSpeed;
             } else if (message == Message::RESET_SPEED) {
@@ -1001,9 +805,12 @@ auto run() -> void
         }
 
         // draw border
-        for (auto y = 0; y < window.dim.h; ++y) {
-            for (auto x = 0; x < window.dim.w; ++x) {
-                draw_solid_square(&window.bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / window.dim.w), 0xff * (1 - (float(x) / window.dim.w) * (float(y) / window.dim.h)), 0xff * (float(y) / window.dim.h));
+        auto windim = get_window_dimensions();
+        auto bb = get_back_buffer();
+        auto scale = get_window_scale();
+        for (auto y = 0; y < windim.h; ++y) {
+            for (auto x = 0; x < windim.w; ++x) {
+                draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
             }
         }
 
@@ -1013,58 +820,20 @@ auto run() -> void
                 auto currindex = y * columns + x;
                 auto& block = board[currindex];
                 auto color = block.isActive ? block.color : Color { 0, 0, 0 };
-                draw_solid_square(&window.bb, {float((x + 1) * scale), float((y + 1) * scale), scale, scale}, color.r, color.g, color.b);
+                draw_solid_square(&bb, {float((x + 1) * scale), float((y + 1) * scale), scale, scale}, color.r, color.g, color.b);
             }
         }
 
         // draw shadow
         for (auto& position : currentShapeShadow.get_absolute_block_positions()) {
-            draw_solid_square(&window.bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
+            draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
         }
 
         // draw current shape
         for (auto& position : currentShape.get_absolute_block_positions()) {
-            draw_solid_square(&window.bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
+            draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
         }
 
-        sdl_swap_buffer();
+        swap_buffer();
     }
-}
-
-auto main(int argc, char** argv) -> int {
-    if (argc || argv) {}
-    SDL_Init(SDL_INIT_EVERYTHING);
-
-    auto newScale = scale;
-    {
-        auto dim = V2 {};
-        do {
-            ++newScale;
-            dim = V2 {baseWindowWidth * newScale, baseWindowHeight * newScale};
-        } while (window_fits_on_screen(dim));
-    }
-    --newScale;
-    scale = newScale;
-    window.dim.w = baseWindowWidth * scale;
-    window.dim.h = baseWindowHeight * scale;
-
-    window.handle = SDL_CreateWindow("Tetris",
-                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                               window.dim.w, window.dim.h, SDL_WINDOW_SHOWN);
-    assert(window.handle);
-
-    window.surface = SDL_GetWindowSurface(window.handle);
-    assert(window.surface);
-
-    window.bbSurface = SDL_CreateRGBSurface(0, window.surface->w, window.surface->h,
-                                      window.surface->format->BitsPerPixel,
-                                      window.surface->format->Rmask,
-                                      window.surface->format->Gmask,
-                                      window.surface->format->Bmask,
-                                      window.surface->format->Amask);
-    assert(window.bbSurface);
-
-    run();
-
-    return 0;
 }
