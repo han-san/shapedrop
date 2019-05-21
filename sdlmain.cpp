@@ -13,8 +13,6 @@ struct {
     SDL_Window* handle;
     SDL_Surface* surface;
     SDL_Surface* bbSurface;
-    V2 dim;
-    BackBuffer bb;
 } window = {};
 
 auto get_window_scale() -> int
@@ -36,14 +34,11 @@ auto get_back_buffer() -> BackBuffer
 
 auto get_window_dimensions() -> V2
 {
-    return window.dim;
+    return {window.surface->w, window.surface->h};
 }
 
 auto resize_window(V2 dimensions) {
     SDL_SetWindowSize(window.handle, dimensions.w, dimensions.h);
-    window.dim.w = dimensions.w;
-    window.dim.h = dimensions.h;
-
     window.surface = SDL_GetWindowSurface(window.handle);
     assert(window.surface);
     SDL_FreeSurface(window.bbSurface);
@@ -54,7 +49,6 @@ auto resize_window(V2 dimensions) {
                                       window.surface->format->Bmask,
                                       window.surface->format->Amask);
     assert(window.bbSurface);
-    window.bb = get_back_buffer();
 }
 
 auto change_window_scale(int newScale) -> void {
@@ -142,12 +136,12 @@ auto init_window() {
     }
     --newScale;
     scale = newScale;
-    window.dim.w = baseWindowWidth * scale;
-    window.dim.h = baseWindowHeight * scale;
+    auto initialWindowWidth = baseWindowWidth * scale;
+    auto initialWindowHeight = baseWindowHeight * scale;
 
     window.handle = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                               window.dim.w, window.dim.h, SDL_WINDOW_SHOWN);
+                               initialWindowWidth, initialWindowHeight, SDL_WINDOW_SHOWN);
     assert(window.handle);
 
     window.surface = SDL_GetWindowSurface(window.handle);
