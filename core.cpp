@@ -665,6 +665,16 @@ auto run() -> void
             return **currentShapeIterator;
         }
 
+        auto get_preview_shapes_array() -> ArrayStack<Shape const*, 14> {
+            ArrayStack<Shape const*, 14> lookaheadArray = {};
+            for (auto it = currentShapeIterator + 1; it != shapePool.end(); ++it) {
+                lookaheadArray.push_back(*it);
+            }
+            for (auto it = previewPool.cbegin(); it != previewPool.cend(); ++it) {
+                lookaheadArray.push_back(*it);
+            }
+            return lookaheadArray;
+        }
     };
     ShapePool shapePool{shapes};
 
@@ -832,6 +842,14 @@ auto run() -> void
         // draw current shape
         for (auto& position : currentShape.get_absolute_block_positions()) {
             draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
+        }
+
+        // draw shape previews
+        auto previewArray = shapePool.get_preview_shapes_array();
+        auto nextShape = *previewArray.front();
+        nextShape.pos.x = columns / 2 + 2;
+        for (auto& position : nextShape.get_absolute_block_positions()) {
+            draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, nextShape.color.r, nextShape.color.g, nextShape.color.b);
         }
 
         swap_buffer();
