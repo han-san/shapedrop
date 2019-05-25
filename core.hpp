@@ -56,7 +56,7 @@ enum class Message {
 auto constexpr rows = 22;
 auto constexpr columns = 10;
 
-auto constexpr baseWindowWidth = columns + 2;
+auto constexpr baseWindowWidth = columns + 2 + 5; // space for border and sidebar
 auto constexpr baseWindowHeight = rows + 2;
 
 auto run() -> void;

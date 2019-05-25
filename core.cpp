@@ -846,10 +846,15 @@ auto run() -> void
 
         // draw shape previews
         auto previewArray = shapePool.get_preview_shapes_array();
-        auto nextShape = *previewArray.front();
-        nextShape.pos.x = columns / 2 + 2;
-        for (auto& position : nextShape.get_absolute_block_positions()) {
-            draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, nextShape.color.r, nextShape.color.g, nextShape.color.b);
+        auto i = 0;
+        for (auto shapePointer : previewArray) {
+            auto shape = *shapePointer;
+            shape.pos.x = baseWindowWidth - 6;
+            shape.pos.y += 3 + 3 * i;
+            for (auto& position : shape.get_absolute_block_positions()) {
+                draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, shape.color.r, shape.color.g, shape.color.b);
+            }
+            ++i;
         }
 
         swap_buffer();
