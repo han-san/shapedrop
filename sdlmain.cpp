@@ -164,5 +164,6 @@ auto main(int argc, char** argv) -> int {
     platform::SDL::init_window();
 
     run();
-}
 
+    return 0;
+}
