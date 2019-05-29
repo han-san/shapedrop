@@ -705,7 +705,7 @@ auto run() -> void
             if (message == Message::QUIT) {
                 gRunning = false;
             } else if (message == Message::RESET) {
-                init();
+                /* init(); */
             } else if (message == Message::MOVE_RIGHT) {
                 // if currentShape is on top of a block before move,
                 // the drop clock needs to be reset
@@ -855,6 +855,14 @@ auto run() -> void
                 draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, shape.color.r, shape.color.g, shape.color.b);
             }
             ++i;
+        }
+
+        // cover top part of border
+        auto topSize = scale * 3;
+        for (auto y = 0; y < topSize; ++y) {
+            for (auto x = 0; x < windim.w; ++x) {
+                draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
+            }
         }
 
         swap_buffer();
