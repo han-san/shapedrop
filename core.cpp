@@ -5,8 +5,8 @@
 #include <array>
 
 #include <SDL2/SDL.h>
-#include <jlib/jint.h>
 
+#include "jint.h"
 #include "core.hpp"
 #include "platform.hpp"
 
