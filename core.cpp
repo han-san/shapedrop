@@ -648,6 +648,24 @@ auto remove_full_rows(std::array<Block, rows * columns>& board) {
     }
 }
 
+auto print_board(std::array<Block, rows * columns>& board) {
+    std::cout << ' ';
+    for (auto i = 0; i < columns; ++i) std::cout << "_";
+    std::cout << '\n';
+    for (auto y = 0; y < rows; ++y) {
+        std::cout << '|';
+        for (auto x = 0; x < columns; ++x) {
+            auto index = y * columns + x;
+            auto currBlock = board[index];
+            std::cout << (currBlock.isActive ? "█" : " ");
+        }
+        std::cout << "|\n";
+    }
+    std::cout << '|';
+    for (auto i = 0; i < columns; ++i) std::cout << "-";
+    std::cout << "|\n";
+}
+
 namespace tests {
 auto remove_full_rows() {
     auto y = Block { {}, true };
