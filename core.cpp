@@ -591,6 +591,19 @@ auto remove_full_rows(std::array<Block, rows * columns>& board) {
             }
         }
 
+        auto move_row_down = [&board](int rowNumber, int distance) {
+            assert(distance > 0);
+            for (auto x = 0; x < columns; ++x) {
+                auto index = rowNumber * columns + x;
+                auto newIndex = (rowNumber + distance) * columns + x;
+                assert((rowNumber + distance) < rows);
+                auto& oldBlock = board[index];
+                auto& newBlock = board[newIndex];
+                newBlock = oldBlock;
+                oldBlock.isActive = false;
+            }
+        };
+
         // if the amount of rows is 2 or 3, there could be non-full rows
         // between full rows which need to be moved different amounts
 
@@ -614,17 +627,7 @@ auto remove_full_rows(std::array<Block, rows * columns>& board) {
                 if (!found) {
                     // a non-full row between full rows
                     // move down the amount of empty rows that have been passed
-                    for (auto x = 0; x < columns; ++x) {
-                        auto index = y * columns + x;
-                        auto newIndex = (y + emptyRowsPassed) * columns + x;
-                        assert((y + emptyRowsPassed) < rows);
-                        auto& oldBlock = board[index];
-                        auto& newBlock = board[newIndex];
-                        if (oldBlock.isActive) {
-                            newBlock = oldBlock;
-                            oldBlock.isActive = false;
-                        }
-                    }
+                    move_row_down(y, emptyRowsPassed);
                     emptyRowsPassed = 0;
                 }
                 ++emptyRowsPassed;
@@ -633,17 +636,7 @@ auto remove_full_rows(std::array<Block, rows * columns>& board) {
 
         // then move all rows above removed rows
         for (auto y = rowsCleared.front() - 1; y >= 0; --y) {
-            for (auto x = 0; x < columns; ++x) {
-                auto index = y * columns + x;
-                auto newIndex = (y + rowsCleared.size()) * columns + x;
-                assert((y + rowsCleared.size()) < rows);
-                auto& oldBlock = board[index];
-                auto& newBlock = board[newIndex];
-                if (oldBlock.isActive) {
-                    newBlock = oldBlock;
-                    oldBlock.isActive = false;
-                }
-            }
+            move_row_down(y, rowsCleared.size());
         }
     }
 }
