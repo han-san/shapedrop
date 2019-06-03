@@ -562,6 +562,92 @@ auto init()
     srand(time(NULL));
 }
 
+auto remove_full_rows(std::array<Block, rows * columns>& board) {
+    // check if a row can be cleared
+    // a maximum of 4 rows can be cleared at once with default shapes
+    ArrayStack<int, 4> rowsCleared;
+
+    for (auto y = 0; y < rows; ++y) {
+        auto rowIsFull = true;
+        for (auto x = 0; x < columns; ++x) {
+            auto boardIndex = y * columns + x;
+            if (!board[boardIndex].isActive) {
+                rowIsFull = false;
+                break;
+            }
+        }
+        if (rowIsFull) {
+            rowsCleared.push_back(y);
+        }
+    }
+    assert(rowsCleared.size() <= 4);
+
+    if (!rowsCleared.empty()) {
+        // remove rows
+        for (auto y : rowsCleared) {
+            for (auto x = 0; x < columns; ++x) {
+                auto index = y * columns + x;
+                board[index].isActive = false;
+            }
+        }
+
+        // if the amount of rows is 2 or 3, there could be non-full rows
+        // between full rows which need to be moved different amounts
+
+        // first move any potential rows between the cleared ones
+        if (rowsCleared.size() == 2 || rowsCleared.size() == 3) {
+            auto topRow = rowsCleared.front();
+            auto botRow = rowsCleared.back();
+            assert(topRow >= 0 && topRow < rows);
+            assert(botRow >= 0 && botRow < rows);
+            assert(botRow >= topRow);
+
+            auto emptyRowsPassed = 0;
+            for (auto y = botRow; y != topRow; --y) {
+                auto found = false;
+                for (auto row : rowsCleared) {
+                    if (row == y) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    // a non-full row between full rows
+                    // move down the amount of empty rows that have been passed
+                    for (auto x = 0; x < columns; ++x) {
+                        auto index = y * columns + x;
+                        auto newIndex = (y + emptyRowsPassed) * columns + x;
+                        assert((y + emptyRowsPassed) < rows);
+                        auto& oldBlock = board[index];
+                        auto& newBlock = board[newIndex];
+                        if (oldBlock.isActive) {
+                            newBlock = oldBlock;
+                            oldBlock.isActive = false;
+                        }
+                    }
+                    emptyRowsPassed = 0;
+                }
+                ++emptyRowsPassed;
+            }
+        }
+
+        // then move all rows above removed rows
+        for (auto y = rowsCleared.front() - 1; y >= 0; --y) {
+            for (auto x = 0; x < columns; ++x) {
+                auto index = y * columns + x;
+                auto newIndex = (y + rowsCleared.size()) * columns + x;
+                assert((y + rowsCleared.size()) < rows);
+                auto& oldBlock = board[index];
+                auto& newBlock = board[newIndex];
+                if (oldBlock.isActive) {
+                    newBlock = oldBlock;
+                    oldBlock.isActive = false;
+                }
+            }
+        }
+    }
+}
+
 auto run() -> void
 {
     gRunning = true;
@@ -569,58 +655,6 @@ auto run() -> void
     init();
 
     Board board = {};
-
-    auto remove_full_rows = [](std::array<Block, rows * columns>& board) {
-        // check if a row can be cleared
-        // a maximum of 4 rows can be cleared at once with default shapes
-        ArrayStack<int, 4> rowsCleared;
-
-        for (auto y = 0; y < rows; ++y) {
-            auto rowIsFull = true;
-            for (auto x = 0; x < columns; ++x) {
-                auto boardIndex = y * columns + x;
-                if (!board[boardIndex].isActive) {
-                    rowIsFull = false;
-                    break;
-                }
-            }
-            if (rowIsFull) {
-                rowsCleared.push_back(y);
-            }
-        }
-        assert(rowsCleared.size() <= 4);
-
-        if (!rowsCleared.empty()) {
-            auto topRow = rowsCleared.front();
-            auto botRow = rowsCleared.back();
-            assert(topRow >= 0 && topRow < rows);
-            assert(botRow >= 0 && botRow < rows);
-            assert(botRow >= topRow);
-
-            // remove rows
-            for (auto y = topRow; y <= botRow; ++y) {
-                for (auto x = 0; x < columns; ++x) {
-                    auto index = y * columns + x;
-                    board[index].isActive = false;
-                }
-            }
-
-            // move rows above removed rows
-            for (auto y = topRow - 1; y >= 0; --y) {
-                for (auto x = 0; x < columns; ++x) {
-                    auto index = y * columns + x;
-                    auto newIndex = (y + rowsCleared.size()) * columns + x;
-                    assert((y + rowsCleared.size()) < rows);
-                    auto& oldBlock = board[index];
-                    auto& newBlock = board[newIndex];
-                    if (oldBlock.isActive) {
-                        newBlock = oldBlock;
-                        oldBlock.isActive = false;
-                    }
-                }
-            }
-        }
-    };
 
     std::array<Shape, 7> const shapes = {
         Shape(Shape::Type::I),
