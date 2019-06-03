@@ -648,8 +648,75 @@ auto remove_full_rows(std::array<Block, rows * columns>& board) {
     }
 }
 
+namespace tests {
+auto remove_full_rows() {
+    auto y = Block { {}, true };
+    auto n = Block { {}, false };
+    std::array<Block, rows * columns> boardStart = {
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, y, y, y, n, n, n,
+        n, n, n, y, y, n, y, n, n, n,
+        n, y, y, y, y, n, n, n, n, n,
+        n, y, n, n, y, n, n, n, n, n,
+        y, y, y, y, y, y, y, y, y, y,
+        y, n, y, n, y, n, y, n, y, n,
+        n, y, n, y, n, y, n, y, n, y,
+        y, y, y, y, y, y, y, y, y, y,
+    };
+
+    std::array<Block, rows * columns> boardEnd = {
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, n, n, n, n, n, n,
+        n, n, n, n, y, y, y, n, n, n,
+        n, n, n, y, y, n, y, n, n, n,
+        n, y, y, y, y, n, n, n, n, n,
+        n, y, n, n, y, n, n, n, n, n,
+        y, n, y, n, y, n, y, n, y, n,
+        n, y, n, y, n, y, n, y, n, y,
+    };
+
+    remove_full_rows(boardStart);
+
+    for (auto i = 0ul; i < boardStart.size(); ++i) {
+        assert(boardStart[i].isActive == boardEnd[i].isActive);
+    }
+}
+
+auto run() {
+    remove_full_rows();
+}
+} // namespace test
+
 auto run() -> void
 {
+    tests::run();
     gRunning = true;
 
     init();
