@@ -47,10 +47,10 @@ public:
 
     auto constexpr begin() noexcept -> iterator { return &m_data[0]; }
     auto constexpr begin() const noexcept -> const_iterator { return &m_data[0]; }
-    auto constexpr end() noexcept -> iterator { return &m_data[m_size]; }
-    auto constexpr end() const noexcept -> const_iterator { return &m_data[m_size]; }
+    auto constexpr end() noexcept -> iterator { return begin() + m_size; }
+    auto constexpr end() const noexcept -> const_iterator { return begin() + m_size; }
     auto constexpr cbegin() const noexcept -> const_iterator { return &m_data[0]; }
-    auto constexpr cend() const noexcept -> const_iterator { return &m_data[m_size]; }
+    auto constexpr cend() const noexcept -> const_iterator { return cbegin() + m_size; }
     auto constexpr front() -> reference { return m_data[0]; }
     auto constexpr front() const -> const_reference { return m_data[0]; }
     auto constexpr back() -> reference { return m_data[m_size - 1]; }
