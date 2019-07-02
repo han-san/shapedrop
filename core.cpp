@@ -651,7 +651,8 @@ auto print_board(std::array<Block, rows * columns>& board) {
         for (auto x = 0; x < columns; ++x) {
             auto index = y * columns + x;
             auto currBlock = board[index];
-            std::cout << (currBlock.isActive ? "█" : " ");
+
+            std::cout << (currBlock.isActive ? "O" : " ");
         }
         std::cout << "|\n";
     }
