@@ -3,6 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include <array>
+#include <random>
 
 #include <SDL2/SDL.h>
 
@@ -758,8 +759,9 @@ auto run() -> void
             };
             previewPool = shapePool;
 
-            std::random_shuffle(shapePool.begin(), shapePool.end());
-            std::random_shuffle(previewPool.begin(), previewPool.end());
+            // TODO: seed random engine
+            std::shuffle(shapePool.begin(), shapePool.end(), std::default_random_engine());
+            std::shuffle(previewPool.begin(), previewPool.end(), std::default_random_engine());
             currentShapeIterator = shapePool.begin();
         }
 
@@ -768,7 +770,7 @@ auto run() -> void
             if (currentShapeIterator == shapePool.end()) {
                 shapePool = previewPool;
                 currentShapeIterator = shapePool.begin();
-                std::random_shuffle(previewPool.begin(), previewPool.end());
+                std::shuffle(previewPool.begin(), previewPool.end(), std::default_random_engine());
             }
             return **currentShapeIterator;
         }
