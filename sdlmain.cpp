@@ -1,13 +1,20 @@
 #include <cassert>
+#include <string_view>
+#include <cstdio>
 
 #include <SDL2/SDL.h>
+
+#define STB_TRUETYPE_IMPLEMENTATION
+#include "stb_truetype.h"
 
 #include "sdlmain.hpp"
 #include "core.hpp"
 
+#include "jint.h"
+
 namespace platform::SDL {
 
-auto scale = 1;
+auto windowScale = 1;
 
 struct {
     SDL_Window* handle;
@@ -15,9 +22,41 @@ struct {
     SDL_Surface* bbSurface;
 } window = {};
 
+uchar static ttf_buffer[1<<25];
+stbtt_fontinfo font;
+
+auto init_font(std::string_view filePath) -> bool
+{
+    auto file = fopen(filePath.data(), "rb");
+    if (!file) return false;
+    fread(ttf_buffer, 1, 1<<25, file);
+    stbtt_InitFont(&font, ttf_buffer, stbtt_GetFontOffsetForIndex(&(*ttf_buffer), 0));
+    return true;
+}
+
+FontCharacter::FontCharacter(char c)
+    : scale(stbtt_ScaleForPixelHeight(&font, 48))
+{
+    bitmap = stbtt_GetCodepointBitmap(&font, 0, scale, c, &w, &h, &xoff, &yoff);
+    stbtt_GetFontVMetrics(&font, &ascent, 0, 0);
+}
+
+FontCharacter::~FontCharacter()
+{
+    stbtt_FreeBitmap(bitmap, font.userdata); // TODO: find out this actually does
+}
+
+auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale) -> float
+{
+    int advance;
+    int lsb;
+    stbtt_GetCodepointHMetrics(&font, codepoint, &advance, &lsb);
+    return scale * (advance + stbtt_GetCodepointKernAdvance(&font, codepoint, nextCodepoint));
+}
+
 auto get_window_scale() -> int
 {
-    return scale;
+    return windowScale;
 }
 
 auto get_back_buffer() -> BackBuffer
@@ -53,9 +92,9 @@ auto resize_window(V2 dimensions) {
 
 auto change_window_scale(int newScale) -> void {
     if (newScale < 1) newScale = 1;
-    if (scale == newScale) return;
-    scale = newScale;
-    resize_window({baseWindowWidth * scale, baseWindowHeight * scale});
+    if (windowScale == newScale) return;
+    windowScale = newScale;
+    resize_window({baseWindowWidth * windowScale, baseWindowHeight * windowScale});
 }
 
 auto swap_buffer() -> void
@@ -126,7 +165,7 @@ auto handle_input() -> Message
 auto init_window() {
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    auto newScale = scale;
+    auto newScale = windowScale;
     {
         auto dim = V2 {};
         do {
@@ -135,9 +174,9 @@ auto init_window() {
         } while (window_fits_on_screen(dim));
     }
     --newScale;
-    scale = newScale;
-    auto initialWindowWidth = baseWindowWidth * scale;
-    auto initialWindowHeight = baseWindowHeight * scale;
+    windowScale = newScale;
+    auto initialWindowWidth = baseWindowWidth * windowScale;
+    auto initialWindowHeight = baseWindowHeight * windowScale;
 
     window.handle = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -162,6 +201,11 @@ auto main(int argc, char** argv) -> int {
     if (argc || argv) {}
 
     platform::SDL::init_window();
+
+    if (!platform::SDL::init_font("c:/windows/fonts/arialbd.ttf")) {
+        assert(false);
+        return 1;
+    }
 
     run();
 

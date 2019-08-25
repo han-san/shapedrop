@@ -3,6 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include <array>
+#include <string_view>
 #include <random>
 
 #include <SDL2/SDL.h>
@@ -478,6 +479,47 @@ struct Point {
     float x;
     float y;
 };
+
+auto draw_font_character(BackBuffer* buf, FontCharacter fontCharacter, int realX, int realY)
+{
+    for (auto y = 0; y < fontCharacter.h; ++y) {
+        auto currY = realY + y + fontCharacter.yoff + (int)(fontCharacter.ascent * fontCharacter.scale);
+        if (currY < 0 || currY >= buf->h) continue;
+        for (auto x = 0; x < fontCharacter.w; ++x) {
+            auto currX = realX + x + fontCharacter.xoff;
+            if (currX < 0 || currX >= buf->w) continue;
+
+            auto currbyteindex = currY * buf->w + currX;
+            auto currbyte = ((u8*)buf->memory + currbyteindex * buf->bpp);
+
+            auto relativeIndex = y * fontCharacter.w + x;
+            auto a = fontCharacter.bitmap[relativeIndex];
+
+            auto alpha_blend = [](uint bg, uint fg, uint alpha) {
+                auto alphaRatio = alpha / 255.0;
+                return fg * alphaRatio + bg * (1 - alphaRatio);
+            };
+
+            *currbyte = alpha_blend(*currbyte, 0, a);
+            ++currbyte;
+            *currbyte = alpha_blend(*currbyte, 0, a);
+            ++currbyte;
+            *currbyte = alpha_blend(*currbyte, 0, a);
+        }
+    }
+}
+
+auto draw_text(BackBuffer* buf, std::string_view text, int x, int y)
+{
+    for (auto i = 0; i < text.size(); ++i) {
+        auto codepoint = text[i];
+        auto fontCharacter = FontCharacter(codepoint);
+        draw_font_character(buf, fontCharacter, x, y);
+
+        auto nextCodepoint = text[i + 1];
+        x += get_codepoint_kern_advance(codepoint, nextCodepoint, fontCharacter.scale);
+    }
+}
 
 auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint a = 0xff)
 {
@@ -979,6 +1021,8 @@ auto run() -> void
                 draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
             }
         }
+
+        draw_text(&bb, "Hello World!", 10, 10);
 
         swap_buffer();
     }
