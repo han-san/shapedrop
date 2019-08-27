@@ -116,35 +116,35 @@ auto handle_input() -> Message
     SDL_Event e;
     if (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) {
-            msg = Message::QUIT;
+            msg.type = Message::Type::QUIT;
         } else if (e.type == SDL_KEYDOWN) {
             switch (e.key.keysym.sym) {
             case SDLK_RIGHT: {
-                msg = Message::MOVE_RIGHT;
+                msg.type = Message::Type::MOVE_RIGHT;
             } break;
             case SDLK_LEFT: {
-                msg = Message::MOVE_LEFT;
+                msg.type = Message::Type::MOVE_LEFT;
             } break;
             case SDLK_r: {
-                msg = Message::RESET;
+                msg.type = Message::Type::RESET;
             } break;
             case SDLK_DOWN: {
-                msg = Message::INCREASE_SPEED;
+                msg.type = Message::Type::INCREASE_SPEED;
             } break;
             case SDLK_UP: {
-                msg = Message::DROP;
+                msg.type = Message::Type::DROP;
             } break;
             case SDLK_z: {
-                msg = Message::ROTATE_LEFT;
+                msg.type = Message::Type::ROTATE_LEFT;
             } break;
             case SDLK_x: {
-                msg = Message::ROTATE_RIGHT;
+                msg.type = Message::Type::ROTATE_RIGHT;
             } break;
             case SDLK_2: {
-                msg = Message::INCREASE_WINDOW_SIZE;
+                msg.type = Message::Type::INCREASE_WINDOW_SIZE;
             } break;
             case SDLK_1: {
-                msg = Message::DECREASE_WINDOW_SIZE;
+                msg.type = Message::Type::DECREASE_WINDOW_SIZE;
             } break;
             default: {
             } break;
@@ -152,8 +152,14 @@ auto handle_input() -> Message
         } else if (e.type == SDL_KEYUP) {
             switch (e.key.keysym.sym) {
             case SDLK_DOWN: {
-                msg = Message::RESET_SPEED;
+                msg.type = Message::Type::RESET_SPEED;
             } break;
+            }
+        } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+            if (e.button.button == SDL_BUTTON_LEFT) {
+                msg.type = Message::Type::MOUSEBUTTONDOWN;
+                msg.x = e.button.x;
+                msg.y = e.button.y;
             }
         }
     }

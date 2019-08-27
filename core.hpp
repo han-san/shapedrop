@@ -38,19 +38,26 @@ struct V3 {
     V3(int a = 0, int b = 0, int c = 0): x{a}, y{b}, z{c} {}
 };
 
-enum class Message {
-    NONE,
-    QUIT,
-    RESET,
-    MOVE_RIGHT,
-    MOVE_LEFT,
-    INCREASE_SPEED,
-    RESET_SPEED,
-    DROP,
-    ROTATE_LEFT,
-    ROTATE_RIGHT,
-    INCREASE_WINDOW_SIZE,
-    DECREASE_WINDOW_SIZE,
+struct Message {
+    enum class Type {
+        NONE,
+        QUIT,
+        RESET,
+        MOVE_RIGHT,
+        MOVE_LEFT,
+        INCREASE_SPEED,
+        RESET_SPEED,
+        DROP,
+        ROTATE_LEFT,
+        ROTATE_RIGHT,
+        INCREASE_WINDOW_SIZE,
+        DECREASE_WINDOW_SIZE,
+        MOUSEBUTTONDOWN,
+    };
+
+    Type type;
+    int x;
+    int y;
 };
 
 auto constexpr rows = 22;

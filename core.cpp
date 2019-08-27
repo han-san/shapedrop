@@ -852,6 +852,17 @@ auto run() -> void
     };
     auto gameState = GameState::MENU;
 
+    struct Button {
+        Square dimensions;
+        std::string text;
+    };
+    auto windim = get_window_dimensions();
+    auto playButton = Button {
+        Square { (float) windim.w / 3, (float) windim.h / 10 * 2, windim.w / 3, windim.h / 10 },
+               std::string("PLAY")
+    };
+    Button* currentButton = &playButton;
+
     while (gRunning) {
         auto newclock = clock();
         auto frameclocktime = newclock - currentclock;
@@ -864,65 +875,79 @@ auto run() -> void
 
         // input
         Message message;
-        while ((message = handle_input()) != Message::NONE) {
-            if (message == Message::QUIT) {
+        while ((message = handle_input()).type != Message::Type::NONE) {
+            // First check messages independent of whether in menu or game
+            if (message.type == Message::Type::QUIT) {
                 gRunning = false;
-            } else if (message == Message::RESET) {
+            } else if (message.type == Message::Type::RESET) {
                 /* init(); */
-            } else if (message == Message::MOVE_RIGHT) {
-                // if currentShape is on top of a block before move,
-                // the drop clock needs to be reset
-                auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
-                if (try_move(board, currentShape, {1, 0})) {
-                    currentShapeShadow = calculateShapeShadow(currentShape);
-                    lockclock = currentclock;
-                    if (isGrounded) {
-                        dropclock = currentclock;
-                    }
-                }
-            } else if (message == Message::MOVE_LEFT) {
-                // if currentShape is on top of a block before move,
-                // the drop clock needs to be reset
-                auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
-                if (try_move(board, currentShape, {-1, 0})) {
-                    currentShapeShadow = calculateShapeShadow(currentShape);
-                    lockclock = currentclock;
-                    if (isGrounded) {
-                        dropclock = currentclock;
-                    }
-                }
-            } else if (message == Message::INCREASE_WINDOW_SIZE) {
+            } else if (message.type == Message::Type::INCREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() + 1);
-            } else if (message == Message::DECREASE_WINDOW_SIZE) {
+            } else if (message.type == Message::Type::DECREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() - 1);
-            } else if (message == Message::INCREASE_SPEED) {
-                dropSpeed = maxDropSpeed;
-            } else if (message == Message::RESET_SPEED) {
-                dropSpeed = 1.0;
-            } else if (message == Message::DROP) {
-                while (try_move(board, currentShape, {0, 1})) {
-                    lockclock = currentclock;
-                }
-            } else if (message == Message::ROTATE_LEFT) {
-                // if currentShape is on top of a block before rotation,
-                // the drop clock needs to be reset
-                auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
-                if (currentShape.rotate(board, Shape::Rotation::LEFT)) {
-                    currentShapeShadow = calculateShapeShadow(currentShape);
-                    lockclock = currentclock;
-                    if (isGrounded) {
-                        dropclock = currentclock;
+            } else if (gameState == GameState::GAME) {
+                if (message.type == Message::Type::MOVE_RIGHT) {
+                    // if currentShape is on top of a block before move,
+                    // the drop clock needs to be reset
+                    auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
+                    if (try_move(board, currentShape, {1, 0})) {
+                        currentShapeShadow = calculateShapeShadow(currentShape);
+                        lockclock = currentclock;
+                        if (isGrounded) {
+                            dropclock = currentclock;
+                        }
+                    }
+                } else if (message.type == Message::Type::MOVE_LEFT) {
+                    // if currentShape is on top of a block before move,
+                    // the drop clock needs to be reset
+                    auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
+                    if (try_move(board, currentShape, {-1, 0})) {
+                        currentShapeShadow = calculateShapeShadow(currentShape);
+                        lockclock = currentclock;
+                        if (isGrounded) {
+                            dropclock = currentclock;
+                        }
+                    }
+                } else if (message.type == Message::Type::INCREASE_SPEED) {
+                    dropSpeed = maxDropSpeed;
+                } else if (message.type == Message::Type::RESET_SPEED) {
+                    dropSpeed = 1.0;
+                } else if (message.type == Message::Type::DROP) {
+                    while (try_move(board, currentShape, {0, 1})) {
+                        lockclock = currentclock;
+                    }
+                } else if (message.type == Message::Type::ROTATE_LEFT) {
+                    // if currentShape is on top of a block before rotation,
+                    // the drop clock needs to be reset
+                    auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
+                    if (currentShape.rotate(board, Shape::Rotation::LEFT)) {
+                        currentShapeShadow = calculateShapeShadow(currentShape);
+                        lockclock = currentclock;
+                        if (isGrounded) {
+                            dropclock = currentclock;
+                        }
+                    }
+                } else if (message.type == Message::Type::ROTATE_RIGHT) {
+                    // if currentShape is on top of a block before rotation,
+                    // the drop clock needs to be reset
+                    auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
+                    if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
+                        currentShapeShadow = calculateShapeShadow(currentShape);
+                        lockclock = currentclock;
+                        if (isGrounded) {
+                            dropclock = currentclock;
+                        }
                     }
                 }
-            } else if (message == Message::ROTATE_RIGHT) {
-                // if currentShape is on top of a block before rotation,
-                // the drop clock needs to be reset
-                auto isGrounded = !is_valid_move(board, currentShape, {0, 1});
-                if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
-                    currentShapeShadow = calculateShapeShadow(currentShape);
-                    lockclock = currentclock;
-                    if (isGrounded) {
-                        dropclock = currentclock;
+            } else if (gameState == GameState::MENU) {
+                if (message.type == Message::Type::MOUSEBUTTONDOWN) {
+                    if (message.x > currentButton->dimensions.x &&
+                        message.x < currentButton->dimensions.x + currentButton->dimensions.w &&
+                        message.y > currentButton->dimensions.y &&
+                        message.y < currentButton->dimensions.y + currentButton->dimensions.h)
+                    {
+                        gameState = GameState::GAME;
+                        init();
                     }
                 }
             }
@@ -990,7 +1015,9 @@ auto run() -> void
         switch (gameState) {
             case GameState::MENU: {
                 draw_text(&bb, "MENU", windim.w / 3, windim.h / 10, windim.h / 10);
-                draw_text(&bb, "Play", windim.w / 3, windim.h / 10 * 2, windim.h / 10);
+                if (currentButton) {
+                    draw_text(&bb, currentButton->text, currentButton->dimensions.x, currentButton->dimensions.y, currentButton->dimensions.h);
+                }
             } break;
             case GameState::GAME: {
                 // draw background
