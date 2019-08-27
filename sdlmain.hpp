@@ -13,7 +13,7 @@ public:
     float scale;
     int ascent;
 
-    FontCharacter(char c);
+    FontCharacter(char c, float pixelHeight);
     ~FontCharacter();
 };
 

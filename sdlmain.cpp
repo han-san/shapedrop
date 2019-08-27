@@ -34,8 +34,8 @@ auto init_font(std::string_view filePath) -> bool
     return true;
 }
 
-FontCharacter::FontCharacter(char c)
-    : scale(stbtt_ScaleForPixelHeight(&font, 48))
+FontCharacter::FontCharacter(char c, float pixelHeight)
+    : scale(stbtt_ScaleForPixelHeight(&font, pixelHeight))
 {
     bitmap = stbtt_GetCodepointBitmap(&font, 0, scale, c, &w, &h, &xoff, &yoff);
     stbtt_GetFontVMetrics(&font, &ascent, 0, 0);

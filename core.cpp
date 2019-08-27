@@ -509,11 +509,11 @@ auto draw_font_character(BackBuffer* buf, FontCharacter fontCharacter, int realX
     }
 }
 
-auto draw_text(BackBuffer* buf, std::string_view text, int x, int y)
+auto draw_text(BackBuffer* buf, std::string_view text, int x, int y, float pixelHeight)
 {
     for (size_t i = 0; i < text.size(); ++i) {
         auto codepoint = text[i];
-        auto fontCharacter = FontCharacter(codepoint);
+        auto fontCharacter = FontCharacter(codepoint, pixelHeight);
         draw_font_character(buf, fontCharacter, x, y);
 
         auto nextCodepoint = text[i + 1];
@@ -1022,7 +1022,7 @@ auto run() -> void
             }
         }
 
-        draw_text(&bb, "Hello World!", 10, 10);
+        draw_text(&bb, "Hello World!", 10, 10, 48);
 
         swap_buffer();
     }
