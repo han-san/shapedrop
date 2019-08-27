@@ -15,6 +15,11 @@ public:
 
     FontCharacter(char c, float pixelHeight);
     ~FontCharacter();
+
+    FontCharacter(FontCharacter const&) = delete;
+    FontCharacter(FontCharacter&&) = delete;
+    FontCharacter& operator=(FontCharacter const&) = delete;
+    FontCharacter& operator=(FontCharacter&&) = delete;
 };
 
 auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale) -> float;

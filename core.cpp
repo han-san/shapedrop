@@ -480,7 +480,7 @@ struct Point {
     float y;
 };
 
-auto draw_font_character(BackBuffer* buf, FontCharacter fontCharacter, int realX, int realY)
+auto draw_font_character(BackBuffer* buf, FontCharacter& fontCharacter, int realX, int realY)
 {
     for (auto y = 0; y < fontCharacter.h; ++y) {
         auto currY = realY + y + fontCharacter.yoff + (int)(fontCharacter.ascent * fontCharacter.scale);
