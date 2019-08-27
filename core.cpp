@@ -511,7 +511,7 @@ auto draw_font_character(BackBuffer* buf, FontCharacter fontCharacter, int realX
 
 auto draw_text(BackBuffer* buf, std::string_view text, int x, int y)
 {
-    for (auto i = 0; i < text.size(); ++i) {
+    for (size_t i = 0; i < text.size(); ++i) {
         auto codepoint = text[i];
         auto fontCharacter = FontCharacter(codepoint);
         draw_font_character(buf, fontCharacter, x, y);
