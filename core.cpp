@@ -856,12 +856,27 @@ auto run() -> void
         Square dimensions;
         std::string text;
     };
+
+    struct Menu {
+        enum class ID {
+            MAIN,
+        };
+        ID id;
+        std::vector<Button> buttons;
+    };
+
     auto windim = get_window_dimensions();
     auto playButton = Button {
         Square { (float) windim.w / 3, (float) windim.h / 10 * 2, windim.w / 3, windim.h / 10 },
                std::string("PLAY")
     };
-    Button* currentButton = &playButton;
+
+    auto mainMenu = Menu {
+        Menu::ID::MAIN,
+        { playButton }
+    };
+
+    auto currentMenu = &mainMenu;
 
     while (gRunning) {
         auto newclock = clock();
@@ -941,13 +956,20 @@ auto run() -> void
                 }
             } else if (gameState == GameState::MENU) {
                 if (message.type == Message::Type::MOUSEBUTTONDOWN) {
-                    if (message.x > currentButton->dimensions.x &&
-                        message.x < currentButton->dimensions.x + currentButton->dimensions.w &&
-                        message.y > currentButton->dimensions.y &&
-                        message.y < currentButton->dimensions.y + currentButton->dimensions.h)
-                    {
-                        gameState = GameState::GAME;
-                        init();
+                    if (!currentMenu) {
+                        std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
+                    }
+
+                    if (currentMenu->id == Menu::ID::MAIN) {
+                        auto& playButton = currentMenu->buttons[0];
+                        if (message.x > playButton.dimensions.x &&
+                            message.x < playButton.dimensions.x + playButton.dimensions.w &&
+                            message.y > playButton.dimensions.y &&
+                            message.y < playButton.dimensions.y + playButton.dimensions.h)
+                        {
+                            gameState = GameState::GAME;
+                            init();
+                        }
                     }
                 }
             }
@@ -1015,8 +1037,11 @@ auto run() -> void
         switch (gameState) {
             case GameState::MENU: {
                 draw_text(&bb, "MENU", windim.w / 3, windim.h / 10, windim.h / 10);
-                if (currentButton) {
-                    draw_text(&bb, currentButton->text, currentButton->dimensions.x, currentButton->dimensions.y, currentButton->dimensions.h);
+                if (!currentMenu) {
+                    std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
+                }
+                for (auto& button : currentMenu->buttons) {
+                    draw_text(&bb, button.text, button.dimensions.x, button.dimensions.y, button.dimensions.h);
                 }
             } break;
             case GameState::GAME: {
