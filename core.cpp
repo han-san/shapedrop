@@ -846,6 +846,12 @@ auto run() -> void
     auto currentShape = shapePool.current_shape();
     auto currentShapeShadow = calculateShapeShadow(currentShape);
 
+    enum class GameState {
+        MENU,
+        GAME,
+    };
+    auto gameState = GameState::MENU;
+
     while (gRunning) {
         auto newclock = clock();
         auto frameclocktime = newclock - currentclock;
@@ -923,7 +929,7 @@ auto run() -> void
         }
 
         // sim
-        {
+        if (gameState == GameState::GAME) {
             // 1 drop per second
             auto nextdropclock = dropclock + dropSpeed * CLOCKS_PER_SEC;
             if (currentclock > nextdropclock) {
@@ -981,48 +987,59 @@ auto run() -> void
             }
         }
 
-        // draw background
-        for (auto y = 2; y < rows; ++y) {
-            for (auto x = 0; x < columns; ++x) {
-                auto currindex = y * columns + x;
-                auto& block = board[currindex];
-                auto color = block.isActive ? block.color : Color { 0, 0, 0 };
-                draw_solid_square(&bb, {float((x + 1) * scale), float((y + 1) * scale), scale, scale}, color.r, color.g, color.b);
-            }
-        }
+        switch (gameState) {
+            case GameState::MENU: {
+                draw_text(&bb, "MENU", windim.w / 3, windim.h / 10, windim.h / 10);
+                draw_text(&bb, "Play", windim.w / 3, windim.h / 10 * 2, windim.h / 10);
+            } break;
+            case GameState::GAME: {
+                // draw background
+                for (auto y = 2; y < rows; ++y) {
+                    for (auto x = 0; x < columns; ++x) {
+                        auto currindex = y * columns + x;
+                        auto& block = board[currindex];
+                        auto color = block.isActive ? block.color : Color { 0, 0, 0 };
+                        draw_solid_square(&bb, {float((x + 1) * scale), float((y + 1) * scale), scale, scale}, color.r, color.g, color.b);
+                    }
+                }
 
-        // draw shadow
-        for (auto& position : currentShapeShadow.get_absolute_block_positions()) {
-            draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
-        }
+                // draw shadow
+                for (auto& position : currentShapeShadow.get_absolute_block_positions()) {
+                    draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
+                }
 
-        // draw current shape
-        for (auto& position : currentShape.get_absolute_block_positions()) {
-            draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
-        }
+                // draw current shape
+                for (auto& position : currentShape.get_absolute_block_positions()) {
+                    draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
+                }
 
-        // draw shape previews
-        auto previewArray = shapePool.get_preview_shapes_array();
-        auto i = 0;
-        for (auto shapePointer : previewArray) {
-            auto shape = *shapePointer;
-            shape.pos.x = baseWindowWidth - 6;
-            shape.pos.y += 3 + 3 * i;
-            for (auto& position : shape.get_absolute_block_positions()) {
-                draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, shape.color.r, shape.color.g, shape.color.b);
-            }
-            ++i;
-        }
+                // draw shape previews
+                auto previewArray = shapePool.get_preview_shapes_array();
+                auto i = 0;
+                for (auto shapePointer : previewArray) {
+                    auto shape = *shapePointer;
+                    shape.pos.x = baseWindowWidth - 6;
+                    shape.pos.y += 3 + 3 * i;
+                    for (auto& position : shape.get_absolute_block_positions()) {
+                        draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, shape.color.r, shape.color.g, shape.color.b);
+                    }
+                    ++i;
+                }
 
-        // cover top part of border
-        auto topSize = scale * 3;
-        for (auto y = 0; y < topSize; ++y) {
-            for (auto x = 0; x < windim.w; ++x) {
-                draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
-            }
-        }
+                // cover top part of border
+                auto topSize = scale * 3;
+                for (auto y = 0; y < topSize; ++y) {
+                    for (auto x = 0; x < windim.w; ++x) {
+                        draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
+                    }
+                }
 
-        draw_text(&bb, "Hello World!", 10, 10, 48);
+                draw_text(&bb, "Hello World!", 10, 10, 48);
+            } break;
+            default: {
+                assert(false);
+            } break;
+        }
 
         swap_buffer();
     }
