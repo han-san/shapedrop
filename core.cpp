@@ -551,6 +551,43 @@ auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint
     }
 }
 
+auto draw_hollow_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint a = 0xff, uint borderSize = 1)
+{
+    for (auto y = 0; y < sqr.h; ++y) {
+        auto pixely = (int)sqr.y + y;
+        if (pixely < 0 || pixely >= buf->h) {
+            continue;
+        }
+        for (auto x = 0; x < sqr.w; ++x) {
+            auto pixelx = (int)sqr.x + x;
+            if (pixelx < 0 || pixelx >= buf->w) {
+                continue;
+            }
+
+            // check if pixel is part of border
+            if (((x < 0 || x >= borderSize) && (x >= sqr.w || x < sqr.w - borderSize)) &&
+                ((y < 0 || y >= borderSize) && (y >= sqr.h || y < sqr.h - borderSize)))
+            {
+                continue;
+            }
+
+            auto currbyteindex = pixely * buf->w + pixelx;
+            auto currbyte = ((u8*)buf->memory + currbyteindex * buf->bpp);
+
+            auto alpha_blend = [](uint bg, uint fg, uint alpha) {
+                auto alphaRatio = alpha / 255.0;
+                return fg * alphaRatio + bg * (1 - alphaRatio);
+            };
+
+            *currbyte = alpha_blend(*currbyte, b, a);
+            ++currbyte;
+            *currbyte = alpha_blend(*currbyte, g, a);
+            ++currbyte;
+            *currbyte = alpha_blend(*currbyte, r, a);
+        }
+    }
+}
+
 auto draw_image(BackBuffer* backBuf, Point dest, BackBuffer* img)
 {
     for (auto y = 0; y < img->h; ++y) {
@@ -1041,6 +1078,7 @@ auto run() -> void
                     std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
                 }
                 for (auto& button : currentMenu->buttons) {
+                    draw_hollow_square(&bb, button.dimensions, 0, 0, 0);
                     draw_text(&bb, button.text, button.dimensions.x, button.dimensions.y, button.dimensions.h);
                 }
             } break;
