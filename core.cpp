@@ -553,7 +553,7 @@ auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint
     }
 }
 
-auto draw_hollow_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint a = 0xff, uint borderSize = 1)
+auto draw_hollow_square(BackBuffer* buf, Square sqr, int r, int g, int b, int a = 0xff, int borderSize = 1)
 {
     for (auto y = 0; y < sqr.h; ++y) {
         auto pixely = (int)sqr.y + y;
