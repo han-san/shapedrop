@@ -509,16 +509,18 @@ auto draw_font_character(BackBuffer* buf, FontCharacter& fontCharacter, int real
     }
 }
 
+auto draw_font_string(BackBuffer* buf, std::vector<FontCharacter>& fontString, int x, int y)
+{
+    for (auto& fontCharacter : fontString) {
+        draw_font_character(buf, fontCharacter, x, y);
+        x += fontCharacter.advance;
+    }
+}
+
 auto draw_text(BackBuffer* buf, std::string_view text, int x, int y, float pixelHeight)
 {
-    for (size_t i = 0; i < text.size(); ++i) {
-        auto codepoint = text[i];
-        auto fontCharacter = FontCharacter(codepoint, pixelHeight);
-        draw_font_character(buf, fontCharacter, x, y);
-
-        auto nextCodepoint = text[i + 1];
-        x += get_codepoint_kern_advance(codepoint, nextCodepoint, fontCharacter.scale);
-    }
+    auto fontString = create_font_string(text, pixelHeight);
+    draw_font_string(buf, fontString, x, y);
 }
 
 auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint a = 0xff)
@@ -1078,8 +1080,15 @@ auto run() -> void
                     std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
                 }
                 for (auto& button : currentMenu->buttons) {
-                    draw_hollow_square(&bb, button.dimensions, 0, 0, 0);
-                    draw_text(&bb, button.text, button.dimensions.x, button.dimensions.y, button.dimensions.h);
+                    auto fontString = create_font_string(button.text, button.dimensions.h);
+                    auto textWidth = std::accumulate(fontString.begin(), fontString.end(), 0.f,
+                                                     [](float const& a, FontCharacter const& b) {
+                        return a + b.advance;
+                    });
+                    auto outline = button.dimensions;
+                    outline.w = textWidth;
+                    draw_hollow_square(&bb, outline, 0, 0, 0);
+                    draw_font_string(&bb, fontString, button.dimensions.x, button.dimensions.y);
                 }
             } break;
             case GameState::GAME: {

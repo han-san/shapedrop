@@ -34,11 +34,20 @@ auto init_font(std::string_view filePath) -> bool
     return true;
 }
 
-FontCharacter::FontCharacter(char c, float pixelHeight)
+auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale) -> float
+{
+    int advance;
+    int lsb;
+    stbtt_GetCodepointHMetrics(&font, codepoint, &advance, &lsb);
+    return scale * (advance + stbtt_GetCodepointKernAdvance(&font, codepoint, nextCodepoint));
+}
+
+FontCharacter::FontCharacter(char c, float pixelHeight, char nextChar)
     : scale(stbtt_ScaleForPixelHeight(&font, pixelHeight))
 {
     bitmap = stbtt_GetCodepointBitmap(&font, 0, scale, c, &w, &h, &xoff, &yoff);
     stbtt_GetFontVMetrics(&font, &ascent, 0, 0);
+    advance = get_codepoint_kern_advance(c, nextChar, scale);
 }
 
 FontCharacter::~FontCharacter()
@@ -46,12 +55,19 @@ FontCharacter::~FontCharacter()
     stbtt_FreeBitmap(bitmap, font.userdata); // TODO: find out this actually does
 }
 
-auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale) -> float
+auto create_font_string(std::string_view string, float pixelHeight) -> std::vector<FontCharacter>
 {
-    int advance;
-    int lsb;
-    stbtt_GetCodepointHMetrics(&font, codepoint, &advance, &lsb);
-    return scale * (advance + stbtt_GetCodepointKernAdvance(&font, codepoint, nextCodepoint));
+    std::vector<FontCharacter> fontString;
+    fontString.reserve(string.size());
+
+    auto size = string.size();
+    for (size_t i = 0; i < size; ++i) {
+        auto c = string[i];
+        auto nextChar = i + 1 == size ? 0 : string[i + 1];
+        fontString.emplace_back(c, pixelHeight, nextChar);
+    }
+
+    return fontString;
 }
 
 auto get_window_scale() -> int
