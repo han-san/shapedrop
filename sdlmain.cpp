@@ -43,11 +43,11 @@ auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale)
 }
 
 FontCharacter::FontCharacter(char c, float pixelHeight, char nextChar)
-    : scale(stbtt_ScaleForPixelHeight(&font, pixelHeight))
+  : scale(stbtt_ScaleForPixelHeight(&font, pixelHeight)),
+    advance(get_codepoint_kern_advance(c, nextChar, scale))
 {
     bitmap = stbtt_GetCodepointBitmap(&font, 0, scale, c, &w, &h, &xoff, &yoff);
     stbtt_GetFontVMetrics(&font, &ascent, 0, 0);
-    advance = get_codepoint_kern_advance(c, nextChar, scale);
 }
 
 FontCharacter::~FontCharacter()

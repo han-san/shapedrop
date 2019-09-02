@@ -13,8 +13,9 @@ public:
     uchar* bitmap;
     int w, h;
     int xoff, yoff;
-    float scale;
     int ascent;
+    // advance depends on scale and must be declared after
+    float scale;
     float advance;
 
     FontCharacter(char c, float pixelHeight, char nextChar);
