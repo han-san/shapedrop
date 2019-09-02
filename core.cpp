@@ -480,6 +480,16 @@ struct Point {
     float y;
 };
 
+auto alpha_blend_channel(int bg, int fg, int alpha) -> float
+{
+    assert(bg >= 0 && bg <= 255);
+    assert(fg >= 0 && fg <= 255);
+    assert(alpha >= 0 && alpha <= 255);
+
+    auto alphaRatio = alpha / 255.f;
+    return fg * alphaRatio + bg * (1 - alphaRatio);
+}
+
 auto draw_font_character(BackBuffer* buf, FontCharacter& fontCharacter, int realX, int realY)
 {
     for (auto y = 0; y < fontCharacter.h; ++y) {
@@ -495,16 +505,11 @@ auto draw_font_character(BackBuffer* buf, FontCharacter& fontCharacter, int real
             auto relativeIndex = y * fontCharacter.w + x;
             auto a = fontCharacter.bitmap[relativeIndex];
 
-            auto alpha_blend = [](uint bg, uint fg, uint alpha) {
-                auto alphaRatio = alpha / 255.0;
-                return fg * alphaRatio + bg * (1 - alphaRatio);
-            };
-
-            *currbyte = alpha_blend(*currbyte, 0, a);
+            *currbyte = alpha_blend_channel(*currbyte, 0, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, 0, a);
+            *currbyte = alpha_blend_channel(*currbyte, 0, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, 0, a);
+            *currbyte = alpha_blend_channel(*currbyte, 0, a);
         }
     }
 }
@@ -537,16 +542,11 @@ auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint
             auto currbyteindex = pixely * buf->w + pixelx;
             auto currbyte = ((u8*)buf->memory + currbyteindex * buf->bpp);
 
-            auto alpha_blend = [](uint bg, uint fg, uint alpha) {
-                auto alphaRatio = alpha / 255.0;
-                return fg * alphaRatio + bg * (1 - alphaRatio);
-            };
-
-            *currbyte = alpha_blend(*currbyte, b, a);
+            *currbyte = alpha_blend_channel(*currbyte, b, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, g, a);
+            *currbyte = alpha_blend_channel(*currbyte, g, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, r, a);
+            *currbyte = alpha_blend_channel(*currbyte, r, a);
         }
     }
 }
