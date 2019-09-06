@@ -550,6 +550,7 @@ auto draw_text_normalized(BackBuffer& buf, std::string_view text, float x, float
 {
     x *= buf.w;
     y *= buf.h;
+    pixelHeight *= buf.h;
 
     draw_text(buf, text, x, y, pixelHeight);
 }
@@ -1126,7 +1127,7 @@ auto run() -> void
 
         switch (gameState) {
             case GameState::MENU: {
-                draw_text_normalized(bb, "MENU", (1.f / 3.f), (1.f / 10.f), windim.h / 10);
+                draw_text_normalized(bb, "MENU", (1.f / 3.f), (1.f / 10.f), (1.f / 10.f));
                 if (!currentMenu) {
                     std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
                 }
