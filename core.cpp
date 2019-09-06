@@ -522,10 +522,26 @@ auto draw_font_string(BackBuffer& buf, std::vector<FontCharacter>& fontString, i
     }
 }
 
+auto draw_font_string_normalized(BackBuffer& buf, std::vector<FontCharacter>& fontString, float x, float y)
+{
+    x *= buf.w;
+    y *= buf.h;
+
+    draw_font_string(buf, fontString, x, y);
+}
+
 auto draw_text(BackBuffer& buf, std::string_view text, int x, int y, float pixelHeight)
 {
     auto fontString = create_font_string(text, pixelHeight);
     draw_font_string(buf, fontString, x, y);
+}
+
+auto draw_text_normalized(BackBuffer& buf, std::string_view text, float x, float y, float pixelHeight)
+{
+    x *= buf.w;
+    y *= buf.h;
+
+    draw_text(buf, text, x, y, pixelHeight);
 }
 
 auto draw_solid_square(BackBuffer& buf, Square sqr, uint r, uint g, uint b, uint a = 0xff)
@@ -551,6 +567,16 @@ auto draw_solid_square(BackBuffer& buf, Square sqr, uint r, uint g, uint b, uint
             *currbyte = alpha_blend_channel(*currbyte, r, a);
         }
     }
+}
+
+auto draw_solid_square_normalized(BackBuffer& buf, Square sqr, uint r, uint g, uint b, uint a = 0xff)
+{
+    sqr.x *= buf.w;
+    sqr.y *= buf.h;
+    sqr.w *= buf.w;
+    sqr.h *= buf.h;
+
+    draw_solid_square(buf, sqr, r, g, b, a);
 }
 
 auto draw_hollow_square(BackBuffer& buf, Square sqr, int r, int g, int b, int a = 0xff, int borderSize = 1)
@@ -588,6 +614,16 @@ auto draw_hollow_square(BackBuffer& buf, Square sqr, int r, int g, int b, int a 
             *currbyte = alpha_blend(*currbyte, r, a);
         }
     }
+}
+
+auto draw_hollow_square_normalized(BackBuffer& buf, Square sqr, int r, int g, int b, int a = 0xff, int borderSize = 1)
+{
+    sqr.x *= buf.w;
+    sqr.y *= buf.h;
+    sqr.w *= buf.w;
+    sqr.h *= buf.h;
+
+    draw_hollow_square(buf, sqr, r, g, b, a, borderSize);
 }
 
 auto draw_image(BackBuffer& backBuf, Point dest, BackBuffer& img)
