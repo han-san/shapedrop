@@ -471,8 +471,8 @@ auto try_move(Board& board, Shape& shape, V2 move) {
 struct Square {
     float x;
     float y;
-    int w;
-    int h;
+    float w;
+    float h;
 };
 
 struct Point {
@@ -906,8 +906,11 @@ auto run() -> void
 
     auto windim = get_window_dimensions();
     auto playButton = Button {
-        Square { (float) windim.w / 3, (float) windim.h / 10 * 2, windim.w / 3, windim.h / 10 },
-               std::string("PLAY")
+        Square {
+            float(windim.w / 3), float(windim.h / 10 * 2),
+            float(windim.w / 3), float(windim.h / 10)
+        },
+        std::string("PLAY")
     };
 
     auto mainMenu = Menu {
@@ -1098,18 +1101,18 @@ auto run() -> void
                         auto currindex = y * columns + x;
                         auto& block = board[currindex];
                         auto color = block.isActive ? block.color : Color { 0, 0, 0 };
-                        draw_solid_square(&bb, {float((x + 1) * scale), float((y + 1) * scale), scale, scale}, color.r, color.g, color.b);
+                        draw_solid_square(&bb, {float((x + 1) * scale), float((y + 1) * scale), float(scale), float(scale)}, color.r, color.g, color.b);
                     }
                 }
 
                 // draw shadow
                 for (auto& position : currentShapeShadow.get_absolute_block_positions()) {
-                    draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
+                    draw_solid_square(&bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
                 }
 
                 // draw current shape
                 for (auto& position : currentShape.get_absolute_block_positions()) {
-                    draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
+                    draw_solid_square(&bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
                 }
 
                 // draw shape previews
@@ -1120,7 +1123,7 @@ auto run() -> void
                     shape.pos.x = baseWindowWidth - 6;
                     shape.pos.y += 3 + 3 * i;
                     for (auto& position : shape.get_absolute_block_positions()) {
-                        draw_solid_square(&bb, {float((position.x + 1) * scale), float((position.y + 1) * scale), scale, scale}, shape.color.r, shape.color.g, shape.color.b);
+                        draw_solid_square(&bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, shape.color.r, shape.color.g, shape.color.b);
                     }
                     ++i;
                 }
