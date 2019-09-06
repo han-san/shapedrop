@@ -28,7 +28,15 @@ public:
     FontCharacter(FontCharacter const&) = delete;
 };
 
-auto create_font_string(std::string_view string, float pixelHeight) -> std::vector<FontCharacter>;
+class FontString {
+public:
+    std::vector<FontCharacter> data;
+    float w = 0;
+    float h;
+
+    FontString(std::string_view string, float pixelHeight);
+};
+
 auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale) -> float;
 auto swap_buffer() -> void;
 auto get_back_buffer() -> BackBuffer;

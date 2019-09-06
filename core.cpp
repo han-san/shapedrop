@@ -524,15 +524,15 @@ auto draw_font_character(BackBuffer& buf, FontCharacter& fontCharacter, int real
     }
 }
 
-auto draw_font_string(BackBuffer& buf, std::vector<FontCharacter>& fontString, int x, int y)
+auto draw_font_string(BackBuffer& buf, FontString& fontString, int x, int y)
 {
-    for (auto& fontCharacter : fontString) {
+    for (auto& fontCharacter : fontString.data) {
         draw_font_character(buf, fontCharacter, x, y);
         x += fontCharacter.advance;
     }
 }
 
-auto draw_font_string_normalized(BackBuffer& buf, std::vector<FontCharacter>& fontString, float x, float y)
+auto draw_font_string_normalized(BackBuffer& buf, FontString& fontString, float x, float y)
 {
     x *= buf.w;
     y *= buf.h;
@@ -542,7 +542,7 @@ auto draw_font_string_normalized(BackBuffer& buf, std::vector<FontCharacter>& fo
 
 auto draw_text(BackBuffer& buf, std::string_view text, int x, int y, float pixelHeight)
 {
-    auto fontString = create_font_string(text, pixelHeight);
+    auto fontString = FontString(text, pixelHeight);
     draw_font_string(buf, fontString, x, y);
 }
 
@@ -1134,8 +1134,8 @@ auto run() -> void
                 for (auto& button : currentMenu->buttons) {
                     auto outlineScreenSpace = button.dimensions.to_screen_space();
 
-                    auto fontString = create_font_string(button.text, outlineScreenSpace.h);
-                    auto textWidth = std::accumulate(fontString.begin(), fontString.end(), 0.f,
+                    auto fontString = FontString(button.text, outlineScreenSpace.h);
+                    auto textWidth = std::accumulate(fontString.data.begin(), fontString.data.end(), 0.f,
                                                      [](float const& a, FontCharacter const& b) {
                         return a + b.advance;
                     });

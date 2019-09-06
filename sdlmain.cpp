@@ -55,19 +55,17 @@ FontCharacter::~FontCharacter()
     stbtt_FreeBitmap(bitmap, font.userdata); // TODO: find out this actually does
 }
 
-auto create_font_string(std::string_view string, float pixelHeight) -> std::vector<FontCharacter>
+FontString::FontString(std::string_view string, float pixelHeight)
+    : h{pixelHeight}
 {
-    std::vector<FontCharacter> fontString;
-    fontString.reserve(string.size());
-
     auto size = string.size();
+    data.reserve(size);
     for (size_t i = 0; i < size; ++i) {
         auto c = string[i];
         auto nextChar = i + 1 == size ? 0 : string[i + 1];
-        fontString.emplace_back(c, pixelHeight, nextChar);
+        auto& fontCharacter = data.emplace_back(c, pixelHeight, nextChar);
+        w += fontCharacter.advance;
     }
-
-    return fontString;
 }
 
 auto get_window_scale() -> int
