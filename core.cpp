@@ -480,36 +480,41 @@ struct Point {
     float y;
 };
 
-auto draw_font_character(BackBuffer* buf, FontCharacter& fontCharacter, int realX, int realY)
+auto alpha_blend_channel(int bg, int fg, int alpha) -> float
+{
+    assert(bg >= 0 && bg <= 255);
+    assert(fg >= 0 && fg <= 255);
+    assert(alpha >= 0 && alpha <= 255);
+
+    auto alphaRatio = alpha / 255.f;
+    return fg * alphaRatio + bg * (1 - alphaRatio);
+}
+
+auto draw_font_character(BackBuffer& buf, FontCharacter& fontCharacter, int realX, int realY)
 {
     for (auto y = 0; y < fontCharacter.h; ++y) {
         auto currY = realY + y + fontCharacter.yoff + (int)(fontCharacter.ascent * fontCharacter.scale);
-        if (currY < 0 || currY >= buf->h) continue;
+        if (currY < 0 || currY >= buf.h) continue;
         for (auto x = 0; x < fontCharacter.w; ++x) {
             auto currX = realX + x + fontCharacter.xoff;
-            if (currX < 0 || currX >= buf->w) continue;
+            if (currX < 0 || currX >= buf.w) continue;
 
-            auto currbyteindex = currY * buf->w + currX;
-            auto currbyte = ((u8*)buf->memory + currbyteindex * buf->bpp);
+            auto currbyteindex = currY * buf.w + currX;
+            auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
             auto relativeIndex = y * fontCharacter.w + x;
             auto a = fontCharacter.bitmap[relativeIndex];
 
-            auto alpha_blend = [](uint bg, uint fg, uint alpha) {
-                auto alphaRatio = alpha / 255.0;
-                return fg * alphaRatio + bg * (1 - alphaRatio);
-            };
-
-            *currbyte = alpha_blend(*currbyte, 0, a);
+            *currbyte = alpha_blend_channel(*currbyte, 0, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, 0, a);
+            *currbyte = alpha_blend_channel(*currbyte, 0, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, 0, a);
+            *currbyte = alpha_blend_channel(*currbyte, 0, a);
         }
     }
 }
 
-auto draw_font_string(BackBuffer* buf, std::vector<FontCharacter>& fontString, int x, int y)
+auto draw_font_string(BackBuffer& buf, std::vector<FontCharacter>& fontString, int x, int y)
 {
     for (auto& fontCharacter : fontString) {
         draw_font_character(buf, fontCharacter, x, y);
@@ -517,52 +522,47 @@ auto draw_font_string(BackBuffer* buf, std::vector<FontCharacter>& fontString, i
     }
 }
 
-auto draw_text(BackBuffer* buf, std::string_view text, int x, int y, float pixelHeight)
+auto draw_text(BackBuffer& buf, std::string_view text, int x, int y, float pixelHeight)
 {
     auto fontString = create_font_string(text, pixelHeight);
     draw_font_string(buf, fontString, x, y);
 }
 
-auto draw_solid_square(BackBuffer* buf, Square sqr, uint r, uint g, uint b, uint a = 0xff)
+auto draw_solid_square(BackBuffer& buf, Square sqr, uint r, uint g, uint b, uint a = 0xff)
 {
     for (auto y = 0; y < sqr.h; ++y) {
         auto pixely = (int)sqr.y + y;
-        if (pixely < 0 || pixely >= buf->h) {
+        if (pixely < 0 || pixely >= buf.h) {
             continue;
         }
         for (auto x = 0; x < sqr.w; ++x) {
             auto pixelx = (int)sqr.x + x;
-            if (pixelx < 0 || pixelx >= buf->w) {
+            if (pixelx < 0 || pixelx >= buf.w) {
                 continue;
             }
 
-            auto currbyteindex = pixely * buf->w + pixelx;
-            auto currbyte = ((u8*)buf->memory + currbyteindex * buf->bpp);
+            auto currbyteindex = pixely * buf.w + pixelx;
+            auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
-            auto alpha_blend = [](uint bg, uint fg, uint alpha) {
-                auto alphaRatio = alpha / 255.0;
-                return fg * alphaRatio + bg * (1 - alphaRatio);
-            };
-
-            *currbyte = alpha_blend(*currbyte, b, a);
+            *currbyte = alpha_blend_channel(*currbyte, b, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, g, a);
+            *currbyte = alpha_blend_channel(*currbyte, g, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, r, a);
+            *currbyte = alpha_blend_channel(*currbyte, r, a);
         }
     }
 }
 
-auto draw_hollow_square(BackBuffer* buf, Square sqr, int r, int g, int b, int a = 0xff, int borderSize = 1)
+auto draw_hollow_square(BackBuffer& buf, Square sqr, int r, int g, int b, int a = 0xff, int borderSize = 1)
 {
     for (auto y = 0; y < sqr.h; ++y) {
         auto pixely = (int)sqr.y + y;
-        if (pixely < 0 || pixely >= buf->h) {
+        if (pixely < 0 || pixely >= buf.h) {
             continue;
         }
         for (auto x = 0; x < sqr.w; ++x) {
             auto pixelx = (int)sqr.x + x;
-            if (pixelx < 0 || pixelx >= buf->w) {
+            if (pixelx < 0 || pixelx >= buf.w) {
                 continue;
             }
 
@@ -573,8 +573,8 @@ auto draw_hollow_square(BackBuffer* buf, Square sqr, int r, int g, int b, int a 
                 continue;
             }
 
-            auto currbyteindex = pixely * buf->w + pixelx;
-            auto currbyte = ((u8*)buf->memory + currbyteindex * buf->bpp);
+            auto currbyteindex = pixely * buf.w + pixelx;
+            auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
             auto alpha_blend = [](uint bg, uint fg, uint alpha) {
                 auto alphaRatio = alpha / 255.0;
@@ -590,23 +590,23 @@ auto draw_hollow_square(BackBuffer* buf, Square sqr, int r, int g, int b, int a 
     }
 }
 
-auto draw_image(BackBuffer* backBuf, Point dest, BackBuffer* img)
+auto draw_image(BackBuffer& backBuf, Point dest, BackBuffer& img)
 {
-    for (auto y = 0; y < img->h; ++y) {
+    for (auto y = 0; y < img.h; ++y) {
         auto pixely = (int)dest.y + y;
-        if (pixely < 0 || pixely >= backBuf->h) {
+        if (pixely < 0 || pixely >= backBuf.h) {
             continue;
         }
-        for (auto x = 0; x < img->w; ++x) {
+        for (auto x = 0; x < img.w; ++x) {
             auto pixelx = (int)dest.x + x;
-            if (pixelx < 0 || pixelx >= backBuf->w) {
+            if (pixelx < 0 || pixelx >= backBuf.w) {
                 continue;
             }
 
-            auto currBBbyteindex = pixely * backBuf->w + pixelx;
-            auto currBBbyte = ((u8*)backBuf->memory + currBBbyteindex * backBuf->bpp);
-            auto currimgbyteindex = y * img->w + x;
-            auto currimgbyte = ((u8*)img->memory + currimgbyteindex * img->bpp);
+            auto currBBbyteindex = pixely * backBuf.w + pixelx;
+            auto currBBbyte = ((u8*)backBuf.memory + currBBbyteindex * backBuf.bpp);
+            auto currimgbyteindex = y * img.w + x;
+            auto currimgbyte = ((u8*)img.memory + currimgbyteindex * img.bpp);
 
             auto r = *currimgbyte++;
             auto g = *currimgbyte++;
@@ -1072,13 +1072,13 @@ auto run() -> void
         auto scale = get_window_scale();
         for (auto y = 0; y < windim.h; ++y) {
             for (auto x = 0; x < windim.w; ++x) {
-                draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
+                draw_solid_square(bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
             }
         }
 
         switch (gameState) {
             case GameState::MENU: {
-                draw_text(&bb, "MENU", windim.w / 3, windim.h / 10, windim.h / 10);
+                draw_text(bb, "MENU", windim.w / 3, windim.h / 10, windim.h / 10);
                 if (!currentMenu) {
                     std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
                 }
@@ -1090,8 +1090,8 @@ auto run() -> void
                     });
                     auto outline = button.dimensions;
                     outline.w = textWidth;
-                    draw_hollow_square(&bb, outline, 0, 0, 0);
-                    draw_font_string(&bb, fontString, button.dimensions.x, button.dimensions.y);
+                    draw_hollow_square(bb, outline, 0, 0, 0);
+                    draw_font_string(bb, fontString, button.dimensions.x, button.dimensions.y);
                 }
             } break;
             case GameState::GAME: {
@@ -1101,18 +1101,18 @@ auto run() -> void
                         auto currindex = y * columns + x;
                         auto& block = board[currindex];
                         auto color = block.isActive ? block.color : Color { 0, 0, 0 };
-                        draw_solid_square(&bb, {float((x + 1) * scale), float((y + 1) * scale), float(scale), float(scale)}, color.r, color.g, color.b);
+                        draw_solid_square(bb, {float((x + 1) * scale), float((y + 1) * scale), float(scale), float(scale)}, color.r, color.g, color.b);
                     }
                 }
 
                 // draw shadow
                 for (auto& position : currentShapeShadow.get_absolute_block_positions()) {
-                    draw_solid_square(&bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
+                    draw_solid_square(bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
                 }
 
                 // draw current shape
                 for (auto& position : currentShape.get_absolute_block_positions()) {
-                    draw_solid_square(&bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
+                    draw_solid_square(bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
                 }
 
                 // draw shape previews
@@ -1123,7 +1123,7 @@ auto run() -> void
                     shape.pos.x = baseWindowWidth - 6;
                     shape.pos.y += 3 + 3 * i;
                     for (auto& position : shape.get_absolute_block_positions()) {
-                        draw_solid_square(&bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, shape.color.r, shape.color.g, shape.color.b);
+                        draw_solid_square(bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, shape.color.r, shape.color.g, shape.color.b);
                     }
                     ++i;
                 }
@@ -1132,11 +1132,11 @@ auto run() -> void
                 auto topSize = scale * 3;
                 for (auto y = 0; y < topSize; ++y) {
                     for (auto x = 0; x < windim.w; ++x) {
-                        draw_solid_square(&bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
+                        draw_solid_square(bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
                     }
                 }
 
-                draw_text(&bb, "Hello World!", 10, 10, 48);
+                draw_text(bb, "Hello World!", 10, 10, 48);
             } break;
             default: {
                 assert(false);
