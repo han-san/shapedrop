@@ -943,8 +943,8 @@ auto run() -> void
     auto windim = get_window_dimensions();
     auto playButton = Button {
         Square {
-            float(windim.w / 3), float(windim.h / 10 * 2),
-            float(windim.w / 3), float(windim.h / 10)
+            (1.f / 3.f), (2.f / 10.f),
+            (1.f / 3.f), (1.f / 10.f)
         },
         std::string("PLAY")
     };
@@ -1040,10 +1040,17 @@ auto run() -> void
 
                     if (currentMenu->id == Menu::ID::MAIN) {
                         auto& playButton = currentMenu->buttons[0];
-                        if (message.x > playButton.dimensions.x &&
-                            message.x < playButton.dimensions.x + playButton.dimensions.w &&
-                            message.y > playButton.dimensions.y &&
-                            message.y < playButton.dimensions.y + playButton.dimensions.h)
+                        auto screenSpaceDimensions = Square {
+                            playButton.dimensions.x * windim.w,
+                            playButton.dimensions.y * windim.h,
+                            playButton.dimensions.w * windim.w,
+                            playButton.dimensions.h * windim.h
+                        };
+
+                        if (message.x > screenSpaceDimensions.x &&
+                            message.x < screenSpaceDimensions.x + screenSpaceDimensions.w &&
+                            message.y > screenSpaceDimensions.y &&
+                            message.y < screenSpaceDimensions.y + screenSpaceDimensions.h)
                         {
                             gameState = GameState::GAME;
                             init();
@@ -1114,20 +1121,22 @@ auto run() -> void
 
         switch (gameState) {
             case GameState::MENU: {
-                draw_text(bb, "MENU", windim.w / 3, windim.h / 10, windim.h / 10);
+                draw_text_normalized(bb, "MENU", (1.f / 3.f), (1.f / 10.f), windim.h / 10);
                 if (!currentMenu) {
                     std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
                 }
                 for (auto& button : currentMenu->buttons) {
-                    auto fontString = create_font_string(button.text, button.dimensions.h);
+                    auto fontString = create_font_string(button.text, button.dimensions.h * bb.h);
                     auto textWidth = std::accumulate(fontString.begin(), fontString.end(), 0.f,
                                                      [](float const& a, FontCharacter const& b) {
                         return a + b.advance;
                     });
-                    auto outline = button.dimensions;
-                    outline.w = textWidth;
-                    draw_hollow_square(bb, outline, 0, 0, 0);
-                    draw_font_string(bb, fontString, button.dimensions.x, button.dimensions.y);
+                    auto outlineScreenSpace = Square {
+                        button.dimensions.x * bb.w, button.dimensions.y * bb.h,
+                        textWidth, button.dimensions.h * bb.h
+                    };
+                    draw_hollow_square(bb, outlineScreenSpace, 0, 0, 0);
+                    draw_font_string(bb, fontString, outlineScreenSpace.x, outlineScreenSpace.y);
                 }
             } break;
             case GameState::GAME: {
