@@ -473,6 +473,16 @@ struct Square {
     float y;
     float w;
     float h;
+
+    auto to_screen_space() -> Square {
+        auto bb = get_back_buffer();
+        return { x * bb.w, y * bb.h, w * bb.w, h * bb.h };
+    }
+
+    auto to_normalized() -> Square {
+        auto bb = get_back_buffer();
+        return { x / bb.w, y / bb.h, w / bb.w, h / bb.h };
+    }
 };
 
 struct Point {
@@ -1040,12 +1050,7 @@ auto run() -> void
 
                     if (currentMenu->id == Menu::ID::MAIN) {
                         auto& playButton = currentMenu->buttons[0];
-                        auto screenSpaceDimensions = Square {
-                            playButton.dimensions.x * windim.w,
-                            playButton.dimensions.y * windim.h,
-                            playButton.dimensions.w * windim.w,
-                            playButton.dimensions.h * windim.h
-                        };
+                        auto screenSpaceDimensions = playButton.dimensions.to_screen_space();
 
                         if (message.x > screenSpaceDimensions.x &&
                             message.x < screenSpaceDimensions.x + screenSpaceDimensions.w &&
@@ -1126,15 +1131,15 @@ auto run() -> void
                     std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
                 }
                 for (auto& button : currentMenu->buttons) {
-                    auto fontString = create_font_string(button.text, button.dimensions.h * bb.h);
+                    auto outlineScreenSpace = button.dimensions.to_screen_space();
+
+                    auto fontString = create_font_string(button.text, outlineScreenSpace.h);
                     auto textWidth = std::accumulate(fontString.begin(), fontString.end(), 0.f,
                                                      [](float const& a, FontCharacter const& b) {
                         return a + b.advance;
                     });
-                    auto outlineScreenSpace = Square {
-                        button.dimensions.x * bb.w, button.dimensions.y * bb.h,
-                        textWidth, button.dimensions.h * bb.h
-                    };
+
+                    outlineScreenSpace.w = textWidth;
                     draw_hollow_square(bb, outlineScreenSpace, 0, 0, 0);
                     draw_font_string(bb, fontString, outlineScreenSpace.x, outlineScreenSpace.y);
                 }
