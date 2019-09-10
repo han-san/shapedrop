@@ -215,3 +215,19 @@ public:
     auto get_absolute_block_positions() -> ArrayStack<Position, 4>;
     auto get_shadow(Board& board) -> Shape;
 };
+
+class ShapePool {
+    std::array<const Shape*, 7> shapePool;
+    decltype(shapePool) previewPool;
+    decltype(shapePool.begin()) currentShapeIterator;
+
+public:
+    ShapePool(const std::array<Shape, 7>& shapes);
+    ShapePool(ShapePool const& other);
+    ShapePool& operator=(ShapePool const& other);
+
+    auto reshuffle() -> void;
+    auto next_shape() -> Shape;
+    auto current_shape() -> Shape;
+    auto get_preview_shapes_array() -> ArrayStack<Shape const*, 14>;
+};

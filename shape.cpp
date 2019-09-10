@@ -1,4 +1,6 @@
 #include <cassert>
+#include <algorithm>
+#include <random>
 
 #include "board.hpp"
 
@@ -192,4 +194,67 @@ auto Shape::rotate(Board& board, Rotation dir) -> bool {
         }
     }
     return false;
+}
+
+ShapePool::ShapePool(const std::array<Shape, 7>& shapes)
+{
+    shapePool = {
+        &shapes[0], &shapes[1], &shapes[2],
+        &shapes[3], &shapes[4], &shapes[5],
+        &shapes[6],
+    };
+    previewPool = shapePool;
+
+    reshuffle();
+    currentShapeIterator = shapePool.begin();
+}
+
+
+ShapePool::ShapePool(ShapePool const& other)
+{
+    *this = other;
+    currentShapeIterator = shapePool.begin();
+}
+
+ShapePool& ShapePool::operator=(ShapePool const& other)
+{
+    this->shapePool = other.shapePool;
+    this->previewPool = other.previewPool;
+    currentShapeIterator = shapePool.begin();
+    return *this;
+}
+
+auto ShapePool::reshuffle() -> void
+{
+    // TODO: seed random engine
+    std::shuffle(shapePool.begin(), shapePool.end(), std::default_random_engine());
+    std::shuffle(previewPool.begin(), previewPool.end(), std::default_random_engine());
+}
+
+auto ShapePool::next_shape() -> Shape
+{
+    ++currentShapeIterator;
+    if (currentShapeIterator == shapePool.end()) {
+        shapePool = previewPool;
+        currentShapeIterator = shapePool.begin();
+        std::shuffle(previewPool.begin(), previewPool.end(), std::default_random_engine());
+    }
+    return **currentShapeIterator;
+}
+
+auto ShapePool::current_shape() -> Shape
+{
+    return **currentShapeIterator;
+}
+
+auto ShapePool::get_preview_shapes_array() -> ArrayStack<Shape const*, 14>
+{
+    ArrayStack<Shape const*, 14> lookaheadArray = {};
+    for (auto it = currentShapeIterator + 1; it != shapePool.end(); ++it) {
+        lookaheadArray.push_back(*it);
+    }
+    for (auto it = previewPool.cbegin(); it != previewPool.cend(); ++it) {
+        lookaheadArray.push_back(*it);
+    }
+    return lookaheadArray;
 }
