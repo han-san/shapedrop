@@ -2,35 +2,44 @@
 
 #include <array>
 
-struct V2 {
+template <typename T>
+struct V2Generic {
     union {
-        int w = 0;
-        int x;
+        T w = 0;
+        T x;
     };
     union {
-        int h = 0;
-        int y;
+        T h = 0;
+        T y;
     };
 
-    V2(int a = 0, int b = 0): x{a}, y{b} {}
+    V2Generic() = default;
+    V2Generic(T a, T b): x{a}, y{b} {}
 };
 
-struct V3 {
+template <typename T>
+struct V3Generic {
     union {
-        int x;
-        int r;
+        T x = 0;
+        T r;
     };
     union {
-        int y;
-        int g;
+        T y = 0;
+        T g;
     };
     union {
-        int z;
-        int b;
+        T z = 0;
+        T b;
     };
 
-    V3(int a = 0, int b = 0, int c = 0): x{a}, y{b}, z{c} {}
+    V3Generic() = default;
+    V3Generic(T a, T b, T c): x{a}, y{b}, z{c} {}
 };
+
+using V2 = V2Generic<int>;
+using V3 = V3Generic<int>;
+using V2f = V2Generic<float>;
+using V3f = V3Generic<float>;
 
 using Position = V2;
 using Color = V3;

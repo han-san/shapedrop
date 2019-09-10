@@ -35,10 +35,7 @@ struct Square {
     }
 };
 
-struct Point {
-    float x;
-    float y;
-};
+using Point = V2f;
 
 auto alpha_blend_channel(int bg, int fg, int alpha) -> float
 {
