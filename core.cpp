@@ -130,27 +130,28 @@ auto run() -> void
             } else if (message.type == Message::Type::DECREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() - 1);
             } else if (gameState == GameState::GAME) {
+
+                auto update_shadow_and_clocks = [&](bool isGrounded) {
+                    currentShapeShadow = currentShape.get_shadow(board);
+                    lockclock = currentclock;
+                    if (isGrounded) {
+                        dropclock = currentclock;
+                    }
+                };
+
                 if (message.type == Message::Type::MOVE_RIGHT) {
                     // if currentShape is on top of a block before move,
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.try_move(board, {1, 0})) {
-                        currentShapeShadow = currentShape.get_shadow(board);
-                        lockclock = currentclock;
-                        if (isGrounded) {
-                            dropclock = currentclock;
-                        }
+                        update_shadow_and_clocks(isGrounded);
                     }
                 } else if (message.type == Message::Type::MOVE_LEFT) {
                     // if currentShape is on top of a block before move,
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.try_move(board, {-1, 0})) {
-                        currentShapeShadow = currentShape.get_shadow(board);
-                        lockclock = currentclock;
-                        if (isGrounded) {
-                            dropclock = currentclock;
-                        }
+                        update_shadow_and_clocks(isGrounded);
                     }
                 } else if (message.type == Message::Type::INCREASE_SPEED) {
                     dropSpeed = maxDropSpeed;
@@ -165,22 +166,14 @@ auto run() -> void
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.rotate(board, Shape::Rotation::LEFT)) {
-                        currentShapeShadow = currentShape.get_shadow(board);
-                        lockclock = currentclock;
-                        if (isGrounded) {
-                            dropclock = currentclock;
-                        }
+                        update_shadow_and_clocks(isGrounded);
                     }
                 } else if (message.type == Message::Type::ROTATE_RIGHT) {
                     // if currentShape is on top of a block before rotation,
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
-                        currentShapeShadow = currentShape.get_shadow(board);
-                        lockclock = currentclock;
-                        if (isGrounded) {
-                            dropclock = currentclock;
-                        }
+                        update_shadow_and_clocks(isGrounded);
                     }
                 }
             } else if (gameState == GameState::MENU) {
