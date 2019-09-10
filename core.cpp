@@ -375,16 +375,8 @@ auto run() -> void
     };
     ShapePool shapePool{shapes};
 
-    auto calculateShapeShadow = [&board](Shape& shape) {
-        auto shapeShadow = shape;
-        while (board.is_valid_move(shapeShadow, {0, 1})) {
-            ++shapeShadow.pos.y;
-        }
-        return shapeShadow;
-    };
-
     auto currentShape = shapePool.current_shape();
-    auto currentShapeShadow = calculateShapeShadow(currentShape);
+    auto currentShapeShadow = currentShape.get_shadow(board);
 
     enum class GameState {
         MENU,
@@ -451,7 +443,7 @@ auto run() -> void
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.try_move(board, {1, 0})) {
-                        currentShapeShadow = calculateShapeShadow(currentShape);
+                        currentShapeShadow = currentShape.get_shadow(board);
                         lockclock = currentclock;
                         if (isGrounded) {
                             dropclock = currentclock;
@@ -462,7 +454,7 @@ auto run() -> void
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.try_move(board, {-1, 0})) {
-                        currentShapeShadow = calculateShapeShadow(currentShape);
+                        currentShapeShadow = currentShape.get_shadow(board);
                         lockclock = currentclock;
                         if (isGrounded) {
                             dropclock = currentclock;
@@ -481,7 +473,7 @@ auto run() -> void
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.rotate(board, Shape::Rotation::LEFT)) {
-                        currentShapeShadow = calculateShapeShadow(currentShape);
+                        currentShapeShadow = currentShape.get_shadow(board);
                         lockclock = currentclock;
                         if (isGrounded) {
                             dropclock = currentclock;
@@ -492,7 +484,7 @@ auto run() -> void
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
-                        currentShapeShadow = calculateShapeShadow(currentShape);
+                        currentShapeShadow = currentShape.get_shadow(board);
                         lockclock = currentclock;
                         if (isGrounded) {
                             dropclock = currentclock;
@@ -555,7 +547,7 @@ auto run() -> void
                     board.remove_full_rows();
                     currentShape = shapePool.next_shape();
                     // update shape shadow
-                    currentShapeShadow = calculateShapeShadow(currentShape);
+                    currentShapeShadow = currentShape.get_shadow(board);
                     lockclock = currentclock;
 
                     // game over if the new shape spawned on top of another shape

@@ -213,4 +213,5 @@ public:
     auto try_move(Board& board, V2 move) -> bool;
     auto get_block_positions() -> ArrayStack<Position, 4>;
     auto get_absolute_block_positions() -> ArrayStack<Position, 4>;
+    auto get_shadow(Board& board) -> Shape;
 };

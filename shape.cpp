@@ -44,6 +44,14 @@ Shape::Shape(Type type, Board& board)
     }
 }
 
+auto Shape::get_shadow(Board& board) -> Shape {
+    auto shapeShadow = *this;
+    while (board.is_valid_move(shapeShadow, {0, 1})) {
+        ++shapeShadow.pos.y;
+    }
+    return shapeShadow;
+};
+
 auto Shape::try_move(Board& board, V2 move) -> bool {
     if (board.is_valid_move(*this, move)) {
         pos.x += move.x;
