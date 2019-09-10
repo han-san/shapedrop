@@ -130,7 +130,6 @@ auto run() -> void
         init();
 
         board = {};
-        shapePool = {shapes};
         shapePool.reshuffle();
         currentShape = shapePool.current_shape();
         currentShapeShadow = currentShape.get_shadow(board);
