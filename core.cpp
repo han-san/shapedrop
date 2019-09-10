@@ -25,26 +25,13 @@ auto dropclock = (decltype(clock())) 0;
 auto constexpr lockdelay = (decltype(clock())) CLOCKS_PER_SEC / 2;
 auto lockclock = (decltype(clock())) 0;
 
-auto highScore = 0;
-
 auto dropSpeed = 1.0;
 auto maxDropSpeed = 0.1;
-
-auto init()
-{
-    currentclock = clock();
-    dropclock = currentclock;
-    lockclock = currentclock;
-
-    srand(time(NULL));
-}
 
 auto run() -> void
 {
     tests::run();
     gRunning = true;
-
-    init();
 
     Board board = {};
 
@@ -72,10 +59,29 @@ auto run() -> void
             };
             previewPool = shapePool;
 
+            reshuffle();
+            currentShapeIterator = shapePool.begin();
+        }
+
+
+        ShapePool(ShapePool const& other)
+        {
+            *this = other;
+            currentShapeIterator = shapePool.begin();
+        }
+
+        ShapePool& operator=(ShapePool const& other)
+        {
+            this->shapePool = other.shapePool;
+            this->previewPool = other.previewPool;
+            currentShapeIterator = shapePool.begin();
+            return *this;
+        }
+
+        auto reshuffle() -> void {
             // TODO: seed random engine
             std::shuffle(shapePool.begin(), shapePool.end(), std::default_random_engine());
             std::shuffle(previewPool.begin(), previewPool.end(), std::default_random_engine());
-            currentShapeIterator = shapePool.begin();
         }
 
         auto next_shape() -> Shape {
@@ -107,6 +113,28 @@ auto run() -> void
 
     auto currentShape = shapePool.current_shape();
     auto currentShapeShadow = currentShape.get_shadow(board);
+
+    auto linesCleared = 0;
+
+    auto init = [&] {
+        linesCleared = 0;
+        currentclock = clock();
+        dropclock = currentclock;
+        lockclock = currentclock;
+        srand(time(NULL));
+    };
+
+    init();
+
+    auto reset_game = [&] {
+        init();
+
+        board = {};
+        shapePool = {shapes};
+        shapePool.reshuffle();
+        currentShape = shapePool.current_shape();
+        currentShapeShadow = currentShape.get_shadow(board);
+    };
 
     enum class GameState {
         MENU,
@@ -162,7 +190,7 @@ auto run() -> void
             if (message.type == Message::Type::QUIT) {
                 gRunning = false;
             } else if (message.type == Message::Type::RESET) {
-                /* init(); */
+                reset_game();
             } else if (message.type == Message::Type::INCREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() + 1);
             } else if (message.type == Message::Type::DECREASE_WINDOW_SIZE) {
@@ -237,7 +265,7 @@ auto run() -> void
                             message.y < screenSpaceDimensions.y + screenSpaceDimensions.h)
                         {
                             gameState = GameState::GAME;
-                            init();
+                            reset_game();
                         }
                     }
                 }
@@ -275,7 +303,7 @@ auto run() -> void
                     }
 
                     auto rowsCleared = board.remove_full_rows();
-                    highScore += rowsCleared;
+                    linesCleared += rowsCleared;
 
                     currentShape = shapePool.next_shape();
                     // update shape shadow
@@ -289,7 +317,7 @@ auto run() -> void
 
                     if (gameOver) {
                         std::cout << "Game Over!\n";
-                        gRunning = false;
+                        gameState = GameState::MENU;
                     }
                 }
             }
@@ -366,8 +394,8 @@ auto run() -> void
                         draw_solid_square(bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
                     }
                 }
-                auto scoreString = std::to_string(highScore);
-                draw_text_normalized(bb, scoreString, 0.01, 0.01, 0.048);
+                auto linesClearedString = std::to_string(linesCleared);
+                draw_text_normalized(bb, linesClearedString, 0.01, 0.01, 0.048);
             } break;
             default: {
                 assert(false);
