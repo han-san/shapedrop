@@ -274,7 +274,9 @@ auto run() -> void
                         board.data[boardIndex] = {currentShape.color, true};
                     }
 
-                    board.remove_full_rows();
+                    auto rowsCleared = board.remove_full_rows();
+                    highScore += rowsCleared;
+
                     currentShape = shapePool.next_shape();
                     // update shape shadow
                     currentShapeShadow = currentShape.get_shadow(board);
@@ -364,8 +366,8 @@ auto run() -> void
                         draw_solid_square(bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
                     }
                 }
-
-                draw_text(bb, "Hello World!", 10, 10, 48);
+                auto scoreString = std::to_string(highScore);
+                draw_text_normalized(bb, scoreString, 0.01, 0.01, 0.048);
             } break;
             default: {
                 assert(false);

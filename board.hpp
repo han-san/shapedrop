@@ -27,6 +27,6 @@ public:
     auto is_valid_spot(V2 pos) -> bool;
     auto is_valid_move(Shape& shape, V2 move) -> bool;
     auto is_valid_shape(Shape& shape) -> bool;
-    auto remove_full_rows() -> void;
+    auto remove_full_rows() -> int;
     auto print_board() -> void;
 };

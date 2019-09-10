@@ -30,7 +30,7 @@ auto Board::is_valid_shape(Shape& shape) -> bool {
     return true;
 }
 
-auto Board::remove_full_rows() -> void {
+auto Board::remove_full_rows() -> int {
     // check if a row can be cleared
     // a maximum of 4 rows can be cleared at once with default shapes
     ArrayStack<int, 4> rowsCleared;
@@ -107,6 +107,8 @@ auto Board::remove_full_rows() -> void {
             move_row_down(y, rowsCleared.size());
         }
     }
+
+    return rowsCleared.size();
 }
 
 auto Board::print_board() -> void {
