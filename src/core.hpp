@@ -15,6 +15,7 @@ struct Message {
         NONE,
         QUIT,
         RESET,
+        HOLD,
         MOVE_RIGHT,
         MOVE_LEFT,
         INCREASE_SPEED,

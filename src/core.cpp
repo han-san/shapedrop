@@ -6,6 +6,7 @@
 #include <random>
 #include <numeric>
 #include <string>
+#include <optional>
 
 #include "jint.h"
 #include "platform.hpp"
@@ -48,6 +49,8 @@ auto run() -> void
 
     auto currentShape = shapePool.current_shape();
     auto currentShapeShadow = currentShape.get_shadow(board);
+
+    std::optional<Shape> holdShape{};
 
     auto linesCleared = 0;
 
@@ -175,6 +178,20 @@ auto run() -> void
                     if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
                         update_shadow_and_clocks(isGrounded);
                     }
+                } else if (message.type == Message::Type::HOLD) {
+                    // TODO: prevent holding multiple times in a row
+                    if (holdShape) {
+                        auto tmp = holdShape;
+
+                        holdShape = Shape(currentShape.type, board);
+                        currentShape = Shape(tmp->type, board);
+                    } else {
+                        holdShape = Shape(currentShape.type, board);
+                        currentShape = shapePool.next_shape();
+                    }
+                    // update shape shadow
+                    currentShapeShadow = currentShape.get_shadow(board);
+                    lockclock = currentclock;
                 }
             } else if (gameState == GameState::MENU) {
                 if (message.type == Message::Type::MOUSEBUTTONDOWN) {
@@ -321,8 +338,20 @@ auto run() -> void
                         draw_solid_square(bb, {float(x), float(y), 1, 1}, 0xff * (float(x) / windim.w), 0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)), 0xff * (float(y) / windim.h));
                     }
                 }
+
+                // draw number of lines cleared
                 auto linesClearedString = std::to_string(linesCleared);
                 draw_text_normalized(bb, linesClearedString, 0.01, 0.01, 0.048);
+
+                // draw held shape
+                if (holdShape) {
+                    auto shape = holdShape;
+                    shape->pos.x = baseWindowWidth - 6;
+                    shape->pos.y = 0;
+                    for (auto& position : shape->get_absolute_block_positions()) {
+                        draw_solid_square(bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, shape->color.r, shape->color.g, shape->color.b);
+                    }
+                }
             } break;
             default: {
                 assert(false);

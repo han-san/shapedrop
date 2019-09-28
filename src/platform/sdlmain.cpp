@@ -160,6 +160,9 @@ auto handle_input() -> Message
             case SDLK_1: {
                 msg.type = Message::Type::DECREASE_WINDOW_SIZE;
             } break;
+            case SDLK_SPACE: {
+                msg.type = Message::Type::HOLD;
+            } break;
             default: {
             } break;
             }

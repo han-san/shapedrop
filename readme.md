@@ -11,6 +11,7 @@ Controls
 * X: Rotate Right
 * 1: Decrease window size
 * 2: Increase window size
+* Space: Hold shape
 
 Dependencies
 ------------
