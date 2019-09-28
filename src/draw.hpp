@@ -1,6 +1,7 @@
 #pragma once
 
 #include "platform.hpp"
+#include "font.hpp"
 
 struct Square {
     float x;
