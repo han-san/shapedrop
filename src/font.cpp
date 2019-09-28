@@ -1,5 +1,7 @@
 #include "font.hpp"
 
+#include "platform.hpp"
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
@@ -24,7 +26,8 @@ auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale)
 }
 
 FontCharacter::FontCharacter(char c, float pixelHeight, char nextChar)
-  : scale(stbtt_ScaleForPixelHeight(&font, pixelHeight)),
+  : character(c),
+    scale(stbtt_ScaleForPixelHeight(&font, pixelHeight)),
     advance(get_codepoint_kern_advance(c, nextChar, scale))
 {
     bitmap = stbtt_GetCodepointBitmap(&font, 0, scale, c, &w, &h, &xoff, &yoff);
@@ -36,9 +39,12 @@ FontCharacter::~FontCharacter()
     stbtt_FreeBitmap(bitmap, font.userdata); // TODO: find out this actually does
 }
 
-FontString::FontString(std::string_view string, float pixelHeight)
-    : h{pixelHeight}
+FontString::FontString(std::string string, float pixelHeight)
+    // TODO: maybe move string? If so the parameter can't be used in the body
+    : string{string}
 {
+    auto w = 0.f;
+
     auto size = string.size();
     data.reserve(size);
     for (size_t i = 0; i < size; ++i) {
@@ -47,5 +53,37 @@ FontString::FontString(std::string_view string, float pixelHeight)
         auto& fontCharacter = data.emplace_back(c, pixelHeight, nextChar);
         w += fontCharacter.advance;
     }
+
+    auto windim = get_window_dimensions();
+    normalizedH = pixelHeight / windim.h;
+    normalizedW = w / windim.w;
 }
 
+auto FontString::from_width(std::string string, float desiredPixelWidth) -> FontString
+{
+    // start with a reasonable pixelheight value
+    auto pixelHeight = 12;
+
+    while (true) {
+        auto width = 0;
+        auto scale = stbtt_ScaleForPixelHeight(&font, pixelHeight);
+        auto size = string.size();
+        for (size_t i = 0; i < size; ++i) {
+            auto c = string[i];
+            auto nextChar = i + 1 == size ? 0 : string[i + 1];
+            auto advance = get_codepoint_kern_advance(c, nextChar, scale);
+            width += advance;
+        }
+
+        if (width > desiredPixelWidth) {
+            pixelHeight -= 1;
+        } else if (width < desiredPixelWidth - 2) {
+            pixelHeight += 1;
+        } else {
+            break;
+        }
+    }
+
+    // TODO: maybe move string here?
+    return FontString(string, pixelHeight);
+}

@@ -56,7 +56,7 @@ auto draw_font_string_normalized(BackBuffer& buf, FontString& fontString, float 
 
 auto draw_text(BackBuffer& buf, std::string_view text, int x, int y, float pixelHeight) -> void
 {
-    auto fontString = FontString(text, pixelHeight);
+    auto fontString = FontString::from_height(std::string(text), pixelHeight);
     draw_font_string(buf, fontString, x, y);
 }
 

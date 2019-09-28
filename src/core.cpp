@@ -6,6 +6,7 @@
 #include <random>
 #include <numeric>
 #include <string>
+#include <vector>
 #include <optional>
 
 #include "jint.h"
@@ -82,7 +83,7 @@ auto run() -> void
 
     struct Button {
         Square dimensions;
-        std::string text;
+        FontString text;
     };
 
     struct Menu {
@@ -94,20 +95,19 @@ auto run() -> void
     };
 
     auto windim = get_window_dimensions();
+    auto playButtonFontString = FontString::from_height("PLAY", windim.h * 1.f / 10.f);
     auto playButton = Button {
         Square {
             (1.f / 3.f), (2.f / 10.f),
-            // FIXME: w doesn't know anything about the length of the font text
-            //        at this point.
-            (1.f / 3.f), (1.f / 10.f)
+            playButtonFontString.normalizedW, playButtonFontString.normalizedH
         },
-        std::string("PLAY")
+        std::move(playButtonFontString)
     };
 
-    auto mainMenu = Menu {
+    Menu mainMenu = {
         Menu::ID::MAIN,
-        { playButton }
     };
+    mainMenu.buttons.push_back(std::move(playButton));
 
     auto currentMenu = &mainMenu;
 
@@ -292,15 +292,8 @@ auto run() -> void
                 for (auto& button : currentMenu->buttons) {
                     auto outlineScreenSpace = button.dimensions.to_screen_space();
 
-                    auto fontString = FontString(button.text, outlineScreenSpace.h);
-                    auto textWidth = std::accumulate(fontString.data.begin(), fontString.data.end(), 0.f,
-                                                     [](float const& a, FontCharacter const& b) {
-                        return a + b.advance;
-                    });
-
-                    outlineScreenSpace.w = textWidth;
                     draw_hollow_square(bb, outlineScreenSpace, 0, 0, 0);
-                    draw_font_string(bb, fontString, outlineScreenSpace.x, outlineScreenSpace.y);
+                    draw_font_string(bb, button.text, outlineScreenSpace.x, outlineScreenSpace.y);
                 }
             } break;
             case GameState::GAME: {

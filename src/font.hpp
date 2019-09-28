@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -11,6 +12,7 @@ public:
     int w, h;
     int xoff, yoff;
     int ascent;
+    char character;
     // advance depends on scale and must be declared after
     float scale;
     float advance;
@@ -27,11 +29,18 @@ public:
 
 class FontString {
 public:
+    std::string string;
     std::vector<FontCharacter> data;
-    float w = 0;
-    float h;
+    float normalizedW = 0;
+    float normalizedH;
 
-    FontString(std::string_view string, float pixelHeight);
+    auto static from_width(std::string string, float desiredPixelWidth) -> FontString;
+    auto static from_height(std::string string, float desiredPixelHeight) -> FontString {
+        return FontString(string, desiredPixelHeight);
+    }
+
+private:
+    FontString(std::string string, float pixelHeight);
 };
 
 auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale) -> float;
