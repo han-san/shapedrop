@@ -28,14 +28,14 @@ typedef signed long long sllong;
 
 #ifdef __cplusplus
 
-s8  constexpr operator "" _s8 (ullong n) { return n; }
-s16 constexpr operator "" _s16(ullong n) { return n; }
-s32 constexpr operator "" _s32(ullong n) { return n; }
-s64 constexpr operator "" _s64(ullong n) { return n; }
+s8  constexpr operator "" _s8 (ullong n) { return (s8 ) n; }
+s16 constexpr operator "" _s16(ullong n) { return (s16) n; }
+s32 constexpr operator "" _s32(ullong n) { return (s32) n; }
+s64 constexpr operator "" _s64(ullong n) { return (s64) n; }
 
-u8  constexpr operator "" _u8 (ullong n) { return n; }
-u16 constexpr operator "" _u16(ullong n) { return n; }
-u32 constexpr operator "" _u32(ullong n) { return n; }
-u64 constexpr operator "" _u64(ullong n) { return n; }
+u8  constexpr operator "" _u8 (ullong n) { return (u8 ) n; }
+u16 constexpr operator "" _u16(ullong n) { return (u16) n; }
+u32 constexpr operator "" _u32(ullong n) { return (u32) n; }
+u64 constexpr operator "" _u64(ullong n) { return (u64) n; }
 
 #endif
