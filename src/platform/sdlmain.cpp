@@ -2,15 +2,15 @@
 #include <string_view>
 #include <cstdio>
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include "stb_truetype.h"
+#include "../stb_truetype.h"
 
 #include "sdlmain.hpp"
-#include "core.hpp"
+#include "../core.hpp"
 
-#include "jint.h"
+#include "../jint.h"
 
 namespace platform::SDL {
 

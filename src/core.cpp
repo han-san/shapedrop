@@ -4,8 +4,8 @@
 #include <array>
 #include <string_view>
 #include <random>
-
-#include <SDL2/SDL.h>
+#include <numeric>
+#include <string>
 
 #include "jint.h"
 #include "platform.hpp"

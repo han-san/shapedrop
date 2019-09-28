@@ -1,2 +1,6 @@
+build
 bin
+!bin/readme.md
 tags
+.vs
+
