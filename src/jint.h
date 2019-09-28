@@ -38,4 +38,6 @@ u16 constexpr operator "" _u16(ullong n) { return (u16) n; }
 u32 constexpr operator "" _u32(ullong n) { return (u32) n; }
 u64 constexpr operator "" _u64(ullong n) { return (u64) n; }
 
+size_t constexpr operator "" _usize(ullong n) { return (size_t) n; }
+
 #endif
