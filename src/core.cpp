@@ -51,6 +51,7 @@ auto run() -> void
     auto currentShapeShadow = currentShape.get_shadow(board);
 
     std::optional<Shape> holdShape{};
+    auto hasHeld = false;
 
     auto linesCleared = 0;
 
@@ -179,19 +180,21 @@ auto run() -> void
                         update_shadow_and_clocks(isGrounded);
                     }
                 } else if (message.type == Message::Type::HOLD) {
-                    // TODO: prevent holding multiple times in a row
-                    if (holdShape) {
-                        auto tmp = holdShape;
+                    if (!hasHeld) {
+                        hasHeld = true;
+                        if (holdShape) {
+                            auto tmp = holdShape;
 
-                        holdShape = Shape(currentShape.type, board);
-                        currentShape = Shape(tmp->type, board);
-                    } else {
-                        holdShape = Shape(currentShape.type, board);
-                        currentShape = shapePool.next_shape();
+                            holdShape = Shape(currentShape.type, board);
+                            currentShape = Shape(tmp->type, board);
+                        } else {
+                            holdShape = Shape(currentShape.type, board);
+                            currentShape = shapePool.next_shape();
+                        }
+
+                        auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
+                        update_shadow_and_clocks(isGrounded);
                     }
-                    // update shape shadow
-                    currentShapeShadow = currentShape.get_shadow(board);
-                    lockclock = currentclock;
                 }
             } else if (gameState == GameState::MENU) {
                 if (message.type == Message::Type::MOUSEBUTTONDOWN) {
@@ -254,6 +257,8 @@ auto run() -> void
                     currentShapeShadow = currentShape.get_shadow(board);
                     lockclock = currentclock;
 
+                    hasHeld = false;
+
                     // game over if the new shape spawned on top of another shape
                     if (!board.is_valid_shape(currentShape)) {
                         gameOver = true;
@@ -263,6 +268,7 @@ auto run() -> void
                         std::cout << "Game Over!\n";
                         gameState = GameState::MENU;
                     }
+
                 }
             }
         }
