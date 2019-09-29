@@ -279,10 +279,12 @@ auto run() -> void
         auto scale = get_window_scale();
         for (auto y = 0; y < windim.h; ++y) {
             for (auto x = 0; x < windim.w; ++x) {
-                auto r = int(0xff * (float(x) / windim.w));
-                auto g = int(0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)));
-                auto b = int(0xff * (float(y) / windim.h));
-                draw_solid_square(bb, {float(x), float(y), 1, 1}, {r, g, b});
+                auto color = RGB {
+                    int(0xff * (float(x) / windim.w)),
+                    int(0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h))),
+                    int(0xff * (float(y) / windim.h)),
+                };
+                draw_solid_square(bb, {float(x), float(y), 1, 1}, color);
             }
         }
 
@@ -361,10 +363,12 @@ auto run() -> void
                 auto topSize = scale * 3;
                 for (auto y = 0; y < topSize; ++y) {
                     for (auto x = 0; x < windim.w; ++x) {
-                        auto r = int(0xff * (float(x) / windim.w));
-                        auto g = int(0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)));
-                        auto b = int(0xff * (float(y) / windim.h));
-                        draw_solid_square(bb, {float(x), float(y), 1, 1}, {r, g, b});
+                        auto color = RGB {
+                            int(0xff * (float(x) / windim.w)),
+                            int(0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h))),
+                            int(0xff * (float(y) / windim.h)),
+                        };
+                        draw_solid_square(bb, {float(x), float(y), 1, 1}, color);
                     }
                 }
 
