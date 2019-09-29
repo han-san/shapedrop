@@ -62,10 +62,10 @@ FontString::FontString(std::string string, float pixelHeight)
 auto FontString::from_width(std::string string, float desiredPixelWidth) -> FontString
 {
     // start with a reasonable pixelheight value
-    auto pixelHeight = 12;
+    auto pixelHeight = 12.f;
 
     while (true) {
-        auto width = 0;
+        auto width = 0.f;
         auto scale = stbtt_ScaleForPixelHeight(&font, pixelHeight);
         auto size = string.size();
         for (size_t i = 0; i < size; ++i) {
@@ -76,9 +76,9 @@ auto FontString::from_width(std::string string, float desiredPixelWidth) -> Font
         }
 
         if (width > desiredPixelWidth) {
-            pixelHeight -= 1;
-        } else if (width < desiredPixelWidth - 2) {
-            pixelHeight += 1;
+            pixelHeight -= 1.f;
+        } else if (width < desiredPixelWidth - 2.f) {
+            pixelHeight += 1.f;
         } else {
             break;
         }
