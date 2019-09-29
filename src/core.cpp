@@ -94,11 +94,14 @@ auto run() -> void
         std::vector<Button> buttons;
     };
 
+    // FIXME: The font string doesn't get updated if the window changes size
     auto windim = get_window_dimensions();
     auto playButtonFontString = FontString::from_height_normalized("PLAY", 1.f / 10.f);
+    auto x = (1.f - playButtonFontString.normalizedW) / 2;
+    auto y = 2.f / 10.f;
     auto playButton = Button {
         Square {
-            (1.f / 3.f), (2.f / 10.f),
+            x, y,
             playButtonFontString.normalizedW, playButtonFontString.normalizedH
         },
         std::move(playButtonFontString)
@@ -290,7 +293,10 @@ auto run() -> void
 
         switch (gameState) {
             case GameState::MENU: {
-                draw_text_normalized(bb, "MENU", (1.f / 3.f), (1.f / 10.f), (1.f / 10.f));
+                auto menuLabel = FontString::from_height_normalized("MENU", 1.f / 10.f);
+                auto x = (1.f - menuLabel.normalizedW) / 2.f;
+                auto y = 1.f / 10.f;
+                draw_font_string_normalized(bb, menuLabel, x, y);
                 if (!currentMenu) {
                     std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
                 }
