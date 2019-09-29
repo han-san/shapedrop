@@ -7,7 +7,7 @@
 #include "shape.hpp"
 
 struct Block {
-    Color color;
+    RGB color;
     bool isActive = false;
 };
 

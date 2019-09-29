@@ -204,7 +204,7 @@ public:
     Type type;
     RotationMap const* rotations = nullptr;
     int rotationIndex = 0;
-    Color color;
+    RGB color;
     Position pos;
 
     Shape(Type type, Board& board);

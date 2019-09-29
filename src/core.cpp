@@ -302,7 +302,7 @@ auto run() -> void
                     for (auto x = 0; x < board.columns; ++x) {
                         auto currindex = y * board.columns + x;
                         auto& block = board.data[currindex];
-                        auto color = block.isActive ? block.color : Color { 0, 0, 0 };
+                        auto color = block.isActive ? block.color : RGB { 0, 0, 0 };
                         draw_solid_square(bb, {float((x + 1) * scale), float((y + 1) * scale), float(scale), float(scale)}, color.r, color.g, color.b);
                     }
                 }

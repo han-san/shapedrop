@@ -12,31 +12,31 @@ Shape::Shape(Type type, Board& board)
     this->type = type;
     switch (type) {
         case Type::I: {
-            color = Color(0x00, 0xf0, 0xf0);
+            color = RGB(0x00, 0xf0, 0xf0);
             rotations = &IRotationMap;
         } break;
         case Type::O: {
-            color = Color(0xf0, 0xf0, 0x00);
+            color = RGB(0xf0, 0xf0, 0x00);
             rotations = &ORotationMap;
         } break;
         case Type::L: {
-            color = Color(0xf0, 0xa0, 0x00);
+            color = RGB(0xf0, 0xa0, 0x00);
             rotations = &LRotationMap;
         } break;
         case Type::J: {
-            color = Color(0x00, 0x00, 0xf0);
+            color = RGB(0x00, 0x00, 0xf0);
             rotations = &JRotationMap;
         } break;
         case Type::S: {
-            color = Color(0x00, 0xf0, 0x00);
+            color = RGB(0x00, 0xf0, 0x00);
             rotations = &SRotationMap;
         } break;
         case Type::Z: {
-            color = Color(0xf0, 0x00, 0x00);
+            color = RGB(0xf0, 0x00, 0x00);
             rotations = &ZRotationMap;
         } break;
         case Type::T: {
-            color = Color(0xa0, 0x00, 0xf0);
+            color = RGB(0xa0, 0x00, 0xf0);
             rotations = &TRotationMap;
         } break;
         default: {

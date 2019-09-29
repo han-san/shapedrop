@@ -36,13 +36,38 @@ struct V3Generic {
     V3Generic(T a, T b, T c): x{a}, y{b}, z{c} {}
 };
 
+template <typename T>
+struct V4Generic {
+    union {
+        T x = 0;
+        T r;
+    };
+    union {
+        T y = 0;
+        T g;
+    };
+    union {
+        T z = 0;
+        T b;
+    };
+    union {
+        T w = 0;
+        T a;
+    };
+
+    V4Generic() = default;
+    V4Generic(T a, T b, T c, T d): x{a}, y{b}, z{c} w{d} {}
+};
 using V2 = V2Generic<int>;
 using V3 = V3Generic<int>;
+using V4 = V4Generic<int>;
 using V2f = V2Generic<float>;
 using V3f = V3Generic<float>;
+using V4f = V4Generic<float>;
 
 using Position = V2;
-using Color = V3;
+using RGB = V3;
+using RGBA = V4;
 
 template <typename T, size_t I>
 class ArrayStack {
