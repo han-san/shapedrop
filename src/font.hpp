@@ -4,6 +4,8 @@
 #include <string_view>
 #include <vector>
 
+#include "platform.hpp"
+
 #include "jint.h"
 
 class FontCharacter {
@@ -35,8 +37,12 @@ public:
     float normalizedH;
 
     auto static from_width(std::string string, float desiredPixelWidth) -> FontString;
+    auto static from_width_normalized(std::string string, float desiredWidth) -> FontString;
     auto static from_height(std::string string, float desiredPixelHeight) -> FontString {
         return FontString(string, desiredPixelHeight);
+    }
+    auto static from_height_normalized(std::string string, float desiredHeight) -> FontString {
+        return from_height(string, get_window_dimensions().h * desiredHeight);
     }
 
 private:

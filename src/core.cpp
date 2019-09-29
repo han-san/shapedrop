@@ -95,7 +95,7 @@ auto run() -> void
     };
 
     auto windim = get_window_dimensions();
-    auto playButtonFontString = FontString::from_height("PLAY", windim.h * 1.f / 10.f);
+    auto playButtonFontString = FontString::from_height_normalized("PLAY", 1.f / 10.f);
     auto playButton = Button {
         Square {
             (1.f / 3.f), (2.f / 10.f),

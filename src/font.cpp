@@ -87,3 +87,8 @@ auto FontString::from_width(std::string string, float desiredPixelWidth) -> Font
     // TODO: maybe move string here?
     return FontString(string, pixelHeight);
 }
+
+auto FontString::from_width_normalized(std::string string, float desiredWidth) -> FontString
+{
+    return from_width(string, get_window_dimensions().w * desiredWidth);
+}
