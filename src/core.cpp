@@ -306,18 +306,36 @@ auto run() -> void
                         auto currindex = y * board.columns + x;
                         auto& block = board.data[currindex];
                         auto color = block.isActive ? block.color : RGB { 0, 0, 0 };
-                        draw_solid_square(bb, {float((x + 1) * scale), float((y + 1) * scale), float(scale), float(scale)}, color.r, color.g, color.b);
+                        auto square = Square {
+                            float((x + 1) * scale),
+                            float((y + 1) * scale),
+                            float(scale),
+                            float(scale)
+                        };
+                        draw_solid_square(bb, square, color.r, color.g, color.b);
                     }
                 }
 
                 // draw shadow
                 for (auto& position : currentShapeShadow.get_absolute_block_positions()) {
-                    draw_solid_square(bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
+                    auto square = Square {
+                        float((position.x + 1) * float(scale)),
+                        float((position.y + 1) * float(scale)),
+                        float(scale),
+                        float(scale)
+                    };
+                    draw_solid_square(bb, square, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
                 }
 
                 // draw current shape
                 for (auto& position : currentShape.get_absolute_block_positions()) {
-                    draw_solid_square(bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, currentShape.color.r, currentShape.color.g, currentShape.color.b);
+                    auto square = Square {
+                        float((position.x + 1) * float(scale)),
+                        float((position.y + 1) * float(scale)),
+                        float(scale),
+                        float(scale)
+                    };
+                    draw_solid_square(bb, square, currentShape.color.r, currentShape.color.g, currentShape.color.b);
                 }
 
                 // draw shape previews
@@ -328,7 +346,13 @@ auto run() -> void
                     shape.pos.x = baseWindowWidth - 6;
                     shape.pos.y += 3 + 3 * i;
                     for (auto& position : shape.get_absolute_block_positions()) {
-                        draw_solid_square(bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, shape.color.r, shape.color.g, shape.color.b);
+                        auto square = Square {
+                            float((position.x + 1) * float(scale)),
+                            float((position.y + 1) * float(scale)),
+                            float(scale),
+                            float(scale)
+                        };
+                        draw_solid_square(bb, square, shape.color.r, shape.color.g, shape.color.b);
                     }
                     ++i;
                 }
@@ -354,7 +378,13 @@ auto run() -> void
                     shape->pos.x = baseWindowWidth - 6;
                     shape->pos.y = 0;
                     for (auto& position : shape->get_absolute_block_positions()) {
-                        draw_solid_square(bb, {float((position.x + 1) * float(scale)), float((position.y + 1) * float(scale)), float(scale), float(scale)}, shape->color.r, shape->color.g, shape->color.b);
+                        auto square = Square {
+                            float((position.x + 1) * float(scale)),
+                            float((position.y + 1) * float(scale)),
+                            float(scale),
+                            float(scale)
+                        };
+                        draw_solid_square(bb, square, shape->color.r, shape->color.g, shape->color.b);
                     }
                 }
             } break;
