@@ -282,7 +282,7 @@ auto run() -> void
                 auto r = int(0xff * (float(x) / windim.w));
                 auto g = int(0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)));
                 auto b = int(0xff * (float(y) / windim.h));
-                draw_solid_square(bb, {float(x), float(y), 1, 1}, r, g, b);
+                draw_solid_square(bb, {float(x), float(y), 1, 1}, {r, g, b});
             }
         }
 
@@ -295,7 +295,7 @@ auto run() -> void
                 for (auto& button : currentMenu->buttons) {
                     auto outlineScreenSpace = button.dimensions.to_screen_space();
 
-                    draw_hollow_square(bb, outlineScreenSpace, 0, 0, 0);
+                    draw_hollow_square(bb, outlineScreenSpace, {0, 0, 0});
                     draw_font_string(bb, button.text, outlineScreenSpace.x, outlineScreenSpace.y);
                 }
             } break;
@@ -312,7 +312,7 @@ auto run() -> void
                             float(scale),
                             float(scale)
                         };
-                        draw_solid_square(bb, square, color.r, color.g, color.b);
+                        draw_solid_square(bb, square, color);
                     }
                 }
 
@@ -324,7 +324,7 @@ auto run() -> void
                         float(scale),
                         float(scale)
                     };
-                    draw_solid_square(bb, square, currentShapeShadow.color.r, currentShapeShadow.color.g, currentShapeShadow.color.b, 0xff / 2);
+                    draw_solid_square(bb, square, currentShapeShadow.color, 0xff / 2);
                 }
 
                 // draw current shape
@@ -335,7 +335,7 @@ auto run() -> void
                         float(scale),
                         float(scale)
                     };
-                    draw_solid_square(bb, square, currentShape.color.r, currentShape.color.g, currentShape.color.b);
+                    draw_solid_square(bb, square, currentShape.color);
                 }
 
                 // draw shape previews
@@ -352,7 +352,7 @@ auto run() -> void
                             float(scale),
                             float(scale)
                         };
-                        draw_solid_square(bb, square, shape.color.r, shape.color.g, shape.color.b);
+                        draw_solid_square(bb, square, shape.color);
                     }
                     ++i;
                 }
@@ -364,7 +364,7 @@ auto run() -> void
                         auto r = int(0xff * (float(x) / windim.w));
                         auto g = int(0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h)));
                         auto b = int(0xff * (float(y) / windim.h));
-                        draw_solid_square(bb, {float(x), float(y), 1, 1}, r, g, b);
+                        draw_solid_square(bb, {float(x), float(y), 1, 1}, {r, g, b});
                     }
                 }
 
@@ -384,7 +384,7 @@ auto run() -> void
                             float(scale),
                             float(scale)
                         };
-                        draw_solid_square(bb, square, shape->color.r, shape->color.g, shape->color.b);
+                        draw_solid_square(bb, square, shape->color);
                     }
                 }
             } break;

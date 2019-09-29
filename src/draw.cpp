@@ -69,7 +69,7 @@ auto draw_text_normalized(BackBuffer& buf, std::string_view text, float x, float
     draw_text(buf, text, x, y, pixelHeight);
 }
 
-auto draw_solid_square(BackBuffer& buf, Square sqr, uint r, uint g, uint b, uint a) -> void
+auto draw_solid_square(BackBuffer& buf, Square sqr, RGB color, uint a) -> void
 {
     for (auto y = 0; y < sqr.h; ++y) {
         auto pixely = (int)sqr.y + y;
@@ -85,26 +85,26 @@ auto draw_solid_square(BackBuffer& buf, Square sqr, uint r, uint g, uint b, uint
             auto currbyteindex = pixely * buf.w + pixelx;
             auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
-            *currbyte = alpha_blend_channel(*currbyte, b, a);
+            *currbyte = alpha_blend_channel(*currbyte, color.b, a);
             ++currbyte;
-            *currbyte = alpha_blend_channel(*currbyte, g, a);
+            *currbyte = alpha_blend_channel(*currbyte, color.g, a);
             ++currbyte;
-            *currbyte = alpha_blend_channel(*currbyte, r, a);
+            *currbyte = alpha_blend_channel(*currbyte, color.r, a);
         }
     }
 }
 
-auto draw_solid_square_normalized(BackBuffer& buf, Square sqr, uint r, uint g, uint b, uint a) -> void
+auto draw_solid_square_normalized(BackBuffer& buf, Square sqr, RGB color, uint a) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
     sqr.w *= buf.w;
     sqr.h *= buf.h;
 
-    draw_solid_square(buf, sqr, r, g, b, a);
+    draw_solid_square(buf, sqr, color, a);
 }
 
-auto draw_hollow_square(BackBuffer& buf, Square sqr, int r, int g, int b, int a, int borderSize) -> void
+auto draw_hollow_square(BackBuffer& buf, Square sqr, RGB color, int a, int borderSize) -> void
 {
     for (auto y = 0; y < sqr.h; ++y) {
         auto pixely = (int)sqr.y + y;
@@ -132,23 +132,23 @@ auto draw_hollow_square(BackBuffer& buf, Square sqr, int r, int g, int b, int a,
                 return fg * alphaRatio + bg * (1 - alphaRatio);
             };
 
-            *currbyte = alpha_blend(*currbyte, b, a);
+            *currbyte = alpha_blend(*currbyte, color.b, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, g, a);
+            *currbyte = alpha_blend(*currbyte, color.g, a);
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, r, a);
+            *currbyte = alpha_blend(*currbyte, color.r, a);
         }
     }
 }
 
-auto draw_hollow_square_normalized(BackBuffer& buf, Square sqr, int r, int g, int b, int a, int borderSize) -> void
+auto draw_hollow_square_normalized(BackBuffer& buf, Square sqr, RGB color, int a, int borderSize) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
     sqr.w *= buf.w;
     sqr.h *= buf.h;
 
-    draw_hollow_square(buf, sqr, r, g, b, a, borderSize);
+    draw_hollow_square(buf, sqr, color, a, borderSize);
 }
 
 auto draw_image(BackBuffer& backBuf, Point dest, BackBuffer& img) -> void
