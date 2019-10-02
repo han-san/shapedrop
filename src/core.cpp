@@ -352,7 +352,7 @@ auto run() -> void
                 for (auto shapePointer : previewArray) {
                     auto shape = *shapePointer;
                     shape.pos.x = baseWindowWidth - 6;
-                    shape.pos.y += 3 + 3 * i;
+                    shape.pos.y = 2 + 3 * i;
                     for (auto& position : shape.get_absolute_block_positions()) {
                         auto square = Square {
                             float((position.x + 1) * float(scale)),
@@ -380,17 +380,18 @@ auto run() -> void
 
                 // draw number of lines cleared
                 auto linesClearedString = std::to_string(linesCleared);
-                draw_text_normalized(bb, linesClearedString, 0.01, 0.01, 0.048);
+                auto fontString = FontString::from_height_normalized(linesClearedString, 0.048);
+                draw_font_string_normalized(bb, fontString, 1.0 - fontString.normalizedW - 0.01, 0.01);
 
                 // draw held shape
                 if (holdShape) {
                     auto shape = holdShape;
-                    shape->pos.x = baseWindowWidth - 6;
+                    shape->pos.x = 0;
                     shape->pos.y = 0;
                     for (auto& position : shape->get_absolute_block_positions()) {
                         auto square = Square {
                             float((position.x + 1) * float(scale)),
-                            float((position.y + 1) * float(scale)),
+                            float((position.y + 0.5f) * float(scale)),
                             float(scale),
                             float(scale)
                         };
