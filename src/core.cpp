@@ -55,6 +55,7 @@ auto run() -> void
     auto hasHeld = false;
 
     auto linesCleared = 0;
+    auto hiScore = 0;
 
     auto init = [&] {
         linesCleared = 0;
@@ -269,6 +270,7 @@ auto run() -> void
 
                     if (gameOver) {
                         std::cout << "Game Over!\n";
+                        if (linesCleared > hiScore) hiScore = linesCleared;
                         gameState = GameState::MENU;
                     }
 
@@ -306,6 +308,12 @@ auto run() -> void
                     draw_hollow_square(bb, outlineScreenSpace, {0, 0, 0});
                     draw_font_string(bb, button.text, outlineScreenSpace.x, outlineScreenSpace.y);
                 }
+
+                // draw high score
+                using namespace std::string_literals;
+                auto hiScoreString = "High Score: "s + std::to_string(hiScore);
+                auto fontString = FontString::from_height_normalized(hiScoreString, 0.048);
+                draw_font_string_normalized(bb, fontString, 1.0 - fontString.normalizedW - 0.01, 0.01);
             } break;
             case GameState::GAME: {
                 // draw background
