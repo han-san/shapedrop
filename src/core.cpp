@@ -19,6 +19,8 @@
 
 #include "core.hpp"
 
+using namespace std::string_literals;
+
 auto gRunning = true;
 
 auto currentclock = (decltype(clock())) 0;
@@ -54,11 +56,16 @@ auto run() -> void
     std::optional<Shape> holdShape{};
     auto hasHeld = false;
 
-    auto linesCleared = 0;
     auto hiScore = 0;
+
+    auto linesCleared = 0;
+    auto level = 1;
+    auto score = 0;
 
     auto init = [&] {
         linesCleared = 0;
+        level = 1;
+        score = 0;
         currentclock = clock();
         dropclock = currentclock;
         lockclock = currentclock;
@@ -255,6 +262,17 @@ auto run() -> void
 
                     auto rowsCleared = board.remove_full_rows();
                     linesCleared += rowsCleared;
+                    if (rowsCleared == 1) {
+                        score += level * 100;
+                    } else if (rowsCleared == 2) {
+                        score += level * 300;
+                    } else if (rowsCleared == 3) {
+                        score += level * 500;
+                    } else if (rowsCleared == 4) {
+                        score += level * 800;
+                    }
+
+                    level = linesCleared / 10 + 1;
 
                     currentShape = shapePool.next_shape();
                     // update shape shadow
@@ -270,7 +288,7 @@ auto run() -> void
 
                     if (gameOver) {
                         std::cout << "Game Over!\n";
-                        if (linesCleared > hiScore) hiScore = linesCleared;
+                        if (score > hiScore) hiScore = score;
                         gameState = GameState::MENU;
                     }
 
@@ -374,10 +392,15 @@ auto run() -> void
                     ++i;
                 }
 
-                // draw number of lines cleared
-                auto linesClearedString = std::to_string(linesCleared);
-                auto fontString = FontString::from_height_normalized(linesClearedString, 0.048);
-                draw_font_string_normalized(bb, fontString, 1.0 - fontString.normalizedW - 0.01, 0.01);
+                // draw score
+                auto scoreString = "Score: "s + std::to_string(score);
+                auto scoreFontString = FontString::from_height_normalized(scoreString, 0.048);
+                draw_font_string_normalized(bb, scoreFontString, 1.0 - scoreFontString.normalizedW - 0.01, 0.01);
+
+                // draw level
+                auto levelString = "Level: "s + std::to_string(level) + " (" + std::to_string(linesCleared) + "/" + std::to_string(level * 10) + ")";
+                auto levelFontString = FontString::from_height_normalized(levelString, 0.048);
+                draw_font_string_normalized(bb, levelFontString, 1.0 - levelFontString.normalizedW - 0.01, 0.01 + levelFontString.normalizedH);
 
                 // draw held shape
                 Squaref holdShapeDim{};
