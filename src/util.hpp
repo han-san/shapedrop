@@ -13,8 +13,8 @@ struct V2Generic {
         T y;
     };
 
-    V2Generic() = default;
-    V2Generic(T a, T b): x{a}, y{b} {}
+    constexpr V2Generic() = default;
+    constexpr V2Generic(T a, T b): x{a}, y{b} {}
 };
 
 template <typename T>
@@ -32,8 +32,8 @@ struct V3Generic {
         T b;
     };
 
-    V3Generic() = default;
-    V3Generic(T a, T b, T c): x{a}, y{b}, z{c} {}
+    constexpr V3Generic() = default;
+    constexpr V3Generic(T a, T b, T c): x{a}, y{b}, z{c} {}
 };
 
 template <typename T>
@@ -47,16 +47,16 @@ struct V4Generic {
         T g;
     };
     union {
-        T z = 0;
+        T w = 0;
         T b;
     };
     union {
-        T w = 0;
+        T h = 0;
         T a;
     };
 
-    V4Generic() = default;
-    V4Generic(T a, T b, T c, T d): x{a}, y{b}, z{c} w{d} {}
+    constexpr V4Generic() = default;
+    constexpr V4Generic(T a, T b, T c, T d): x{a}, y{b}, w{c}, h{d} {}
 };
 using V2 = V2Generic<int>;
 using V3 = V3Generic<int>;
@@ -65,9 +65,13 @@ using V2f = V2Generic<float>;
 using V3f = V3Generic<float>;
 using V4f = V4Generic<float>;
 
-using Position = V2;
 using RGB = V3;
 using RGBA = V4;
+
+using Square = V4;
+using Squaref = V4f;
+using Position = V2;
+using Positionf = V2f;
 
 template <typename T, size_t I>
 class ArrayStack {

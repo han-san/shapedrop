@@ -69,7 +69,7 @@ auto draw_text_normalized(BackBuffer& buf, std::string_view text, float x, float
     draw_text(buf, text, x, y, pixelHeight);
 }
 
-auto draw_solid_square(BackBuffer& buf, Square sqr, RGB color, uint a) -> void
+auto draw_solid_square(BackBuffer& buf, Squaref sqr, RGB color, uint a) -> void
 {
     for (auto y = 0; y < sqr.h; ++y) {
         auto pixely = (int)sqr.y + y;
@@ -94,7 +94,7 @@ auto draw_solid_square(BackBuffer& buf, Square sqr, RGB color, uint a) -> void
     }
 }
 
-auto draw_solid_square_normalized(BackBuffer& buf, Square sqr, RGB color, uint a) -> void
+auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, uint a) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
@@ -104,7 +104,7 @@ auto draw_solid_square_normalized(BackBuffer& buf, Square sqr, RGB color, uint a
     draw_solid_square(buf, sqr, color, a);
 }
 
-auto draw_hollow_square(BackBuffer& buf, Square sqr, RGB color, int a, int borderSize) -> void
+auto draw_hollow_square(BackBuffer& buf, Squaref sqr, RGB color, int a, int borderSize) -> void
 {
     for (auto y = 0; y < sqr.h; ++y) {
         auto pixely = (int)sqr.y + y;
@@ -141,7 +141,7 @@ auto draw_hollow_square(BackBuffer& buf, Square sqr, RGB color, int a, int borde
     }
 }
 
-auto draw_hollow_square_normalized(BackBuffer& buf, Square sqr, RGB color, int a, int borderSize) -> void
+auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, int a, int borderSize) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
@@ -151,7 +151,7 @@ auto draw_hollow_square_normalized(BackBuffer& buf, Square sqr, RGB color, int a
     draw_hollow_square(buf, sqr, color, a, borderSize);
 }
 
-auto draw_image(BackBuffer& backBuf, Point dest, BackBuffer& img) -> void
+auto draw_image(BackBuffer& backBuf, Position dest, BackBuffer& img) -> void
 {
     for (auto y = 0; y < img.h; ++y) {
         auto pixely = (int)dest.y + y;

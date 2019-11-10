@@ -192,9 +192,13 @@ public:
         },
     };
 
+    // ShapeDims relies on the specific order of these.
+    // Don't move them around!
     enum class Type {
         I, O, L, J, S, Z, T
     };
+
+    V2 static constexpr dimensions[] = { {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
 
     enum class Rotation {
         LEFT,

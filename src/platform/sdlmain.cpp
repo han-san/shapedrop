@@ -58,7 +58,7 @@ auto change_window_scale(int newScale) -> void {
     if (newScale < 1) newScale = 1;
     if (windowScale == newScale) return;
     windowScale = newScale;
-    resize_window({baseWindowWidth * windowScale, baseWindowHeight * windowScale});
+    resize_window({gBaseWindowWidth * windowScale, gBaseWindowHeight * windowScale});
 }
 
 auto swap_buffer() -> void
@@ -143,13 +143,13 @@ auto init_window() {
         auto dim = V2 {};
         do {
             ++newScale;
-            dim = V2 {baseWindowWidth * newScale, baseWindowHeight * newScale};
+            dim = V2 {gBaseWindowWidth * newScale, gBaseWindowHeight * newScale};
         } while (window_fits_on_screen(dim));
     }
     --newScale;
     windowScale = newScale;
-    auto initialWindowWidth = baseWindowWidth * windowScale;
-    auto initialWindowHeight = baseWindowHeight * windowScale;
+    auto initialWindowWidth = gBaseWindowWidth * windowScale;
+    auto initialWindowHeight = gBaseWindowHeight * windowScale;
 
     window.handle = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
