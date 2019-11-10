@@ -372,25 +372,31 @@ auto run() -> void
                 draw_font_string_normalized(bb, fontString, 1.0 - fontString.normalizedW - 0.01, 0.01);
 
                 // draw held shape
-                draw_solid_square(bb, {1.f * scale, 1.f * scale, 5.f * scale, 3.f * scale}, {0, 0, 0});
+                Squaref holdShapeDim{};
+                holdShapeDim.x = gHoldShapeDim.x * scale;
+                holdShapeDim.y = gHoldShapeDim.y * scale;
+                holdShapeDim.w = gHoldShapeDim.w * scale;
+                holdShapeDim.h = gHoldShapeDim.h * scale;
+                draw_solid_square(bb, holdShapeDim, {0, 0, 0});
                 if (holdShape) {
-                    auto shape = holdShape;
-                    shape->pos.x = 0;
-                    shape->pos.y = 0;
-                    float x;
-                    if (shape->type == Shape::Type::I || shape->type == Shape::Type::O) {
-                            x = 0.5f;
-                    } else {
-                            x = 1.0f;
-                    }
-                    for (auto& position : shape->get_absolute_block_positions()) {
+                    auto shape = *holdShape;
+                    shape.pos.x = 0;
+                    shape.pos.y = 0;
+
+                    auto is_even = [](auto n) { return (n % 2) == 0; };
+                    // offset to center shape inside hold square
+                    auto shapeDimensions = Shape::dimensions[int(shape.type)];
+                    auto xOffset = is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0f : 0.5f;
+                    auto yOffset = is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0f : 0.5f;
+
+                    for (auto& position : shape.get_absolute_block_positions()) {
                         auto square = Squaref {
-                            float((position.x + 1 + x) * scale),
-                            float((position.y + 1.5) * scale),
+                            float((position.x + gHoldShapeDim.x + xOffset) * scale),
+                            float((position.y + gHoldShapeDim.y + yOffset) * scale),
                             float(scale),
                             float(scale)
                         };
-                        draw_solid_square(bb, square, shape->color);
+                        draw_solid_square(bb, square, shape.color);
                     }
                 }
             } break;
