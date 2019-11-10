@@ -33,7 +33,23 @@ struct Message {
     int y;
 };
 
-auto constexpr baseWindowWidth = gColumns + 2 + 5; // space for border and sidebar
-auto constexpr baseWindowHeight = gRows + 2;
+auto constexpr gBorderSize = 1;
+
+auto constexpr gHoldShapeDim = Square { gBorderSize, gBorderSize, 5, 3 };
+auto constexpr gPlayAreaDim = Square {
+    gBorderSize, (gBorderSize + gHoldShapeDim.h + gBorderSize),
+    Board::columns, Board::visibleRows
+};
+auto constexpr gSidebarDim = Square {
+    (gBorderSize + gPlayAreaDim.w + gBorderSize), gBorderSize,
+    4, (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)
+};
+
+auto constexpr constexpr_round(float const val) -> int {
+    return int(val + 0.5);
+};
+
+auto constexpr gBaseWindowWidth = constexpr_round(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize);
+auto constexpr gBaseWindowHeight = constexpr_round(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize);
 
 auto run() -> void;

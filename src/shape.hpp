@@ -196,6 +196,8 @@ public:
         I, O, L, J, S, Z, T
     };
 
+    int static constexpr shapeWidth[] = { 4, 2, 3, 3, 3, 3, 3 };
+
     enum class Rotation {
         LEFT,
         RIGHT

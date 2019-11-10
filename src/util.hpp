@@ -65,9 +65,13 @@ using V2f = V2Generic<float>;
 using V3f = V3Generic<float>;
 using V4f = V4Generic<float>;
 
-using Position = V2;
 using RGB = V3;
 using RGBA = V4;
+
+using Square = V4;
+using Squaref = V4f;
+using Position = V2;
+using Positionf = V2f;
 
 template <typename T, size_t I>
 class ArrayStack {

@@ -3,7 +3,7 @@
 
 #include "board.hpp"
 
-auto Board::is_valid_spot(V2 pos) -> bool {
+auto Board::is_valid_spot(Position pos) -> bool {
     if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
         return false;
     } else {

@@ -82,7 +82,7 @@ auto run() -> void
     auto gameState = GameState::MENU;
 
     struct Button {
-        Square dimensions;
+        Squaref dimensions;
         FontString text;
     };
 
@@ -100,7 +100,7 @@ auto run() -> void
     auto x = (1.f - playButtonFontString.normalizedW) / 2;
     auto y = 2.f / 10.f;
     auto playButton = Button {
-        Square {
+        Squaref {
             x, y,
             playButtonFontString.normalizedW, playButtonFontString.normalizedH
         },
@@ -207,7 +207,7 @@ auto run() -> void
 
                     if (currentMenu->id == Menu::ID::MAIN) {
                         auto& playButton = currentMenu->buttons[0];
-                        auto screenSpaceDimensions = playButton.dimensions.to_screen_space();
+                        auto screenSpaceDimensions = to_screen_space(playButton.dimensions);
 
                         if (message.x > screenSpaceDimensions.x &&
                             message.x < screenSpaceDimensions.x + screenSpaceDimensions.w &&
@@ -301,22 +301,22 @@ auto run() -> void
                     std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
                 }
                 for (auto& button : currentMenu->buttons) {
-                    auto outlineScreenSpace = button.dimensions.to_screen_space();
+                    auto outlineScreenSpace = to_screen_space(button.dimensions);
 
                     draw_hollow_square(bb, outlineScreenSpace, {0, 0, 0});
                     draw_font_string(bb, button.text, outlineScreenSpace.x, outlineScreenSpace.y);
                 }
             } break;
             case GameState::GAME: {
-                // draw background
-                for (auto y = 2; y < board.rows; ++y) {
-                    for (auto x = 0; x < board.columns; ++x) {
-                        auto currindex = y * board.columns + x;
+                // draw playarea background
+                for (auto y = 2; y < Board::rows; ++y) {
+                    for (auto x = 0; x < Board::columns; ++x) {
+                        auto currindex = y * Board::columns + x;
                         auto& block = board.data[currindex];
                         auto color = block.isActive ? block.color : RGB { 0, 0, 0 };
-                        auto square = Square {
-                            float((x + 1) * scale),
-                            float((y + 1) * scale),
+                        auto square = Squaref {
+                            float((x + gPlayAreaDim.x) * scale),
+                            float((y - 2 + gPlayAreaDim.y) * scale),
                             float(scale),
                             float(scale)
                         };
@@ -324,39 +324,40 @@ auto run() -> void
                     }
                 }
 
-                // draw shadow
-                for (auto& position : currentShapeShadow.get_absolute_block_positions()) {
-                    auto square = Square {
-                        float((position.x + 1) * float(scale)),
-                        float((position.y + 1) * float(scale)),
-                        float(scale),
-                        float(scale)
-                    };
-                    draw_solid_square(bb, square, currentShapeShadow.color, 0xff / 2);
-                }
+                auto draw_shape_in_play_area = [&](Shape& shape, int transparency) {
+                    for (auto& position : shape.get_absolute_block_positions()) {
+                        // since the top 2 rows shouldn't be visible, the y
+                        // position for drawing is 2 less than the shape's
+                        auto actualYPosition = position.y - 2;
 
-                // draw current shape
-                for (auto& position : currentShape.get_absolute_block_positions()) {
-                    auto square = Square {
-                        float((position.x + 1) * float(scale)),
-                        float((position.y + 1) * float(scale)),
-                        float(scale),
-                        float(scale)
-                    };
-                    draw_solid_square(bb, square, currentShape.color);
-                }
+                        // don't draw if square is above the playarea
+                        if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) continue;
+                        auto square = Squaref {
+                            float((position.x + gPlayAreaDim.x) * scale),
+                            float((actualYPosition + gPlayAreaDim.y) * scale),
+                            float(scale),
+                            float(scale)
+                        };
+
+                        draw_solid_square(bb, square, shape.color, transparency);
+                    }
+                };
+
+                draw_shape_in_play_area(currentShapeShadow, 0xff / 2);
+                draw_shape_in_play_area(currentShape, 0xff);
 
                 // draw shape previews
                 auto previewArray = shapePool.get_preview_shapes_array();
                 auto i = 0;
                 for (auto shapePointer : previewArray) {
                     auto shape = *shapePointer;
-                    shape.pos.x = baseWindowWidth - 6;
-                    shape.pos.y = 2 + 3 * i;
+                    shape.pos.x = gSidebarDim.x;
+                    auto const ySpacing = 3; // max height of a shape is 2 + 1 for a block of space
+                    shape.pos.y = gSidebarDim.y + ySpacing * i;
                     for (auto& position : shape.get_absolute_block_positions()) {
-                        auto square = Square {
-                            float((position.x + 1) * float(scale)),
-                            float((position.y + 1) * float(scale)),
+                        auto square = Squaref {
+                            float((position.x) * scale),
+                            float((position.y) * scale),
                             float(scale),
                             float(scale)
                         };
@@ -365,33 +366,27 @@ auto run() -> void
                     ++i;
                 }
 
-                // cover top part of border
-                auto topSize = scale * 3;
-                for (auto y = 0; y < topSize; ++y) {
-                    for (auto x = 0; x < windim.w; ++x) {
-                        auto color = RGB {
-                            int(0xff * (float(x) / windim.w)),
-                            int(0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h))),
-                            int(0xff * (float(y) / windim.h)),
-                        };
-                        draw_solid_square(bb, {float(x), float(y), 1, 1}, color);
-                    }
-                }
-
                 // draw number of lines cleared
                 auto linesClearedString = std::to_string(linesCleared);
                 auto fontString = FontString::from_height_normalized(linesClearedString, 0.048);
                 draw_font_string_normalized(bb, fontString, 1.0 - fontString.normalizedW - 0.01, 0.01);
 
                 // draw held shape
+                draw_solid_square(bb, {1.f * scale, 1.f * scale, 5.f * scale, 3.f * scale}, {0, 0, 0});
                 if (holdShape) {
                     auto shape = holdShape;
                     shape->pos.x = 0;
                     shape->pos.y = 0;
+                    float x;
+                    if (shape->type == Shape::Type::I || shape->type == Shape::Type::O) {
+                            x = 0.5f;
+                    } else {
+                            x = 1.0f;
+                    }
                     for (auto& position : shape->get_absolute_block_positions()) {
-                        auto square = Square {
-                            float((position.x + 1) * float(scale)),
-                            float((position.y + 0.5f) * float(scale)),
+                        auto square = Squaref {
+                            float((position.x + 1 + x) * scale),
+                            float((position.y + 1.5) * scale),
                             float(scale),
                             float(scale)
                         };
