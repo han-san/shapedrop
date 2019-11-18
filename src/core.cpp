@@ -56,6 +56,8 @@ auto run() -> void
     std::optional<Shape> holdShape{};
     auto hasHeld = false;
 
+    auto hasSpun = false;
+
     auto hiScore = 0;
 
     auto linesCleared = 0;
@@ -175,6 +177,7 @@ auto run() -> void
                 } else if (message.type == Message::Type::DROP) {
                     while (currentShape.try_move(board, {0, 1})) {
                         lockclock = currentclock;
+                        hasSpun = false;
                     }
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
                     // if currentShape is on top of a block before rotation,
@@ -182,6 +185,7 @@ auto run() -> void
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.rotate(board, Shape::Rotation::LEFT)) {
                         update_shadow_and_clocks(isGrounded);
+                        hasSpun = true;
                     }
                 } else if (message.type == Message::Type::ROTATE_RIGHT) {
                     // if currentShape is on top of a block before rotation,
@@ -189,10 +193,12 @@ auto run() -> void
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
                     if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
                         update_shadow_and_clocks(isGrounded);
+                        hasSpun = true;
                     }
                 } else if (message.type == Message::Type::HOLD) {
                     if (!hasHeld) {
                         hasHeld = true;
+                        hasSpun = false;
                         if (holdShape) {
                             auto tmp = holdShape;
 
@@ -238,6 +244,7 @@ auto run() -> void
                 dropclock = currentclock;
                 if (currentShape.try_move(board, {0, 1})) {
                     lockclock = currentclock;
+                    hasSpun = false;
                 }
             }
 
@@ -258,6 +265,20 @@ auto run() -> void
                         assert(board.is_valid_spot(position));
                         auto boardIndex = position.y * board.columns + position.x;
                         board.data[boardIndex] = {currentShape.color, true};
+                    }
+
+                    // check if it's a t-spin
+                    auto tspin = false;
+                    if (hasSpun && (currentShape.type == Shape::Type::T)) {
+                        auto cornersOccupied = 0;
+                        cornersOccupied += !board.is_valid_spot({currentShape.pos.x + 0, currentShape.pos.y + 0});
+                        cornersOccupied += !board.is_valid_spot({currentShape.pos.x + 2, currentShape.pos.y + 0});
+                        cornersOccupied += !board.is_valid_spot({currentShape.pos.x + 0, currentShape.pos.y + 2});
+                        cornersOccupied += !board.is_valid_spot({currentShape.pos.x + 2, currentShape.pos.y + 2});
+                        std::cout << cornersOccupied << '\n';
+                        if (cornersOccupied == 3) {
+                            tspin = true;
+                        }
                     }
 
                     auto rowsCleared = board.remove_full_rows();
