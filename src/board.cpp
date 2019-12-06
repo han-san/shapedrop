@@ -30,6 +30,23 @@ auto Board::is_valid_shape(Shape& shape) -> bool {
     return true;
 }
 
+// If the shape is a T, its last movement was a rotation, and 3 or more of its
+// corners are occupied by other pieces it counts as a T-spin. If the rotation
+// was a wallkick it only counts as a T-spin mini.
+auto Board::check_for_tspin(Shape& shape, Shape::RotationType rotationType) -> std::optional<TspinType> {
+    if (shape.type == Shape::Type::T) {
+        V2 const cornerOffsets[] = {{0, 0}, {2, 0}, {0, 2}, {2, 2}};
+        auto cornersOccupied = 0;
+        for (auto offset : cornerOffsets) {
+            cornersOccupied += !is_valid_spot({shape.pos.x + offset.x, shape.pos.y + offset.y});
+        }
+        if (cornersOccupied >= 3) {
+            return (rotationType == Shape::RotationType::WALLKICK) ? TspinType::MINI : TspinType::REGULAR;
+        }
+    }
+    return {};
+}
+
 auto Board::remove_full_rows() -> int {
     // check if a row can be cleared
     // a maximum of 4 rows can be cleared at once with default shapes

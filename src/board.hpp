@@ -6,12 +6,17 @@
 #include "jint.h"
 #include "shape.hpp"
 
+class Shape;
+
 struct Block {
     RGB color;
     bool isActive = false;
 };
 
-class Shape;
+enum class TspinType {
+    REGULAR,
+    MINI
+};
 
 class Board {
 public:
@@ -21,6 +26,7 @@ public:
 
     std::array<Block, rows * columns> data;
 
+    auto check_for_tspin(Shape& shape, Shape::RotationType rotationType) -> std::optional<TspinType>;
     auto is_valid_spot(Position pos) -> bool;
     auto is_valid_move(Shape& shape, V2 move) -> bool;
     auto is_valid_shape(Shape& shape) -> bool;

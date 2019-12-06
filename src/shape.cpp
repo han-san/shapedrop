@@ -90,14 +90,14 @@ auto Shape::get_absolute_block_positions() -> ArrayStack<Position, 4> {
     return positions;
 }
 
-auto Shape::rotate(Board& board, Rotation dir) -> bool {
+auto Shape::rotate(Board& board, Rotation dir) -> std::optional<RotationType> {
     auto rotatingShape = *this;
     rotatingShape.rotationIndex += dir == Rotation::RIGHT ? 1 : -1;
     if (rotatingShape.rotationIndex == -1) rotatingShape.rotationIndex = 3;
     else if (rotatingShape.rotationIndex == 4) rotatingShape.rotationIndex = 0;
     if (board.is_valid_shape(rotatingShape)) {
         *this = rotatingShape;
-        return true;
+        return Shape::RotationType::REGULAR;
     }
 
     std::array<V2, 4> kicks = {};
@@ -190,10 +190,10 @@ auto Shape::rotate(Board& board, Rotation dir) -> bool {
         rotatingShape.pos.y -= kickMove.y;
         if (board.is_valid_shape(rotatingShape)) {
             *this = rotatingShape;
-            return true;
+            return Shape::RotationType::WALLKICK;
         }
     }
-    return false;
+    return {};
 }
 
 ShapePool::ShapePool(const std::array<Shape, 7>& shapes)

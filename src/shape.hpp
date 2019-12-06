@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "util.hpp"
 
 class Board;
@@ -192,6 +194,11 @@ public:
         },
     };
 
+    enum class RotationType {
+        WALLKICK,
+        REGULAR,
+    };
+
     // ShapeDims relies on the specific order of these.
     // Don't move them around!
     enum class Type {
@@ -213,7 +220,7 @@ public:
 
     Shape(Type type, Board& board);
 
-    auto rotate(Board& board, Rotation dir) -> bool;
+    auto rotate(Board& board, Rotation dir) -> std::optional<RotationType>;
     auto try_move(Board& board, V2 move) -> bool;
     auto get_block_positions() -> ArrayStack<Position, 4>;
     auto get_absolute_block_positions() -> ArrayStack<Position, 4>;

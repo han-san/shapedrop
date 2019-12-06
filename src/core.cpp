@@ -56,18 +56,19 @@ auto run() -> void
     std::optional<Shape> holdShape{};
     auto hasHeld = false;
 
-    auto hasSpun = false;
+    auto currentRotationType = std::optional<Shape::RotationType>{};
 
     auto hiScore = 0;
 
     auto linesCleared = 0;
     auto level = 1;
-    auto score = 0;
+    auto totalScore = 0;
 
     auto init = [&] {
+        holdShape = {};
         linesCleared = 0;
         level = 1;
-        score = 0;
+        totalScore = 0;
         currentclock = clock();
         dropclock = currentclock;
         lockclock = currentclock;
@@ -177,28 +178,28 @@ auto run() -> void
                 } else if (message.type == Message::Type::DROP) {
                     while (currentShape.try_move(board, {0, 1})) {
                         lockclock = currentclock;
-                        hasSpun = false;
+                        currentRotationType = {};
                     }
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
                     // if currentShape is on top of a block before rotation,
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
-                    if (currentShape.rotate(board, Shape::Rotation::LEFT)) {
+                    if (auto const rotation = currentShape.rotate(board, Shape::Rotation::LEFT); rotation) {
                         update_shadow_and_clocks(isGrounded);
-                        hasSpun = true;
+                        currentRotationType = rotation;
                     }
                 } else if (message.type == Message::Type::ROTATE_RIGHT) {
                     // if currentShape is on top of a block before rotation,
                     // the drop clock needs to be reset
                     auto isGrounded = !board.is_valid_move(currentShape, {0, 1});
-                    if (currentShape.rotate(board, Shape::Rotation::RIGHT)) {
+                    if (auto const rotation = currentShape.rotate(board, Shape::Rotation::RIGHT); rotation) {
                         update_shadow_and_clocks(isGrounded);
-                        hasSpun = true;
+                        currentRotationType = rotation;
                     }
                 } else if (message.type == Message::Type::HOLD) {
                     if (!hasHeld) {
                         hasHeld = true;
-                        hasSpun = false;
+                        currentRotationType = {};
                         if (holdShape) {
                             auto tmp = holdShape;
 
@@ -244,7 +245,7 @@ auto run() -> void
                 dropclock = currentclock;
                 if (currentShape.try_move(board, {0, 1})) {
                     lockclock = currentclock;
-                    hasSpun = false;
+                    currentRotationType = {};
                 }
             }
 
@@ -267,30 +268,49 @@ auto run() -> void
                         board.data[boardIndex] = {currentShape.color, true};
                     }
 
-                    // check if it's a t-spin
-                    auto tspin = false;
-                    if (hasSpun && (currentShape.type == Shape::Type::T)) {
-                        auto cornersOccupied = 0;
-                        cornersOccupied += !board.is_valid_spot({currentShape.pos.x + 0, currentShape.pos.y + 0});
-                        cornersOccupied += !board.is_valid_spot({currentShape.pos.x + 2, currentShape.pos.y + 0});
-                        cornersOccupied += !board.is_valid_spot({currentShape.pos.x + 0, currentShape.pos.y + 2});
-                        cornersOccupied += !board.is_valid_spot({currentShape.pos.x + 2, currentShape.pos.y + 2});
-                        std::cout << cornersOccupied << '\n';
-                        if (cornersOccupied == 3) {
-                            tspin = true;
-                        }
-                    }
+                    auto const tspin = currentRotationType ? board.check_for_tspin(currentShape, *currentRotationType) : std::nullopt;
 
+                    // scoring formula (https://harddrop.com/wiki/Scoring):
+                    // Single:             100 x level
+                    // Double:             300 x level
+                    // Triple:             500 x level
+                    // Tetris:             800 x level
+                    // T-Spin Mini:        100 x level
+                    // T-Spin:             400 x level
+                    // T-Spin Mini Single: 200 x level
+                    // T-Spin Single:      800 x level
+                    // T-Spin Mini Double: 1200 x level
+                    // T-Spin Double:      1200 x level
+                    // T-Spin Triple:      1600 x level
+                    //
+                    // Back to Back Tetris/T-Spin: * 1.5 (for example, back to back tetris: 1200 x level)
+                    // Combo:     50 x combo count x level
+                    // Soft drop: 1 point per cell
+                    // Hard drop: 2 point per cell
                     auto rowsCleared = board.remove_full_rows();
                     linesCleared += rowsCleared;
                     if (rowsCleared == 1) {
-                        score += level * 100;
+                        if (tspin) {
+                            auto const score = level * (*tspin == TspinType::MINI ? 200 : 800);
+                            totalScore += score;
+                        } else {
+                            totalScore += level * 100;
+                        }
                     } else if (rowsCleared == 2) {
-                        score += level * 300;
+                        // T-spin mini double and T-spin double are both 1200
+                        totalScore += level * (tspin ? 1200 : 300);
                     } else if (rowsCleared == 3) {
-                        score += level * 500;
+                        // T-spin triple requires a wallkick so there is no
+                        // distinction between regular and mini (although it's
+                        // going to be represented internally as a mini).
+                        auto const score = level * (tspin ? 1600 : 500);
+                        totalScore += score;
                     } else if (rowsCleared == 4) {
-                        score += level * 800;
+                        totalScore += level * 800;
+                    } else if (tspin) {
+                        // tspin without clearing any lines
+                        auto const score = level * (*tspin == TspinType::MINI ? 100 : 400);
+                        totalScore += score;
                     }
 
                     level = linesCleared / 10 + 1;
@@ -309,7 +329,7 @@ auto run() -> void
 
                     if (gameOver) {
                         std::cout << "Game Over!\n";
-                        if (score > hiScore) hiScore = score;
+                        if (totalScore > hiScore) hiScore = totalScore;
                         gameState = GameState::MENU;
                     }
 
@@ -414,7 +434,7 @@ auto run() -> void
                 }
 
                 // draw score
-                auto scoreString = "Score: "s + std::to_string(score);
+                auto scoreString = "Score: "s + std::to_string(totalScore);
                 auto scoreFontString = FontString::from_height_normalized(scoreString, 0.048);
                 draw_font_string_normalized(bb, scoreFontString, 1.0 - scoreFontString.normalizedW - 0.01, 0.01);
 
