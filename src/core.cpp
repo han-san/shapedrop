@@ -31,6 +31,50 @@ auto lockclock = (decltype(clock())) 0;
 auto dropSpeed = 1.0;
 auto maxDropSpeed = 0.1;
 
+// scoring formula (https://harddrop.com/wiki/Scoring):
+// Single:             100 x level
+// Double:             300 x level
+// Triple:             500 x level
+// Tetris:             800 x level
+// T-Spin Mini:        100 x level
+// T-Spin:             400 x level
+// T-Spin Mini Single: 200 x level
+// T-Spin Single:      800 x level
+// T-Spin Mini Double: 1200 x level
+// T-Spin Double:      1200 x level
+// T-Spin Triple:      1600 x level
+//
+// Back to Back Tetris/T-Spin: * 1.5 (for example, back to back tetris: 1200 x level)
+// Combo:     50 x combo count x level
+// Soft drop: 1 point per cell
+// Hard drop: 2 point per cell
+auto calculate_score(int const rowsCleared, std::optional<TspinType> const tspin, int const level) -> int {
+    if (rowsCleared == 1) {
+        if (tspin) {
+            auto const score = level * (*tspin == TspinType::MINI ? 200 : 800);
+            return score;
+        } else {
+            return level * 100;
+        }
+    } else if (rowsCleared == 2) {
+        // T-spin mini double and T-spin double are both 1200
+        return level * (tspin ? 1200 : 300);
+    } else if (rowsCleared == 3) {
+        // T-spin triple requires a wallkick so there is no
+        // distinction between regular and mini (although it's
+        // going to be represented internally as a mini).
+        auto const score = level * (tspin ? 1600 : 500);
+        return score;
+    } else if (rowsCleared == 4) {
+        return level * 800;
+    } else if (tspin) {
+        // tspin without clearing any lines
+        auto const score = level * (*tspin == TspinType::MINI ? 100 : 400);
+        return score;
+    }
+    return 0;
+};
+
 auto run() -> void
 {
     tests::run();
@@ -270,48 +314,9 @@ auto run() -> void
 
                     auto const tspin = currentRotationType ? board.check_for_tspin(currentShape, *currentRotationType) : std::nullopt;
 
-                    // scoring formula (https://harddrop.com/wiki/Scoring):
-                    // Single:             100 x level
-                    // Double:             300 x level
-                    // Triple:             500 x level
-                    // Tetris:             800 x level
-                    // T-Spin Mini:        100 x level
-                    // T-Spin:             400 x level
-                    // T-Spin Mini Single: 200 x level
-                    // T-Spin Single:      800 x level
-                    // T-Spin Mini Double: 1200 x level
-                    // T-Spin Double:      1200 x level
-                    // T-Spin Triple:      1600 x level
-                    //
-                    // Back to Back Tetris/T-Spin: * 1.5 (for example, back to back tetris: 1200 x level)
-                    // Combo:     50 x combo count x level
-                    // Soft drop: 1 point per cell
-                    // Hard drop: 2 point per cell
                     auto rowsCleared = board.remove_full_rows();
                     linesCleared += rowsCleared;
-                    if (rowsCleared == 1) {
-                        if (tspin) {
-                            auto const score = level * (*tspin == TspinType::MINI ? 200 : 800);
-                            totalScore += score;
-                        } else {
-                            totalScore += level * 100;
-                        }
-                    } else if (rowsCleared == 2) {
-                        // T-spin mini double and T-spin double are both 1200
-                        totalScore += level * (tspin ? 1200 : 300);
-                    } else if (rowsCleared == 3) {
-                        // T-spin triple requires a wallkick so there is no
-                        // distinction between regular and mini (although it's
-                        // going to be represented internally as a mini).
-                        auto const score = level * (tspin ? 1600 : 500);
-                        totalScore += score;
-                    } else if (rowsCleared == 4) {
-                        totalScore += level * 800;
-                    } else if (tspin) {
-                        // tspin without clearing any lines
-                        auto const score = level * (*tspin == TspinType::MINI ? 100 : 400);
-                        totalScore += score;
-                    }
+                    totalScore += calculate_score(rowsCleared, tspin, level);
 
                     level = linesCleared / 10 + 1;
 
