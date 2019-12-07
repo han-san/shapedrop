@@ -130,11 +130,11 @@ auto run() -> void
         currentShapeShadow = currentShape.get_shadow(board);
     };
 
-    enum class GameState {
+    enum class LevelType {
         MENU,
         GAME,
     };
-    auto gameState = GameState::MENU;
+    auto levelType = LevelType::MENU;
 
     struct Button {
         Squaref dimensions;
@@ -191,7 +191,7 @@ auto run() -> void
                 change_window_scale(get_window_scale() + 1);
             } else if (message.type == Message::Type::DECREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() - 1);
-            } else if (gameState == GameState::GAME) {
+            } else if (levelType == LevelType::GAME) {
 
                 auto update_shadow_and_clocks = [&](bool isGrounded) {
                     currentShapeShadow = currentShape.get_shadow(board);
@@ -258,10 +258,10 @@ auto run() -> void
                         update_shadow_and_clocks(isGrounded);
                     }
                 }
-            } else if (gameState == GameState::MENU) {
+            } else if (levelType == LevelType::MENU) {
                 if (message.type == Message::Type::MOUSEBUTTONDOWN) {
                     if (!currentMenu) {
-                        std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
+                        std::cerr << "ERROR: currentMenu is null, but levelType is LevelType::MENU\n";
                     }
 
                     if (currentMenu->id == Menu::ID::MAIN) {
@@ -273,7 +273,7 @@ auto run() -> void
                             message.y > screenSpaceDimensions.y &&
                             message.y < screenSpaceDimensions.y + screenSpaceDimensions.h)
                         {
-                            gameState = GameState::GAME;
+                            levelType = LevelType::GAME;
                             reset_game();
                         }
                     }
@@ -282,7 +282,7 @@ auto run() -> void
         }
 
         // sim
-        if (gameState == GameState::GAME) {
+        if (levelType == LevelType::GAME) {
             // 1 drop per second
             auto nextdropclock = dropclock + dropSpeed * CLOCKS_PER_SEC;
             if (currentclock > nextdropclock) {
@@ -335,7 +335,7 @@ auto run() -> void
                     if (gameOver) {
                         std::cout << "Game Over!\n";
                         if (totalScore > hiScore) hiScore = totalScore;
-                        gameState = GameState::MENU;
+                        levelType = LevelType::MENU;
                     }
 
                 }
@@ -357,14 +357,14 @@ auto run() -> void
             }
         }
 
-        switch (gameState) {
-            case GameState::MENU: {
+        switch (levelType) {
+            case LevelType::MENU: {
                 auto menuLabel = FontString::from_height_normalized("MENU", 1.f / 10.f);
                 auto x = (1.f - menuLabel.normalizedW) / 2.f;
                 auto y = 1.f / 10.f;
                 draw_font_string_normalized(bb, menuLabel, x, y);
                 if (!currentMenu) {
-                    std::cerr << "ERROR: currentMenu is null, but gameState is GameState::MENU\n";
+                    std::cerr << "ERROR: currentMenu is null, but levelType is LevelType::MENU\n";
                 }
                 for (auto& button : currentMenu->buttons) {
                     auto outlineScreenSpace = to_screen_space(button.dimensions);
@@ -379,7 +379,7 @@ auto run() -> void
                 auto fontString = FontString::from_height_normalized(hiScoreString, 0.048);
                 draw_font_string_normalized(bb, fontString, 1.0 - fontString.normalizedW - 0.01, 0.01);
             } break;
-            case GameState::GAME: {
+            case LevelType::GAME: {
                 // draw playarea background
                 for (auto y = 2; y < Board::rows; ++y) {
                     for (auto x = 0; x < Board::columns; ++x) {
