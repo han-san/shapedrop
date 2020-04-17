@@ -21,16 +21,6 @@
 
 using namespace std::string_literals;
 
-auto gRunning = true;
-
-auto currentclock = (decltype(clock())) 0;
-auto dropclock = (decltype(clock())) 0;
-auto constexpr lockdelay = (decltype(clock())) CLOCKS_PER_SEC / 2;
-auto lockclock = (decltype(clock())) 0;
-
-auto dropSpeed = 1.0;
-auto maxDropSpeed = 0.1;
-
 // scoring formula (https://harddrop.com/wiki/Scoring):
 // Single:             100 x level
 // Double:             300 x level
@@ -75,10 +65,51 @@ auto calculate_score(int const rowsCleared, std::optional<TspinType> const tspin
     return 0;
 };
 
+enum class LevelType {
+    MENU,
+    GAME,
+};
+
+struct GameState {
+    size_t linesCleared = 0;
+    size_t level = 1;
+    size_t score = 0;
+    bool hasHeld = false;
+    time_t currentClock = clock();
+    time_t dropClock = currentClock;
+    time_t lockClock = currentClock;
+    auto constexpr static lockDelay = time_t(CLOCKS_PER_SEC / 2);
+    size_t highScore = 0;
+    bool running = true;
+    LevelType levelType = LevelType::MENU;
+    double dropSpeed = 1.0;
+    double maxDropSpeed = 0.1;
+
+    /* Board board = {}; */
+    /* std::optional<Shape> holdShape = {}; */
+    /* std::array<Shape, 7> shapes { */
+    /*     Shape(Shape::Type::I, board), */
+    /*     Shape(Shape::Type::L, board), */
+    /*     Shape(Shape::Type::J, board), */
+    /*     Shape(Shape::Type::O, board), */
+    /*     Shape(Shape::Type::S, board), */
+    /*     Shape(Shape::Type::Z, board), */
+    /*     Shape(Shape::Type::T, board), */
+    /* }; */
+    /* ShapePool shapePool = {shapes}; */
+    /* Shape currentShape = shapePool.current_shape(); */
+    /* Shape currentShapeShadow = currentShape.get_shadow(board); */
+    /* std::optional<Shape::RotationType> currentRotationType = {}; */
+
+    /* auto reset() { */
+    /*     *this = std::move(GameState {}); */
+    /* } */
+
+};
+
 auto run() -> void
 {
     tests::run();
-    gRunning = true;
 
     Board board = {};
 
@@ -98,24 +129,19 @@ auto run() -> void
     auto currentShapeShadow = currentShape.get_shadow(board);
 
     std::optional<Shape> holdShape{};
-    auto hasHeld = false;
 
     auto currentRotationType = std::optional<Shape::RotationType>{};
 
-    auto hiScore = 0;
-
-    auto linesCleared = 0;
-    auto level = 1;
-    auto totalScore = 0;
+    GameState gameState = {};
 
     auto init = [&] {
         holdShape = {};
-        linesCleared = 0;
-        level = 1;
-        totalScore = 0;
-        currentclock = clock();
-        dropclock = currentclock;
-        lockclock = currentclock;
+        gameState.linesCleared = 0;
+        gameState.level = 1;
+        gameState.score = 0;
+        gameState.currentClock = clock();
+        gameState.dropClock = gameState.currentClock;
+        gameState.lockClock = gameState.currentClock;
         srand(time(NULL));
     };
 
@@ -129,12 +155,6 @@ auto run() -> void
         currentShape = shapePool.current_shape();
         currentShapeShadow = currentShape.get_shadow(board);
     };
-
-    enum class LevelType {
-        MENU,
-        GAME,
-    };
-    auto levelType = LevelType::MENU;
 
     struct Button {
         Squaref dimensions;
@@ -169,10 +189,10 @@ auto run() -> void
 
     auto currentMenu = &mainMenu;
 
-    while (gRunning) {
+    while (gameState.running) {
         auto newclock = clock();
-        auto frameclocktime = newclock - currentclock;
-        currentclock = newclock;
+        auto frameclocktime = newclock - gameState.currentClock;
+        gameState.currentClock = newclock;
 
         // delta = (double)frameclocktime / CLOCKS_PER_SEC;
         /* auto framemstime = 1000.0 * delta; */
@@ -184,20 +204,20 @@ auto run() -> void
         while ((message = handle_input()).type != Message::Type::NONE) {
             // First check messages independent of whether in menu or game
             if (message.type == Message::Type::QUIT) {
-                gRunning = false;
+                gameState.running = false;
             } else if (message.type == Message::Type::RESET) {
                 reset_game();
             } else if (message.type == Message::Type::INCREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() + 1);
             } else if (message.type == Message::Type::DECREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() - 1);
-            } else if (levelType == LevelType::GAME) {
+            } else if (gameState.levelType == LevelType::GAME) {
 
                 auto update_shadow_and_clocks = [&](bool isGrounded) {
                     currentShapeShadow = currentShape.get_shadow(board);
-                    lockclock = currentclock;
+                    gameState.lockClock = gameState.currentClock;
                     if (isGrounded) {
-                        dropclock = currentclock;
+                        gameState.dropClock = gameState.currentClock;
                     }
                 };
 
@@ -216,12 +236,12 @@ auto run() -> void
                         update_shadow_and_clocks(isGrounded);
                     }
                 } else if (message.type == Message::Type::INCREASE_SPEED) {
-                    dropSpeed = maxDropSpeed;
+                    gameState.dropSpeed = gameState.maxDropSpeed;
                 } else if (message.type == Message::Type::RESET_SPEED) {
-                    dropSpeed = 1.0;
+                    gameState.dropSpeed = 1.0;
                 } else if (message.type == Message::Type::DROP) {
                     while (currentShape.try_move(board, {0, 1})) {
-                        lockclock = currentclock;
+                        gameState.lockClock = gameState.currentClock;
                         currentRotationType = {};
                     }
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
@@ -241,8 +261,8 @@ auto run() -> void
                         currentRotationType = rotation;
                     }
                 } else if (message.type == Message::Type::HOLD) {
-                    if (!hasHeld) {
-                        hasHeld = true;
+                    if (!gameState.hasHeld) {
+                        gameState.hasHeld = true;
                         currentRotationType = {};
                         if (holdShape) {
                             auto tmp = holdShape;
@@ -258,7 +278,7 @@ auto run() -> void
                         update_shadow_and_clocks(isGrounded);
                     }
                 }
-            } else if (levelType == LevelType::MENU) {
+            } else if (gameState.levelType == LevelType::MENU) {
                 if (message.type == Message::Type::MOUSEBUTTONDOWN) {
                     if (!currentMenu) {
                         std::cerr << "ERROR: currentMenu is null, but levelType is LevelType::MENU\n";
@@ -273,7 +293,7 @@ auto run() -> void
                             message.y > screenSpaceDimensions.y &&
                             message.y < screenSpaceDimensions.y + screenSpaceDimensions.h)
                         {
-                            levelType = LevelType::GAME;
+                            gameState.levelType = LevelType::GAME;
                             reset_game();
                         }
                     }
@@ -282,18 +302,18 @@ auto run() -> void
         }
 
         // sim
-        if (levelType == LevelType::GAME) {
+        if (gameState.levelType == LevelType::GAME) {
             // 1 drop per second
-            auto nextdropclock = dropclock + dropSpeed * CLOCKS_PER_SEC;
-            if (currentclock > nextdropclock) {
-                dropclock = currentclock;
+            auto nextdropClock = gameState.dropClock + gameState.dropSpeed * CLOCKS_PER_SEC;
+            if (gameState.currentClock > nextdropClock) {
+                gameState.dropClock = gameState.currentClock;
                 if (currentShape.try_move(board, {0, 1})) {
-                    lockclock = currentclock;
+                    gameState.lockClock = gameState.currentClock;
                     currentRotationType = {};
                 }
             }
 
-            if (currentclock > lockclock + lockdelay) {
+            if (gameState.currentClock > gameState.lockClock + gameState.lockDelay) {
                 // only care about locking if currentShape is on top of a block
                 if (!board.is_valid_move(currentShape, {0, 1})) {
                     // game over if entire piece is above visible portion
@@ -315,17 +335,17 @@ auto run() -> void
                     auto const tspin = currentRotationType ? board.check_for_tspin(currentShape, *currentRotationType) : std::nullopt;
 
                     auto rowsCleared = board.remove_full_rows();
-                    linesCleared += rowsCleared;
-                    totalScore += calculate_score(rowsCleared, tspin, level);
+                    gameState.linesCleared += rowsCleared;
+                    gameState.score += calculate_score(rowsCleared, tspin, gameState.level);
 
-                    level = linesCleared / 10 + 1;
+                    gameState.level = gameState.linesCleared / 10 + 1;
 
                     currentShape = shapePool.next_shape();
                     // update shape shadow
                     currentShapeShadow = currentShape.get_shadow(board);
-                    lockclock = currentclock;
+                    gameState.lockClock = gameState.currentClock;
 
-                    hasHeld = false;
+                    gameState.hasHeld = false;
 
                     // game over if the new shape spawned on top of another shape
                     if (!board.is_valid_shape(currentShape)) {
@@ -334,8 +354,8 @@ auto run() -> void
 
                     if (gameOver) {
                         std::cout << "Game Over!\n";
-                        if (totalScore > hiScore) hiScore = totalScore;
-                        levelType = LevelType::MENU;
+                        if (gameState.score > gameState.highScore) gameState.highScore = gameState.score;
+                        gameState.levelType = LevelType::MENU;
                     }
 
                 }
@@ -357,7 +377,7 @@ auto run() -> void
             }
         }
 
-        switch (levelType) {
+        switch (gameState.levelType) {
             case LevelType::MENU: {
                 auto menuLabel = FontString::from_height_normalized("MENU", 1.f / 10.f);
                 auto x = (1.f - menuLabel.normalizedW) / 2.f;
@@ -375,8 +395,8 @@ auto run() -> void
 
                 // draw high score
                 using namespace std::string_literals;
-                auto hiScoreString = "High Score: "s + std::to_string(hiScore);
-                auto fontString = FontString::from_height_normalized(hiScoreString, 0.048);
+                auto highScoreString = "High Score: "s + std::to_string(gameState.highScore);
+                auto fontString = FontString::from_height_normalized(highScoreString, 0.048);
                 draw_font_string_normalized(bb, fontString, 1.0 - fontString.normalizedW - 0.01, 0.01);
             } break;
             case LevelType::GAME: {
@@ -439,12 +459,12 @@ auto run() -> void
                 }
 
                 // draw score
-                auto scoreString = "Score: "s + std::to_string(totalScore);
+                auto scoreString = "Score: "s + std::to_string(gameState.score);
                 auto scoreFontString = FontString::from_height_normalized(scoreString, 0.048);
                 draw_font_string_normalized(bb, scoreFontString, 1.0 - scoreFontString.normalizedW - 0.01, 0.01);
 
                 // draw level
-                auto levelString = "Level: "s + std::to_string(level) + " (" + std::to_string(linesCleared) + "/" + std::to_string(level * 10) + ")";
+                auto levelString = "Level: "s + std::to_string(gameState.level) + " (" + std::to_string(gameState.linesCleared) + "/" + std::to_string(gameState.level * 10) + ")";
                 auto levelFontString = FontString::from_height_normalized(levelString, 0.048);
                 draw_font_string_normalized(bb, levelFontString, 1.0 - levelFontString.normalizedW - 0.01, 0.01 + levelFontString.normalizedH);
 
