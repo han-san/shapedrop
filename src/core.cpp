@@ -101,7 +101,7 @@ struct GameState {
     Board board = {};
     ShapePool shapePool = {initialShapes};
     Shape currentShape = shapePool.current_shape();
-    Shape currentShapeShadow = currentShape.get_shadow(board);
+    Shape currentShapeShadow = board.get_shadow(currentShape);
     std::optional<Shape::RotationType> currentRotationType = {};
     std::optional<Shape> holdShape = {};
 
@@ -136,7 +136,7 @@ auto run() -> void
         gameState.board = {};
         gameState.shapePool.reshuffle();
         gameState.currentShape = gameState.shapePool.current_shape();
-        gameState.currentShapeShadow = gameState.currentShape.get_shadow(gameState.board);
+        gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
     };
 
     struct Button {
@@ -197,7 +197,7 @@ auto run() -> void
             } else if (levelType == LevelType::GAME) {
 
                 auto update_shadow_and_clocks = [&](bool isGrounded) {
-                    gameState.currentShapeShadow = gameState.currentShape.get_shadow(gameState.board);
+                    gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
                     gameState.lockClock = currentClock;
                     if (isGrounded) {
                         gameState.dropClock = currentClock;
@@ -208,14 +208,14 @@ auto run() -> void
                     // if currentShape is on top of a block before move,
                     // the drop clock needs to be reset
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
-                    if (gameState.currentShape.try_move(gameState.board, {1, 0})) {
+                    if (gameState.board.try_move(gameState.currentShape, {1, 0})) {
                         update_shadow_and_clocks(isGrounded);
                     }
                 } else if (message.type == Message::Type::MOVE_LEFT) {
                     // if currentShape is on top of a block before move,
                     // the drop clock needs to be reset
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
-                    if (gameState.currentShape.try_move(gameState.board, {-1, 0})) {
+                    if (gameState.board.try_move(gameState.currentShape, {-1, 0})) {
                         update_shadow_and_clocks(isGrounded);
                     }
                 } else if (message.type == Message::Type::INCREASE_SPEED) {
@@ -223,7 +223,7 @@ auto run() -> void
                 } else if (message.type == Message::Type::RESET_SPEED) {
                     gameState.dropSpeed = 1.0;
                 } else if (message.type == Message::Type::DROP) {
-                    while (gameState.currentShape.try_move(gameState.board, {0, 1})) {
+                    while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
                         gameState.lockClock = currentClock;
                         gameState.currentRotationType = {};
                     }
@@ -231,7 +231,7 @@ auto run() -> void
                     // if currentShape is on top of a block before rotation,
                     // the drop clock needs to be reset
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
-                    if (auto const rotation = gameState.currentShape.rotate(gameState.board, Shape::Rotation::LEFT); rotation) {
+                    if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, Shape::Rotation::LEFT); rotation) {
                         update_shadow_and_clocks(isGrounded);
                         gameState.currentRotationType = rotation;
                     }
@@ -239,7 +239,7 @@ auto run() -> void
                     // if currentShape is on top of a block before rotation,
                     // the drop clock needs to be reset
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
-                    if (auto const rotation = gameState.currentShape.rotate(gameState.board, Shape::Rotation::RIGHT); rotation) {
+                    if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, Shape::Rotation::RIGHT); rotation) {
                         update_shadow_and_clocks(isGrounded);
                         gameState.currentRotationType = rotation;
                     }
@@ -290,7 +290,7 @@ auto run() -> void
             auto nextdropClock = gameState.dropClock + gameState.dropSpeed * CLOCKS_PER_SEC;
             if (currentClock > nextdropClock) {
                 gameState.dropClock = currentClock;
-                if (gameState.currentShape.try_move(gameState.board, {0, 1})) {
+                if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
                     gameState.lockClock = currentClock;
                     gameState.currentRotationType = {};
                 }
@@ -325,7 +325,7 @@ auto run() -> void
 
                     gameState.currentShape = gameState.shapePool.next_shape();
                     // update shape shadow
-                    gameState.currentShapeShadow = gameState.currentShape.get_shadow(gameState.board);
+                    gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
                     gameState.lockClock = currentClock;
 
                     gameState.hasHeld = false;

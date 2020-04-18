@@ -4,8 +4,6 @@
 
 #include "util.hpp"
 
-class Board;
-
 class Shape {
 public:
     using ShapeLayout = std::array<bool, 16>;
@@ -220,11 +218,8 @@ public:
 
     Shape(Type type);
 
-    auto rotate(Board& board, Rotation dir) -> std::optional<RotationType>;
-    auto try_move(Board& board, V2 move) -> bool;
     auto get_block_positions() -> ArrayStack<Position, 4>;
     auto get_absolute_block_positions() -> ArrayStack<Position, 4>;
-    auto get_shadow(Board& board) -> Shape;
 };
 
 class ShapePool {

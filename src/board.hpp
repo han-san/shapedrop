@@ -6,8 +6,6 @@
 #include "jint.h"
 #include "shape.hpp"
 
-class Shape;
-
 struct Block {
     RGB color;
     bool isActive = false;
@@ -26,6 +24,9 @@ public:
 
     std::array<Block, rows * columns> data;
 
+    auto rotate_shape(Shape& shape, Shape::Rotation dir) -> std::optional<Shape::RotationType>;
+    auto try_move(Shape& shape, V2 move) -> bool;
+    auto get_shadow(Shape& shape) -> Shape;
     auto check_for_tspin(Shape& shape, Shape::RotationType rotationType) -> std::optional<TspinType>;
     auto is_valid_spot(Position pos) -> bool;
     auto is_valid_move(Shape& shape, V2 move) -> bool;

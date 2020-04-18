@@ -3,6 +3,130 @@
 
 #include "board.hpp"
 
+auto Board::get_shadow(Shape& shape) -> Shape {
+    auto shapeShadow = shape;
+    while (is_valid_move(shapeShadow, {0, 1})) {
+        ++shapeShadow.pos.y;
+    }
+    return shapeShadow;
+};
+
+auto Board::try_move(Shape& shape, V2 move) -> bool {
+    if (is_valid_move(shape, move)) {
+        shape.pos.x += move.x;
+        shape.pos.y += move.y;
+        return true;
+    }
+    return false;
+}
+
+auto Board::rotate_shape(Shape& shape, Shape::Rotation dir) -> std::optional<Shape::RotationType> {
+    auto rotatingShape = shape;
+    rotatingShape.rotationIndex += dir == Shape::Rotation::RIGHT ? 1 : -1;
+    if (rotatingShape.rotationIndex == -1) rotatingShape.rotationIndex = 3;
+    else if (rotatingShape.rotationIndex == 4) rotatingShape.rotationIndex = 0;
+    if (is_valid_shape(rotatingShape)) {
+        // only rotationindex should have changed
+        shape = rotatingShape;
+        return Shape::RotationType::REGULAR;
+    }
+
+    std::array<V2, 4> kicks = {};
+
+    // do wall kicks to see if valid
+    switch (shape.type) {
+        case Shape::Type::J:
+        case Shape::Type::L:
+        case Shape::Type::S:
+        case Shape::Type::T:
+        case Shape::Type::Z: {
+            switch (shape.rotationIndex) {
+                case 0: {
+                    if (dir == Shape::Rotation::RIGHT) {
+                        kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
+                    } else {
+                        kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
+                    }
+                } break;
+                case 1: {
+                    // both directions check same positions
+                    kicks = { V2 {1, 0}, {1, -1}, {0, 2}, {1, 2} };
+                } break;
+                case 2: {
+                    if (dir == Shape::Rotation::RIGHT) {
+                        kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
+                    } else {
+                        kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
+                    }
+                } break;
+                case 3: {
+                    // both directions check same positions
+                    kicks = { V2 {-1, 0}, {-1, -1}, {0, 2}, {-1, 2} };
+                } break;
+                default: {
+                    assert(false);
+                } break;
+            }
+        } break;
+        case Shape::Type::I: {
+            switch (shape.rotationIndex) {
+                case 0: {
+                    if (dir == Shape::Rotation::RIGHT) {
+                        kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
+                    } else {
+                        kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
+                    }
+                } break;
+                case 1: {
+                    if (dir == Shape::Rotation::RIGHT) {
+                        kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
+                    } else {
+                        kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
+                    }
+                } break;
+                case 2: {
+                    if (dir == Shape::Rotation::RIGHT) {
+                        kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
+                    } else {
+                        kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
+                    }
+                } break;
+                case 3: {
+                    if (dir == Shape::Rotation::RIGHT) {
+                        kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
+                    } else {
+                        kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
+                    }
+                } break;
+                default: {
+                    assert(false);
+                } break;
+            }
+
+        } break;
+        case Shape::Type::O: {
+            // should have already returned true in the is_valid() check
+            assert(false);
+        } break;
+        default: {
+            assert(false);
+        }
+    }
+
+    for (auto kickMove : kicks) {
+        rotatingShape.pos = shape.pos;
+        rotatingShape.pos.x += kickMove.x;
+        // the y in kicks is bottom up while it's top down for the shape position
+        // so we have to invert it by subtracting instead of adding
+        rotatingShape.pos.y -= kickMove.y;
+        if (is_valid_shape(rotatingShape)) {
+            shape = rotatingShape;
+            return Shape::RotationType::WALLKICK;
+        }
+    }
+    return {};
+}
+
 auto Board::is_valid_spot(Position pos) -> bool {
     if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
         return false;
