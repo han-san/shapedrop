@@ -72,7 +72,6 @@ enum class LevelType {
 
 LevelType levelType = LevelType::MENU;
 size_t highScore = 0;
-time_t currentClock = clock();
 auto constexpr static lockDelay = time_t(CLOCKS_PER_SEC / 2);
 bool running = true;
 
@@ -93,8 +92,8 @@ struct GameState {
     size_t level = 1;
     size_t score = 0;
     bool hasHeld = false;
-    time_t dropClock = currentClock;
-    time_t lockClock = currentClock;
+    time_t dropClock = clock();
+    time_t lockClock = dropClock;
     double dropSpeed = 1.0;
     double maxDropSpeed = 0.1;
 
@@ -117,14 +116,15 @@ auto run() -> void
 
     GameState gameState = {};
 
+    time_t frameStartClock = clock();
+
     auto init = [&] {
         gameState.holdShape = {};
         gameState.linesCleared = 0;
         gameState.level = 1;
         gameState.score = 0;
-        currentClock = clock();
-        gameState.dropClock = currentClock;
-        gameState.lockClock = currentClock;
+        gameState.dropClock = frameStartClock;
+        gameState.lockClock = frameStartClock;
         srand(time(NULL));
     };
 
@@ -174,8 +174,8 @@ auto run() -> void
 
     while (running) {
         auto newclock = clock();
-        auto frameclocktime = newclock - currentClock;
-        currentClock = newclock;
+        auto frameclocktime = newclock - frameStartClock;
+        frameStartClock = newclock;
 
         // delta = (double)frameclocktime / CLOCKS_PER_SEC;
         /* auto framemstime = 1000.0 * delta; */
@@ -198,9 +198,9 @@ auto run() -> void
 
                 auto update_shadow_and_clocks = [&](bool isGrounded) {
                     gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
-                    gameState.lockClock = currentClock;
+                    gameState.lockClock = frameStartClock;
                     if (isGrounded) {
-                        gameState.dropClock = currentClock;
+                        gameState.dropClock = frameStartClock;
                     }
                 };
 
@@ -224,7 +224,7 @@ auto run() -> void
                     gameState.dropSpeed = 1.0;
                 } else if (message.type == Message::Type::DROP) {
                     while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
-                        gameState.lockClock = currentClock;
+                        gameState.lockClock = frameStartClock;
                         gameState.currentRotationType = {};
                     }
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
@@ -288,15 +288,15 @@ auto run() -> void
         if (levelType == LevelType::GAME) {
             // 1 drop per second
             auto nextdropClock = gameState.dropClock + gameState.dropSpeed * CLOCKS_PER_SEC;
-            if (currentClock > nextdropClock) {
-                gameState.dropClock = currentClock;
+            if (frameStartClock > nextdropClock) {
+                gameState.dropClock = frameStartClock;
                 if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
-                    gameState.lockClock = currentClock;
+                    gameState.lockClock = frameStartClock;
                     gameState.currentRotationType = {};
                 }
             }
 
-            if (currentClock > gameState.lockClock + lockDelay) {
+            if (frameStartClock > gameState.lockClock + lockDelay) {
                 // only care about locking if currentShape is on top of a block
                 if (!gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
                     // game over if entire piece is above visible portion
@@ -326,7 +326,7 @@ auto run() -> void
                     gameState.currentShape = gameState.shapePool.next_shape();
                     // update shape shadow
                     gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
-                    gameState.lockClock = currentClock;
+                    gameState.lockClock = frameStartClock;
 
                     gameState.hasHeld = false;
 
