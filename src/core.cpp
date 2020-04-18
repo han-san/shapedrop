@@ -76,6 +76,16 @@ time_t currentClock = clock();
 auto constexpr static lockDelay = time_t(CLOCKS_PER_SEC / 2);
 bool running = true;
 
+std::array<Shape, 7> const initialShapes {
+    Shape::Type::I,
+    Shape::Type::L,
+    Shape::Type::J,
+    Shape::Type::O,
+    Shape::Type::S,
+    Shape::Type::Z,
+    Shape::Type::T,
+};
+
 // For variables which are unique to their instance of a game
 // i.e. should be reset when starting a new one
 struct GameState {
@@ -89,16 +99,7 @@ struct GameState {
     double maxDropSpeed = 0.1;
 
     Board board = {};
-    std::array<Shape, 7> shapes {
-        Shape(Shape::Type::I, board),
-        Shape(Shape::Type::L, board),
-        Shape(Shape::Type::J, board),
-        Shape(Shape::Type::O, board),
-        Shape(Shape::Type::S, board),
-        Shape(Shape::Type::Z, board),
-        Shape(Shape::Type::T, board),
-    };
-    ShapePool shapePool = {shapes};
+    ShapePool shapePool = {initialShapes};
     Shape currentShape = shapePool.current_shape();
     Shape currentShapeShadow = currentShape.get_shadow(board);
     std::optional<Shape::RotationType> currentRotationType = {};
@@ -249,10 +250,10 @@ auto run() -> void
                         if (gameState.holdShape) {
                             auto tmp = gameState.holdShape;
 
-                            gameState.holdShape = Shape(gameState.currentShape.type, gameState.board);
-                            gameState.currentShape = Shape(tmp->type, gameState.board);
+                            gameState.holdShape = Shape(gameState.currentShape.type);
+                            gameState.currentShape = Shape(tmp->type);
                         } else {
-                            gameState.holdShape = Shape(gameState.currentShape.type, gameState.board);
+                            gameState.holdShape = Shape(gameState.currentShape.type);
                             gameState.currentShape = gameState.shapePool.next_shape();
                         }
 

@@ -218,7 +218,7 @@ public:
     RGB color;
     Position pos;
 
-    Shape(Type type, Board& board);
+    Shape(Type type);
 
     auto rotate(Board& board, Rotation dir) -> std::optional<RotationType>;
     auto try_move(Board& board, V2 move) -> bool;

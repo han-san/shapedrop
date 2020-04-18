@@ -6,8 +6,8 @@
 
 #include "shape.hpp"
 
-Shape::Shape(Type type, Board& board)
-    : pos{board.columns / 2 - 2, 0} // spawn centrally
+Shape::Shape(Type type)
+    : pos{Board::columns / 2 - 2, 0} // spawn centrally
 {
     this->type = type;
     switch (type) {
