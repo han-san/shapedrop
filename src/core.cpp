@@ -141,6 +141,7 @@ struct GameState {
     time_t lockClock = dropClock;
     double dropSpeed = 1.0;
     double maxDropSpeed = 0.1;
+    size_t droppedRows = 0;
 
     Board board = {};
     ShapePool shapePool = {initialShapes};
@@ -234,6 +235,9 @@ auto run() -> void
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
                     if (gameState.board.try_move(gameState.currentShape, {1, 0})) {
                         update_shadow_and_clocks(isGrounded);
+                    } else {
+                        // if you move the piece you cancel the drop
+                        gameState.droppedRows = 0;
                     }
                 } else if (message.type == Message::Type::MOVE_LEFT) {
                     // if currentShape is on top of a block before move,
@@ -241,15 +245,24 @@ auto run() -> void
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
                     if (gameState.board.try_move(gameState.currentShape, {-1, 0})) {
                         update_shadow_and_clocks(isGrounded);
+                    } else {
+                        // if you move the piece you cancel the drop
+                        gameState.droppedRows = 0;
                     }
                 } else if (message.type == Message::Type::INCREASE_SPEED) {
                     gameState.dropSpeed = gameState.maxDropSpeed;
                 } else if (message.type == Message::Type::RESET_SPEED) {
                     gameState.dropSpeed = 1.0;
                 } else if (message.type == Message::Type::DROP) {
+                    auto droppedRows = 0;
                     while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
                         gameState.lockClock = frameStartClock;
                         gameState.currentRotationType = {};
+                        ++droppedRows;
+                    }
+                    // If it's not possible to drop it even one row it doesn't count
+                    if (droppedRows) {
+                        gameState.droppedRows = droppedRows;
                     }
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
                     // if currentShape is on top of a block before rotation,
@@ -258,6 +271,9 @@ auto run() -> void
                     if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, Shape::Rotation::LEFT); rotation) {
                         update_shadow_and_clocks(isGrounded);
                         gameState.currentRotationType = rotation;
+                    } else {
+                        // if you move the piece you cancel the drop
+                        gameState.droppedRows = 0;
                     }
                 } else if (message.type == Message::Type::ROTATE_RIGHT) {
                     // if currentShape is on top of a block before rotation,
@@ -266,6 +282,9 @@ auto run() -> void
                     if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, Shape::Rotation::RIGHT); rotation) {
                         update_shadow_and_clocks(isGrounded);
                         gameState.currentRotationType = rotation;
+                    } else {
+                        // if you move the piece you cancel the drop
+                        gameState.droppedRows = 0;
                     }
                 } else if (message.type == Message::Type::HOLD) {
                     if (!gameState.hasHeld) {
@@ -362,6 +381,14 @@ auto run() -> void
                     if (!clearName.empty()) {
                         std::cout << clearName << std::endl;
                     }
+
+                    // only regular clears count, but if it's a t-spin then
+                    // droppedRows should have been set to 0 from rotating the shape
+                    // so it SHOULDN'T be necessary to check explicitly.
+                    if (clearType != ClearType::NONE) {
+                        gameState.score += 2 * gameState.droppedRows;
+                    }
+
                     gameState.score += calculate_score(clearType, gameState.level);
 
                     gameState.level = gameState.linesCleared / 10 + 1;
