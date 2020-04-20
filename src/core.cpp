@@ -235,7 +235,6 @@ auto run() -> void
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
                     if (gameState.board.try_move(gameState.currentShape, {1, 0})) {
                         update_shadow_and_clocks(isGrounded);
-                    } else {
                         // if you move the piece you cancel the drop
                         gameState.droppedRows = 0;
                     }
@@ -245,7 +244,6 @@ auto run() -> void
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
                     if (gameState.board.try_move(gameState.currentShape, {-1, 0})) {
                         update_shadow_and_clocks(isGrounded);
-                    } else {
                         // if you move the piece you cancel the drop
                         gameState.droppedRows = 0;
                     }
@@ -260,10 +258,7 @@ auto run() -> void
                         gameState.currentRotationType = {};
                         ++droppedRows;
                     }
-                    // If it's not possible to drop it even one row it doesn't count
-                    if (droppedRows) {
-                        gameState.droppedRows = droppedRows;
-                    }
+                    gameState.droppedRows = droppedRows;
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
                     // if currentShape is on top of a block before rotation,
                     // the drop clock needs to be reset
@@ -271,7 +266,6 @@ auto run() -> void
                     if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, Shape::Rotation::LEFT); rotation) {
                         update_shadow_and_clocks(isGrounded);
                         gameState.currentRotationType = rotation;
-                    } else {
                         // if you move the piece you cancel the drop
                         gameState.droppedRows = 0;
                     }
@@ -282,7 +276,6 @@ auto run() -> void
                     if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, Shape::Rotation::RIGHT); rotation) {
                         update_shadow_and_clocks(isGrounded);
                         gameState.currentRotationType = rotation;
-                    } else {
                         // if you move the piece you cancel the drop
                         gameState.droppedRows = 0;
                     }
