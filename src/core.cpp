@@ -104,9 +104,9 @@ struct GameState {
     std::optional<Shape::RotationType> currentRotationType = {};
     std::optional<Shape> holdShape = {};
 
-    /* auto reset() { */
-    /*     *this = std::move(GameState {}); */
-    /* } */
+    auto reset() {
+        *this = std::move(GameState {});
+    }
 
 };
 
@@ -117,27 +117,6 @@ auto run() -> void
     GameState gameState = {};
 
     time_t frameStartClock = clock();
-
-    auto init = [&] {
-        gameState.holdShape = {};
-        gameState.linesCleared = 0;
-        gameState.level = 1;
-        gameState.score = 0;
-        gameState.dropClock = frameStartClock;
-        gameState.lockClock = frameStartClock;
-        srand(time(NULL));
-    };
-
-    init();
-
-    auto reset_game = [&] {
-        init();
-
-        gameState.board = {};
-        gameState.shapePool.reshuffle();
-        gameState.currentShape = gameState.shapePool.current_shape();
-        gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
-    };
 
     struct Button {
         Squaref dimensions;
@@ -189,7 +168,7 @@ auto run() -> void
             if (message.type == Message::Type::QUIT) {
                 running = false;
             } else if (message.type == Message::Type::RESET) {
-                reset_game();
+                gameState.reset();
             } else if (message.type == Message::Type::INCREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() + 1);
             } else if (message.type == Message::Type::DECREASE_WINDOW_SIZE) {
@@ -277,7 +256,7 @@ auto run() -> void
                             message.y < screenSpaceDimensions.y + screenSpaceDimensions.h)
                         {
                             levelType = LevelType::GAME;
-                            reset_game();
+                            gameState.reset();
                         }
                     }
                 }
