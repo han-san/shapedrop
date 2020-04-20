@@ -26,44 +26,88 @@ using namespace std::string_literals;
 // Double:             300 x level
 // Triple:             500 x level
 // Tetris:             800 x level
-// T-Spin Mini:        100 x level
 // T-Spin:             400 x level
-// T-Spin Mini Single: 200 x level
 // T-Spin Single:      800 x level
-// T-Spin Mini Double: 1200 x level
 // T-Spin Double:      1200 x level
 // T-Spin Triple:      1600 x level
+// T-Spin Mini:        100 x level
+// T-Spin Mini Single: 200 x level
+// T-Spin Mini Double: 1200 x level
 //
 // Back to Back Tetris/T-Spin: * 1.5 (for example, back to back tetris: 1200 x level)
 // Combo:     50 x combo count x level
 // Soft drop: 1 point per cell
 // Hard drop: 2 point per cell
-auto calculate_score(int const rowsCleared, std::optional<TspinType> const tspin, int const level) -> int {
-    if (rowsCleared == 1) {
-        if (tspin) {
-            auto const score = level * (*tspin == TspinType::MINI ? 200 : 800);
-            return score;
-        } else {
-            return level * 100;
-        }
-    } else if (rowsCleared == 2) {
-        // T-spin mini double and T-spin double are both 1200
-        return level * (tspin ? 1200 : 300);
-    } else if (rowsCleared == 3) {
-        // T-spin triple requires a wallkick so there is no
-        // distinction between regular and mini (although it's
-        // going to be represented internally as a mini).
-        auto const score = level * (tspin ? 1600 : 500);
-        return score;
-    } else if (rowsCleared == 4) {
-        return level * 800;
-    } else if (tspin) {
-        // tspin without clearing any lines
-        auto const score = level * (*tspin == TspinType::MINI ? 100 : 400);
-        return score;
-    }
-    return 0;
+
+enum class ClearType {
+    // Don't change order. clearTypeScores and get_clear_type() depends on the
+    // specific order.
+    NONE,
+    SINGLE,
+    DOUBLE,
+    TRIPLE,
+    TETRIS,
+
+    TSPIN,
+    TSPIN_SINGLE,
+    TSPIN_DOUBLE,
+    TSPIN_TRIPLE,
+    TSPIN_MINI,
+    TSPIN_MINI_SINGLE,
+    TSPIN_MINI_DOUBLE,
 };
+
+auto constexpr clearTypeScores = std::array {
+    0,    // None
+    100,  // Single
+    300,  // Double
+    500,  // Triple
+    800,  // Tetris
+
+    400,  // T-Spin
+    800,  // T-Spin Single
+    1200, // T-Spin Double
+    1600, // T-Spin Triple
+    100,  // T-Spin Mini
+    200,  // T-Spin Mini Single
+    1200  // T-Spin Mini Double
+};
+
+auto get_clear_type(int const rowsCleared, std::optional<TspinType> const tspin) {
+    assert(rowsCleared <= 4);
+    assert(rowsCleared >= 0);
+    if (!tspin) {
+        return static_cast<ClearType>(rowsCleared);
+    } else {
+        assert(rowsCleared <= 3);
+        switch (rowsCleared) {
+            case 0: {
+                return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI : ClearType::TSPIN;
+            } break;
+            case 1: {
+                return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI_SINGLE : ClearType::TSPIN_SINGLE;
+            } break;
+            case 2: {
+                return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI_DOUBLE : ClearType::TSPIN_DOUBLE;
+            } break;
+            case 3: {
+                // T-spin triple requires a wallkick so there is no
+                // distinction between regular and mini (although it's
+                // going to be represented internally as a mini).
+                return ClearType::TSPIN_TRIPLE;
+            } break;
+        }
+    }
+}
+
+auto calculate_score(ClearType const clearType, int const level) {
+    return clearTypeScores[static_cast<size_t>(clearType)] * level;
+}
+
+auto calculate_score(int const rowsCleared, std::optional<TspinType> tspin, int const level) {
+    auto const clearType = get_clear_type(rowsCleared, tspin);
+    return calculate_score(clearType, level);
+}
 
 enum class LevelType {
     MENU,
