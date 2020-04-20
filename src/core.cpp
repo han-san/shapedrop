@@ -20,6 +20,7 @@
 #include "core.hpp"
 
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 // scoring formula (https://harddrop.com/wiki/Scoring):
 // Single:             100 x level
@@ -342,7 +343,26 @@ auto run() -> void
 
                     auto rowsCleared = gameState.board.remove_full_rows();
                     gameState.linesCleared += rowsCleared;
-                    gameState.score += calculate_score(rowsCleared, tspin, gameState.level);
+                    auto clearType = get_clear_type(rowsCleared, tspin);
+                    auto constexpr clearTypeToName = std::array {
+                        ""sv,
+                        "Single"sv,
+                        "Double"sv,
+                        "Triple"sv,
+                        "Tetris"sv,
+                        "T-Spin"sv,
+                        "T-Spin Single"sv,
+                        "T-Spin Double"sv,
+                        "T-Spin Triple"sv,
+                        "T-Spin Mini"sv,
+                        "T-Spin Mini Single"sv,
+                        "T-Spin Mini Double"sv,
+                    };
+                    auto const clearName = clearTypeToName[static_cast<int>(clearType)];
+                    if (!clearName.empty()) {
+                        std::cout << clearName << std::endl;
+                    }
+                    gameState.score += calculate_score(clearType, gameState.level);
 
                     gameState.level = gameState.linesCleared / 10 + 1;
 
