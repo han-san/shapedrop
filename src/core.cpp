@@ -130,6 +130,11 @@ std::array<Shape, 7> const initialShapes {
     Shape::Type::T,
 };
 
+enum class BackToBackType {
+    TETRIS,
+    TSPIN
+};
+
 // For variables which are unique to their instance of a game
 // i.e. should be reset when starting a new one
 struct GameState {
@@ -142,6 +147,7 @@ struct GameState {
     double dropSpeed = 1.0;
     double maxDropSpeed = 0.1;
     size_t droppedRows = 0;
+    std::optional<BackToBackType> backToBackType = {};
 
     Board board = {};
     ShapePool shapePool = {initialShapes};
@@ -382,7 +388,38 @@ auto run() -> void
                         gameState.score += 2 * gameState.droppedRows;
                     }
 
-                    gameState.score += calculate_score(clearType, gameState.level);
+                    // check for back to back tetris/t-spin
+                    auto backToBackModifier = 1.0;
+                    switch (clearType) {
+                        case ClearType::TETRIS: {
+                            if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::TETRIS)) {
+                                std::cerr << "Back to back Tetris\n";
+                                backToBackModifier = 1.5;
+                            } else {
+                                gameState.backToBackType = BackToBackType::TETRIS;
+                            }
+                        } break;
+                        case ClearType::TSPIN:
+                        case ClearType::TSPIN_MINI:
+                        case ClearType::TSPIN_SINGLE:
+                        case ClearType::TSPIN_MINI_SINGLE:
+                        case ClearType::TSPIN_DOUBLE:
+                        case ClearType::TSPIN_MINI_DOUBLE:
+                        case ClearType::TSPIN_TRIPLE: {
+                            if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::TSPIN)) {
+                                std::cerr << "Back to back T-Spin\n";
+                                backToBackModifier = 1.5;
+                            } else {
+                                gameState.backToBackType = BackToBackType::TSPIN;
+                            }
+                        } break;
+                        default: {
+                            gameState.backToBackType = {};
+                        } break;
+                    }
+
+                    auto clearScore = calculate_score(clearType, gameState.level) * backToBackModifier;
+                    gameState.score += clearScore;
 
                     gameState.level = gameState.linesCleared / 10 + 1;
 
