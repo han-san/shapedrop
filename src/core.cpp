@@ -148,6 +148,7 @@ struct GameState {
     double maxDropSpeed = 0.1;
     size_t droppedRows = 0;
     std::optional<BackToBackType> backToBackType = {};
+    int comboCounter = -1;
 
     Board board = {};
     ShapePool shapePool = {initialShapes};
@@ -386,6 +387,29 @@ auto run() -> void
                     // so it SHOULDN'T be necessary to check explicitly.
                     if (clearType != ClearType::NONE) {
                         gameState.score += 2 * gameState.droppedRows;
+                    }
+
+                    // handle combos
+                    switch (clearType) {
+                        case ClearType::SINGLE:
+                        case ClearType::DOUBLE:
+                        case ClearType::TRIPLE:
+                        case ClearType::TETRIS:
+                        case ClearType::TSPIN_SINGLE:
+                        case ClearType::TSPIN_DOUBLE:
+                        case ClearType::TSPIN_TRIPLE:
+                        case ClearType::TSPIN_MINI_SINGLE:
+                        case ClearType::TSPIN_MINI_DOUBLE: {
+                            ++gameState.comboCounter;
+                            auto const comboScore = 50 * gameState.comboCounter * gameState.level;
+                            gameState.score += comboScore;
+                            if (comboScore) {
+                                std::cerr << "Combo " << gameState.comboCounter << "! " << comboScore << " pts.\n";
+                            }
+                        } break;
+                        default: {
+                            gameState.comboCounter = -1;
+                        } break;
                     }
 
                     // check for back to back tetris/t-spin
