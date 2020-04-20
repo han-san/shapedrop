@@ -39,6 +39,9 @@ using namespace std::string_view_literals;
 // Combo:     50 x combo count x level
 // Soft drop: 1 point per cell
 // Hard drop: 2 point per cell
+//
+// TODO:
+// Implement soft drop scoring
 
 enum class ClearType {
     // Don't change order. clearTypeScores and get_clear_type() depends on the
@@ -236,24 +239,39 @@ auto run() -> void
                     }
                 };
 
+                enum class HorDir {
+                    LEFT,
+                    RIGHT
+                };
+
+                auto move_horizontal = [&] (HorDir const dir) {
+                    // if currentShape is on top of a block before move,
+                    // the drop clock needs to be reset
+                    auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
+                    auto const dirVec = dir == HorDir::RIGHT ? V2{1, 0} : V2{-1, 0};
+                    if (gameState.board.try_move(gameState.currentShape, dirVec)) {
+                        update_shadow_and_clocks(isGrounded);
+                        // if you move the piece you cancel the drop
+                        gameState.droppedRows = 0;
+                    }
+                };
+
+                auto rotate_current_shape = [&] (Shape::Rotation rot) {
+                    // if currentShape is on top of a block before rotation,
+                    // the drop clock needs to be reset
+                    auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
+                    if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, rot); rotation) {
+                        update_shadow_and_clocks(isGrounded);
+                        gameState.currentRotationType = rotation;
+                        // if you move the piece you cancel the drop
+                        gameState.droppedRows = 0;
+                    }
+                };
+
                 if (message.type == Message::Type::MOVE_RIGHT) {
-                    // if currentShape is on top of a block before move,
-                    // the drop clock needs to be reset
-                    auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
-                    if (gameState.board.try_move(gameState.currentShape, {1, 0})) {
-                        update_shadow_and_clocks(isGrounded);
-                        // if you move the piece you cancel the drop
-                        gameState.droppedRows = 0;
-                    }
+                    move_horizontal(HorDir::RIGHT);
                 } else if (message.type == Message::Type::MOVE_LEFT) {
-                    // if currentShape is on top of a block before move,
-                    // the drop clock needs to be reset
-                    auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
-                    if (gameState.board.try_move(gameState.currentShape, {-1, 0})) {
-                        update_shadow_and_clocks(isGrounded);
-                        // if you move the piece you cancel the drop
-                        gameState.droppedRows = 0;
-                    }
+                    move_horizontal(HorDir::LEFT);
                 } else if (message.type == Message::Type::INCREASE_SPEED) {
                     gameState.dropSpeed = gameState.maxDropSpeed;
                 } else if (message.type == Message::Type::RESET_SPEED) {
@@ -267,25 +285,10 @@ auto run() -> void
                     }
                     gameState.droppedRows = droppedRows;
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
-                    // if currentShape is on top of a block before rotation,
-                    // the drop clock needs to be reset
-                    auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
-                    if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, Shape::Rotation::LEFT); rotation) {
-                        update_shadow_and_clocks(isGrounded);
-                        gameState.currentRotationType = rotation;
-                        // if you move the piece you cancel the drop
-                        gameState.droppedRows = 0;
-                    }
+                    rotate_current_shape(Shape::Rotation::LEFT);
                 } else if (message.type == Message::Type::ROTATE_RIGHT) {
-                    // if currentShape is on top of a block before rotation,
-                    // the drop clock needs to be reset
-                    auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
-                    if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, Shape::Rotation::RIGHT); rotation) {
-                        update_shadow_and_clocks(isGrounded);
-                        gameState.currentRotationType = rotation;
-                        // if you move the piece you cancel the drop
-                        gameState.droppedRows = 0;
-                    }
+                    rotate_current_shape(Shape::Rotation::RIGHT);
+                } else if (message.type == Message::Type::ROTATE_RIGHT) {
                 } else if (message.type == Message::Type::HOLD) {
                     if (!gameState.hasHeld) {
                         gameState.hasHeld = true;
