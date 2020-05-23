@@ -121,6 +121,8 @@ enum class LevelType {
 LevelType levelType = LevelType::MENU;
 size_t highScore = 0;
 auto constexpr static lockDelay = time_t(CLOCKS_PER_SEC / 2);
+auto constexpr static initialDropDelay = 1.0;
+auto constexpr static softDropDelay = 0.1;
 bool running = true;
 
 std::array<Shape, 7> const initialShapes {
@@ -147,11 +149,12 @@ struct GameState {
     bool hasHeld = false;
     time_t dropClock = clock();
     time_t lockClock = dropClock;
-    double dropSpeed = 1.0;
-    double maxDropSpeed = 0.1;
     size_t droppedRows = 0;
     std::optional<BackToBackType> backToBackType = {};
+    // Starts at -1 since the first clear advances the counter, but only the
+    // second clear in a row counts as a combo.
     int comboCounter = -1;
+    bool isSoftDropping = false;
 
     Board board = {};
     ShapePool shapePool = {initialShapes};
@@ -164,6 +167,11 @@ struct GameState {
         *this = std::move(GameState {});
     }
 
+    auto drop_delay_for_level() {
+        auto const dropDelay = initialDropDelay - this->level * 0.1;
+        // dropDelay can't be negative
+        return dropDelay > 0. ? dropDelay : 0.;
+    }
 };
 
 auto run() -> void
@@ -273,9 +281,12 @@ auto run() -> void
                 } else if (message.type == Message::Type::MOVE_LEFT) {
                     move_horizontal(HorDir::LEFT);
                 } else if (message.type == Message::Type::INCREASE_SPEED) {
-                    gameState.dropSpeed = gameState.maxDropSpeed;
+                    // TODO: How does this work if you e.g. press
+                    // left/right/rotate while holding button down?
+                    // is isSoftDropping still true at that time?
+                    gameState.isSoftDropping = true;
                 } else if (message.type == Message::Type::RESET_SPEED) {
-                    gameState.dropSpeed = 1.0;
+                    gameState.isSoftDropping = false;
                 } else if (message.type == Message::Type::DROP) {
                     auto droppedRows = 0;
                     while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
@@ -332,8 +343,19 @@ auto run() -> void
 
         // sim
         if (levelType == LevelType::GAME) {
-            // 1 drop per second
-            auto nextdropClock = gameState.dropClock + gameState.dropSpeed * CLOCKS_PER_SEC;
+            auto const dropDelay = [&]() {
+                auto const levelDropDelay = gameState.drop_delay_for_level();
+                if (gameState.isSoftDropping && (softDropDelay < levelDropDelay)) {
+                    return softDropDelay;
+                } else {
+                    return levelDropDelay;
+                }
+            }();
+
+            // TODO: make it possible for shapes to drop more than one block
+            // (e.g. at max drop speed it should drop all the way to the bottom
+            // instantly)
+            auto nextdropClock = gameState.dropClock + dropDelay * CLOCKS_PER_SEC;
             if (frameStartClock > nextdropClock) {
                 gameState.dropClock = frameStartClock;
                 if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
