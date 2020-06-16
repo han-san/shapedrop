@@ -247,7 +247,6 @@ auto run() -> void
             } else if (message.type == Message::Type::DECREASE_WINDOW_SIZE) {
                 change_window_scale(get_window_scale() - 1);
             } else if (levelType == LevelType::GAME) {
-
                 auto update_shadow_and_clocks = [&](bool isGrounded) {
                     gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
                     gameState.lockClock = frameStartClock;
@@ -516,14 +515,17 @@ auto run() -> void
                         } break;
                     }
 
-                    auto clearScore = calculate_score(clearType, gameState.level) * backToBackModifier;
+                    auto clearScore = size_t(calculate_score(clearType, gameState.level) * backToBackModifier);
                     gameState.score += clearScore;
 
+                    // TODO: If someone wants to start from a higher level this can't
+                    // be constantly calculated based on lines cleared
                     gameState.level = gameState.linesCleared / 10 + 1;
 
                     gameState.currentShape = gameState.shapePool.next_shape();
                     // update shape shadow
                     gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
+
                     gameState.lockClock = frameStartClock;
 
                     gameState.hasHeld = false;
@@ -571,14 +573,14 @@ auto run() -> void
                     auto outlineScreenSpace = to_screen_space(button.dimensions);
 
                     draw_hollow_square(bb, outlineScreenSpace, {0, 0, 0});
-                    draw_font_string(bb, button.text, outlineScreenSpace.x, outlineScreenSpace.y);
+                    draw_font_string(bb, button.text, int(outlineScreenSpace.x), int(outlineScreenSpace.y));
                 }
 
                 // draw high score
                 using namespace std::string_literals;
                 auto highScoreString = "High Score: "s + std::to_string(highScore);
-                auto fontString = FontString::from_height_normalized(highScoreString, 0.048);
-                draw_font_string_normalized(bb, fontString, 1.0 - fontString.normalizedW - 0.01, 0.01);
+                auto fontString = FontString::from_height_normalized(highScoreString, 0.048f);
+                draw_font_string_normalized(bb, fontString, 1.0f - fontString.normalizedW - 0.01f, 0.01f);
             } break;
             case LevelType::GAME: {
                 // draw playarea background
@@ -641,20 +643,20 @@ auto run() -> void
 
                 // draw score
                 auto scoreString = "Score: "s + std::to_string(gameState.score);
-                auto scoreFontString = FontString::from_height_normalized(scoreString, 0.048);
-                draw_font_string_normalized(bb, scoreFontString, 1.0 - scoreFontString.normalizedW - 0.01, 0.01);
+                auto scoreFontString = FontString::from_height_normalized(scoreString, 0.048f);
+                draw_font_string_normalized(bb, scoreFontString, 1.0f - scoreFontString.normalizedW - 0.01f, 0.01f);
 
                 // draw level
                 auto levelString = "Level: "s + std::to_string(gameState.level) + " (" + std::to_string(gameState.linesCleared) + "/" + std::to_string(gameState.level * 10) + ")";
-                auto levelFontString = FontString::from_height_normalized(levelString, 0.048);
-                draw_font_string_normalized(bb, levelFontString, 1.0 - levelFontString.normalizedW - 0.01, 0.01 + levelFontString.normalizedH);
+                auto levelFontString = FontString::from_height_normalized(levelString, 0.048f);
+                draw_font_string_normalized(bb, levelFontString, 1.0f - levelFontString.normalizedW - 0.01f, 0.01f + levelFontString.normalizedH);
 
                 // draw held shape
                 Squaref holdShapeDim{};
-                holdShapeDim.x = gHoldShapeDim.x * scale;
-                holdShapeDim.y = gHoldShapeDim.y * scale;
-                holdShapeDim.w = gHoldShapeDim.w * scale;
-                holdShapeDim.h = gHoldShapeDim.h * scale;
+                holdShapeDim.x = gHoldShapeDim.x * float(scale);
+                holdShapeDim.y = gHoldShapeDim.y * float(scale);
+                holdShapeDim.w = gHoldShapeDim.w * float(scale);
+                holdShapeDim.h = gHoldShapeDim.h * float(scale);
                 draw_solid_square(bb, holdShapeDim, {0, 0, 0});
                 if (gameState.holdShape) {
                     auto shape = *gameState.holdShape;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "board.hpp"
+#include "util.hpp"
 
 struct BackBuffer {
     void* memory;
@@ -49,7 +50,7 @@ auto constexpr constexpr_round(float const val) -> int {
     return int(val + 0.5);
 };
 
-auto constexpr gBaseWindowWidth = constexpr_round(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize);
-auto constexpr gBaseWindowHeight = constexpr_round(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize);
+auto constexpr gBaseWindowWidth = constexpr_round(float(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize));
+auto constexpr gBaseWindowHeight = constexpr_round(float(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize));
 
 auto run() -> void;

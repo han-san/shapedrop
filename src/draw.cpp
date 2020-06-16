@@ -29,11 +29,11 @@ auto draw_font_character(BackBuffer& buf, FontCharacter& fontCharacter, int real
             auto relativeIndex = y * fontCharacter.w + x;
             auto a = fontCharacter.bitmap[relativeIndex];
 
-            *currbyte = alpha_blend_channel(*currbyte, 0, a);
+            *currbyte = u8(alpha_blend_channel(*currbyte, 0, a));
             ++currbyte;
-            *currbyte = alpha_blend_channel(*currbyte, 0, a);
+            *currbyte = u8(alpha_blend_channel(*currbyte, 0, a));
             ++currbyte;
-            *currbyte = alpha_blend_channel(*currbyte, 0, a);
+            *currbyte = u8(alpha_blend_channel(*currbyte, 0, a));
         }
     }
 }
@@ -42,7 +42,7 @@ auto draw_font_string(BackBuffer& buf, FontString& fontString, int x, int y) -> 
 {
     for (auto& fontCharacter : fontString.data) {
         draw_font_character(buf, fontCharacter, x, y);
-        x += fontCharacter.advance;
+        x += int(fontCharacter.advance);
     }
 }
 
@@ -51,7 +51,7 @@ auto draw_font_string_normalized(BackBuffer& buf, FontString& fontString, float 
     x *= buf.w;
     y *= buf.h;
 
-    draw_font_string(buf, fontString, x, y);
+    draw_font_string(buf, fontString, int(x), int(y));
 }
 
 auto draw_text(BackBuffer& buf, std::string_view text, int x, int y, float pixelHeight) -> void
@@ -66,7 +66,7 @@ auto draw_text_normalized(BackBuffer& buf, std::string_view text, float x, float
     y *= buf.h;
     pixelHeight *= buf.h;
 
-    draw_text(buf, text, x, y, pixelHeight);
+    draw_text(buf, text, int(x), int(y), pixelHeight);
 }
 
 auto draw_solid_square(BackBuffer& buf, Squaref sqr, RGB color, uint a) -> void
@@ -85,11 +85,11 @@ auto draw_solid_square(BackBuffer& buf, Squaref sqr, RGB color, uint a) -> void
             auto currbyteindex = pixely * buf.w + pixelx;
             auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
-            *currbyte = alpha_blend_channel(*currbyte, color.b, a);
+            *currbyte = u8(alpha_blend_channel(*currbyte, color.b, a));
             ++currbyte;
-            *currbyte = alpha_blend_channel(*currbyte, color.g, a);
+            *currbyte = u8(alpha_blend_channel(*currbyte, color.g, a));
             ++currbyte;
-            *currbyte = alpha_blend_channel(*currbyte, color.r, a);
+            *currbyte = u8(alpha_blend_channel(*currbyte, color.r, a));
         }
     }
 }
@@ -132,11 +132,11 @@ auto draw_hollow_square(BackBuffer& buf, Squaref sqr, RGB color, int a, int bord
                 return fg * alphaRatio + bg * (1 - alphaRatio);
             };
 
-            *currbyte = alpha_blend(*currbyte, color.b, a);
+            *currbyte = u8(alpha_blend(*currbyte, color.b, a));
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, color.g, a);
+            *currbyte = u8(alpha_blend(*currbyte, color.g, a));
             ++currbyte;
-            *currbyte = alpha_blend(*currbyte, color.r, a);
+            *currbyte = u8(alpha_blend(*currbyte, color.r, a));
         }
     }
 }
