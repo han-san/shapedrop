@@ -40,8 +40,13 @@ using namespace std::string_view_literals;
 // Soft drop: 1 point per cell
 // Hard drop: 2 point per cell
 //
-// TODO:
-// Implement soft drop scoring
+// Softdropping.
+// dropcount needs to be reset when:
+//     A new shape is introduced, i.e. shape lock or hold.
+//     the soft drop button is released, but not if the shape is on ground.
+//     If the shape falls at all when the soft drop button is not pressed.
+//     If the shape is moved when it's grounded or is rotated with a kick while grounded
+//     If the shape is hard dropped (and actually moves from it)
 
 enum class ClearType {
     // Don't change order. clearTypeScores and get_clear_type() depends on the
@@ -143,19 +148,23 @@ enum class BackToBackType {
 // For variables which are unique to their instance of a game
 // i.e. should be reset when starting a new one
 struct GameState {
+
+    // unique to current shape
+    time_t dropClock = clock();
+    time_t lockClock = dropClock;
+    size_t droppedRows = 0;
+    size_t softDropRowCount = 0;
+
+    // shared for all shapes
+    bool isSoftDropping = false;
     size_t linesCleared = 0;
     size_t level = 1;
     size_t score = 0;
     bool hasHeld = false;
-    time_t dropClock = clock();
-    time_t lockClock = dropClock;
-    size_t droppedRows = 0;
     std::optional<BackToBackType> backToBackType = {};
     // Starts at -1 since the first clear advances the counter, but only the
     // second clear in a row counts as a combo.
     int comboCounter = -1;
-    bool isSoftDropping = false;
-
     Board board = {};
     ShapePool shapePool = {initialShapes};
     Shape currentShape = shapePool.current_shape();
@@ -261,6 +270,9 @@ auto run() -> void
                         update_shadow_and_clocks(isGrounded);
                         // if you move the piece you cancel the drop
                         gameState.droppedRows = 0;
+                        if (isGrounded) {
+                            gameState.softDropRowCount = 0;
+                        }
                     }
                 };
 
@@ -271,8 +283,11 @@ auto run() -> void
                     if (auto const rotation = gameState.board.rotate_shape(gameState.currentShape, rot); rotation) {
                         update_shadow_and_clocks(isGrounded);
                         gameState.currentRotationType = rotation;
-                        // if you move the piece you cancel the drop
+                        // if you rotate the piece you cancel the drop
                         gameState.droppedRows = 0;
+                        if ((rotation == Shape::RotationType::WALLKICK) && isGrounded) {
+                            gameState.softDropRowCount = 0;
+                        }
                     }
                 };
 
@@ -284,9 +299,23 @@ auto run() -> void
                     // TODO: How does this work if you e.g. press
                     // left/right/rotate while holding button down?
                     // is isSoftDropping still true at that time?
+
+                    // This message currently gets spammed when you hold down
+                    // the button, so resetting the soft drop count directly
+                    // will continue resetting it while the button is pressed.
+                    // In order to avoid that we check if isSoftDropping has
+                    // been set, which only happens during spam.
+                    if (!gameState.isSoftDropping) {
+                        gameState.softDropRowCount = 0;
+                    }
                     gameState.isSoftDropping = true;
                 } else if (message.type == Message::Type::RESET_SPEED) {
                     gameState.isSoftDropping = false;
+
+                    // softdrops only get reset if the piece can currently fall
+                    if (gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
+                        gameState.softDropRowCount = 0;
+                    }
                 } else if (message.type == Message::Type::DROP) {
                     auto droppedRows = 0;
                     while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
@@ -295,6 +324,11 @@ auto run() -> void
                         ++droppedRows;
                     }
                     gameState.droppedRows = droppedRows;
+
+                    // hard drop overrides soft drop
+                    if (droppedRows) {
+                        gameState.softDropRowCount = 0;
+                    }
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
                     rotate_current_shape(Shape::Rotation::LEFT);
                 } else if (message.type == Message::Type::ROTATE_RIGHT) {
@@ -313,6 +347,9 @@ auto run() -> void
                             gameState.holdShape = Shape(gameState.currentShape.type);
                             gameState.currentShape = gameState.shapePool.next_shape();
                         }
+
+                        gameState.softDropRowCount = 0;
+                        gameState.droppedRows = 0;
 
                         auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
                         update_shadow_and_clocks(isGrounded);
@@ -361,6 +398,12 @@ auto run() -> void
                 if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
                     gameState.lockClock = frameStartClock;
                     gameState.currentRotationType = {};
+
+                    if (gameState.isSoftDropping) {
+                        ++gameState.softDropRowCount;
+                    } else {
+                        gameState.softDropRowCount = 0;
+                    }
                 }
             }
 
@@ -411,8 +454,14 @@ auto run() -> void
                     // droppedRows should have been set to 0 from rotating the shape
                     // so it SHOULDN'T be necessary to check explicitly.
                     if (clearType != ClearType::NONE) {
+                        // you shouldn't be able to soft drop and hard drop at the same time.
+                        assert(!gameState.droppedRows || !gameState.softDropRowCount);
                         gameState.score += 2 * gameState.droppedRows;
+                        gameState.score += gameState.softDropRowCount;
                     }
+                    // needs to be reset for the next piece
+                    gameState.softDropRowCount = 0;
+                    gameState.droppedRows = 0;
 
                     // handle combos
                     switch (clearType) {
