@@ -577,7 +577,6 @@ auto run() -> void
                 }
 
                 // draw high score
-                using namespace std::string_literals;
                 auto highScoreString = "High Score: "s + std::to_string(highScore);
                 auto fontString = FontString::from_height_normalized(highScoreString, 0.048f);
                 draw_font_string_normalized(bb, fontString, 1.0f - fontString.normalizedW - 0.01f, 0.01f);
