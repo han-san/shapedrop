@@ -158,6 +158,7 @@ struct GameState {
     // shared for all shapes
     bool isSoftDropping = false;
     size_t linesCleared = 0;
+    size_t startingLevel = 1;
     size_t level = 1;
     size_t score = 0;
     bool hasHeld = false;
@@ -518,9 +519,7 @@ auto run() -> void
                     auto clearScore = size_t(calculate_score(clearType, gameState.level) * backToBackModifier);
                     gameState.score += clearScore;
 
-                    // TODO: If someone wants to start from a higher level this can't
-                    // be constantly calculated based on lines cleared
-                    gameState.level = gameState.linesCleared / 10 + 1;
+                    gameState.level = gameState.linesCleared / 10 + gameState.startingLevel;
 
                     gameState.currentShape = gameState.shapePool.next_shape();
                     // update shape shadow
