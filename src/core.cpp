@@ -145,6 +145,9 @@ enum class BackToBackType {
     TSPIN
 };
 
+auto constexpr gMinLevel = 1;
+auto constexpr gMaxLevel = 99;
+
 // For variables which are unique to their instance of a game
 // i.e. should be reset when starting a new one
 struct GameState {
@@ -159,7 +162,7 @@ struct GameState {
     bool isSoftDropping = false;
     size_t linesCleared = 0;
     size_t startingLevel = 1;
-    size_t level = 1;
+    size_t level = gMinLevel;
     size_t score = 0;
     bool hasHeld = false;
     std::optional<BackToBackType> backToBackType = {};
