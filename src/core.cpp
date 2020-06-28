@@ -16,6 +16,7 @@
 #include "platform.hpp"
 #include "shape.hpp"
 #include "tests.hpp"
+#include "ui.hpp"
 #include "util.hpp"
 
 #include "core.hpp"
@@ -196,39 +197,6 @@ auto run() -> void
 
     time_t frameStartClock = clock();
 
-    struct Button {
-        Squaref dimensions;
-        FontString text;
-    };
-
-    struct Menu {
-        enum class ID {
-            MAIN,
-        };
-        ID id;
-        std::vector<Button> buttons;
-    };
-
-    // FIXME: The font string doesn't get updated if the window changes size
-    auto windim = get_window_dimensions();
-    auto playButtonFontString = FontString::from_height_normalized("PLAY", 1.f / 10.f);
-    auto x = (1.f - playButtonFontString.normalizedW) / 2;
-    auto y = 2.f / 10.f;
-    auto playButton = Button {
-        Squaref {
-            x, y,
-            playButtonFontString.normalizedW, playButtonFontString.normalizedH
-        },
-        std::move(playButtonFontString)
-    };
-
-    Menu mainMenu = {
-        Menu::ID::MAIN,
-    };
-    mainMenu.buttons.push_back(std::move(playButton));
-
-    auto currentMenu = &mainMenu;
-
     while (running) {
         auto newclock = clock();
         auto frameclocktime = newclock - frameStartClock;
@@ -242,6 +210,8 @@ auto run() -> void
         // input
         Message message;
         while ((message = handle_input()).type != Message::Type::NONE) {
+            UI::update_state(message);
+
             // First check messages independent of whether in menu or game
             if (message.type == Message::Type::QUIT) {
                 running = false;
@@ -357,26 +327,6 @@ auto run() -> void
 
                         auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
                         update_shadow_and_clocks(isGrounded);
-                    }
-                }
-            } else if (levelType == LevelType::MENU) {
-                if (message.type == Message::Type::MOUSEBUTTONDOWN) {
-                    if (!currentMenu) {
-                        std::cerr << "ERROR: currentMenu is null, but levelType is LevelType::MENU\n";
-                    }
-
-                    if (currentMenu->id == Menu::ID::MAIN) {
-                        auto& playButton = currentMenu->buttons[0];
-                        auto screenSpaceDimensions = to_screen_space(playButton.dimensions);
-
-                        if (message.x > screenSpaceDimensions.x &&
-                            message.x < screenSpaceDimensions.x + screenSpaceDimensions.w &&
-                            message.y > screenSpaceDimensions.y &&
-                            message.y < screenSpaceDimensions.y + screenSpaceDimensions.h)
-                        {
-                            levelType = LevelType::GAME;
-                            gameState.reset();
-                        }
                     }
                 }
             }
@@ -546,6 +496,22 @@ auto run() -> void
 
                 }
             }
+        } else if (levelType == LevelType::MENU) {
+            auto highScoreString = "High Score: "s + std::to_string(highScore);
+            auto highScoreFontSize = 0.048f;
+            auto stringWidthNormalized = to_normalized_width(FontString::get_text_width_normalized(highScoreString, highScoreFontSize));
+            // TODO: should add a right-aligned option to label instead of calculating it here
+            UI::label(highScoreString, highScoreFontSize, {1.0f - stringWidthNormalized - 0.01f, 0.01f});
+
+            auto menuY = 1.f / 10.f;
+            auto menuFontSize = 1.f / 10.f;
+            auto menuFontRegion = Squaref{0, menuY, 1.f, 1.f - menuY};
+            UI::begin_menu("MENU", menuFontSize, menuFontRegion);
+            if (UI::button("PLAY", menuFontSize, {0, 0})) {
+                levelType = LevelType::GAME;
+                gameState.reset();
+            }
+            UI::end_menu();
         }
 
         // draw border
@@ -565,24 +531,7 @@ auto run() -> void
 
         switch (levelType) {
             case LevelType::MENU: {
-                auto menuLabel = FontString::from_height_normalized("MENU", 1.f / 10.f);
-                auto x = (1.f - menuLabel.normalizedW) / 2.f;
-                auto y = 1.f / 10.f;
-                draw_font_string_normalized(bb, menuLabel, x, y);
-                if (!currentMenu) {
-                    std::cerr << "ERROR: currentMenu is null, but levelType is LevelType::MENU\n";
-                }
-                for (auto& button : currentMenu->buttons) {
-                    auto outlineScreenSpace = to_screen_space(button.dimensions);
-
-                    draw_hollow_square(bb, outlineScreenSpace, {0, 0, 0});
-                    draw_font_string(bb, button.text, int(outlineScreenSpace.x), int(outlineScreenSpace.y));
-                }
-
-                // draw high score
-                auto highScoreString = "High Score: "s + std::to_string(highScore);
-                auto fontString = FontString::from_height_normalized(highScoreString, 0.048f);
-                draw_font_string_normalized(bb, fontString, 1.0f - fontString.normalizedW - 0.01f, 0.01f);
+                UI::draw(bb);
             } break;
             case LevelType::GAME: {
                 // draw playarea background
