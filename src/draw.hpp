@@ -4,13 +4,29 @@
 #include "font.hpp"
 
 auto inline to_screen_space(Squaref square) -> Squaref {
-    auto bb = get_back_buffer();
-    return { square.x * bb.w, square.y * bb.h, square.w * bb.w, square.h * bb.h };
+    auto dim = get_window_dimensions();
+    return { square.x * dim.w, square.y * dim.h, square.w * dim.w, square.h * dim.h };
 }
 
 auto inline to_normalized(Squaref square) -> Squaref {
-    auto bb = get_back_buffer();
-    return { square.x / bb.w, square.y / bb.h, square.w / bb.w, square.h / bb.h };
+    auto dim = get_window_dimensions();
+    return { square.x / dim.w, square.y / dim.h, square.w / dim.w, square.h / dim.h };
+}
+
+auto inline to_normalized_height(float height) -> float {
+    return height / get_window_dimensions().h;
+}
+
+auto inline to_normalized_width(float width) -> float {
+    return width / get_window_dimensions().w;
+}
+
+auto inline to_screen_space_height(float height) -> float {
+    return height * get_window_dimensions().h;
+}
+
+auto inline to_screen_space_width(float width) -> float {
+    return width * get_window_dimensions().w;
 }
 
 auto draw_solid_square(BackBuffer& buf, Squaref sqr, RGB color, uint a = 0xff) -> void;
