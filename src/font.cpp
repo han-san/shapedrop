@@ -59,21 +59,31 @@ FontString::FontString(std::string string, float pixelHeight)
     normalizedW = w / windim.w;
 }
 
+auto FontString::get_text_width(std::string_view const text, float const fontHeight) -> float {
+    auto width = 0.f;
+    auto const scale = stbtt_ScaleForPixelHeight(&font, fontHeight);
+    auto const size = text.size();
+    for (size_t i = 0; i < size; ++i) {
+        auto const c = text[i];
+        auto const nextChar = (i + 1 == size) ? 0 : text[i + 1];
+        auto const advance = get_codepoint_kern_advance(c, nextChar, scale);
+        width += advance;
+    }
+
+    return width;
+}
+
+auto FontString::get_text_width_normalized(std::string_view const text, float const fontHeightNormalized) -> float {
+    return get_text_width(text, get_window_dimensions().h * fontHeightNormalized);
+}
+
 auto FontString::from_width(std::string string, float desiredPixelWidth) -> FontString
 {
     // start with a reasonable pixelheight value
     auto pixelHeight = 12.f;
 
     while (true) {
-        auto width = 0.f;
-        auto scale = stbtt_ScaleForPixelHeight(&font, pixelHeight);
-        auto size = string.size();
-        for (size_t i = 0; i < size; ++i) {
-            auto c = string[i];
-            auto nextChar = i + 1 == size ? 0 : string[i + 1];
-            auto advance = get_codepoint_kern_advance(c, nextChar, scale);
-            width += advance;
-        }
+        auto width = get_text_width(string, pixelHeight);
 
         if (width > desiredPixelWidth) {
             pixelHeight -= 1.f;

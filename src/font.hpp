@@ -45,6 +45,8 @@ public:
     auto static from_height_normalized(std::string string, float desiredHeight) -> FontString {
         return from_height(string, get_window_dimensions().h * desiredHeight);
     }
+    auto static get_text_width(std::string_view const text, float const fontSize) -> float;
+    auto static get_text_width_normalized(std::string_view const text, float const fontSize) -> float;
 
 private:
     FontString(std::string string, float pixelHeight);
