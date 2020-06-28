@@ -4,9 +4,10 @@
 #include <string_view>
 #include <vector>
 
+#include "jint.h"
+
 #include "platform.hpp"
 
-#include "jint.h"
 
 class FontCharacter {
 public:

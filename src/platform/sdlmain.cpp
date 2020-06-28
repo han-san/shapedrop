@@ -2,11 +2,12 @@
 
 #include <SDL.h>
 
-#include "sdlmain.hpp"
+#include "../jint.h"
 
 #include "../core.hpp"
 #include "../font.hpp"
-#include "../jint.h"
+
+#include "sdlmain.hpp"
 
 namespace platform::SDL {
 

@@ -1,9 +1,9 @@
-#include "font.hpp"
+#define STB_TRUETYPE_IMPLEMENTATION
+#include "stb_truetype.h"
 
 #include "platform.hpp"
 
-#define STB_TRUETYPE_IMPLEMENTATION
-#include "stb_truetype.h"
+#include "font.hpp"
 
 uchar static ttf_buffer[1<<25];
 stbtt_fontinfo font;

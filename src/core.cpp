@@ -1,21 +1,22 @@
+#include <array>
 #include <cassert>
 #include <ctime>
 #include <iostream>
-#include <array>
-#include <string_view>
-#include <random>
 #include <numeric>
-#include <string>
-#include <vector>
 #include <optional>
+#include <random>
+#include <string>
+#include <string_view>
+#include <vector>
 
 #include "jint.h"
+
+#include "board.hpp"
+#include "draw.hpp"
 #include "platform.hpp"
 #include "shape.hpp"
-#include "board.hpp"
-#include "util.hpp"
-#include "draw.hpp"
 #include "tests.hpp"
+#include "util.hpp"
 
 #include "core.hpp"
 

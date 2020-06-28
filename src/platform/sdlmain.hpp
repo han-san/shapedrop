@@ -1,10 +1,11 @@
 #pragma once
 
-#include <vector>
 #include <string_view>
+#include <vector>
+
+#include "../jint.h"
 
 #include "../core.hpp"
-#include "../jint.h"
 
 namespace platform::SDL {
 

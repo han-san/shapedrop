@@ -2,9 +2,10 @@
 
 #include <array>
 
-#include "util.hpp"
 #include "jint.h"
+
 #include "shape.hpp"
+#include "util.hpp"
 
 struct Block {
     RGB color;
