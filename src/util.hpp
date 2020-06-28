@@ -106,3 +106,17 @@ private:
     std::array<value_type, I> m_data = {};
     size_type m_size = 0;
 };
+
+auto inline point_is_in_rect(Positionf const point, Squaref const rect) {
+    return (point.x >= rect.x) &&
+        (point.x <= rect.x + rect.w) &&
+        (point.y >= rect.y) &&
+        (point.y <= rect.y + rect.h);
+}
+
+auto inline point_is_in_rect(Position const point, Square const rect) {
+    return (point.x >= rect.x) &&
+        (point.x <= rect.x + rect.w) &&
+        (point.y >= rect.y) &&
+        (point.y <= rect.y + rect.h);
+}
