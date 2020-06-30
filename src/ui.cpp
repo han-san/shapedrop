@@ -16,19 +16,19 @@ namespace UI {
 
     struct TextInfo {
         std::string text;
-        float textSize;
-        float x;
-        float y;
+        WindowScale textSize;
+        WindowScale x;
+        WindowScale y;
     };
     auto static textToDraw = std::vector<TextInfo>{};
 
     struct Menu {
-        Squaref region;
-        std::vector<Squaref> children;
+        WindowScaleRect region;
+        std::vector<WindowScaleRect> children;
     };
     auto static menus = std::vector<Menu>{};
 
-    auto static get_current_ui_region() -> Squaref {
+    auto static get_current_ui_region() -> WindowScaleRect {
         if (menus.empty()) {
             return {0.f, 0.f, 1.f, 1.f};
         } else {
@@ -45,46 +45,46 @@ namespace UI {
         }
     }
 
-    auto static turn_relative_offset_into_window_space(Positionf const offset) -> Positionf {
+    auto static to_window_scale(RelativeScalePoint const offset) -> WindowScalePoint {
         auto const workingRegion = get_current_ui_region();
-        auto const x = workingRegion.x + offset.x * workingRegion.w;
-        auto const y = workingRegion.y + offset.y * workingRegion.h;
+        auto const x = workingRegion.x + float(offset.x) * workingRegion.w;
+        auto const y = workingRegion.y + float(offset.y) * workingRegion.h;
         return {x, y};
     }
 
-    auto static turn_relative_offset_into_window_space(Squaref const region) -> Squaref {
+    auto static to_window_scale(RelativeScaleRect const region) -> WindowScaleRect {
         auto const workingRegion = get_current_ui_region();
-        auto const x = workingRegion.x + region.x * workingRegion.w;
-        auto const y = workingRegion.y + region.y * workingRegion.h;
-        auto const w = region.w * workingRegion.w;
-        auto const h = region.h * workingRegion.h;
+        auto const x = workingRegion.x + float(region.x) * workingRegion.w;
+        auto const y = workingRegion.y + float(region.y) * workingRegion.h;
+        auto const w = float(region.w) * workingRegion.w;
+        auto const h = float(region.h) * workingRegion.h;
         return {x, y, w, h};
     }
 
-    auto static add_region_as_child_of_current_menu(Squaref const region) {
+    auto static add_region_as_child_of_current_menu(WindowScaleRect const region) {
         if (!menus.empty()) {
             menus.back().children.push_back(region);
         }
     }
 
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
-    auto label(std::string const text, float const fontHeight, Positionf const offset, bool const centered) -> void {
-        auto const windowOffset = turn_relative_offset_into_window_space(offset);
+    auto label(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, bool const centered) -> void {
+        auto const windowOffset = to_window_scale(offset);
         add_region_as_child_of_current_menu({windowOffset.x, windowOffset.y, 0, fontHeight});
         textToDraw.push_back({std::move(text), fontHeight, windowOffset.x, windowOffset.y});
     }
 
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
-    auto button(std::string const text, float const fontHeight, Positionf const offset, bool const centered) -> bool {
-        auto const windowOffset = turn_relative_offset_into_window_space(offset);
-        auto const w = to_normalized_width(FontString::get_text_width_normalized(text, fontHeight));
+    auto button(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, bool const centered) -> bool {
+        auto const windowOffset = to_window_scale(offset);
+        auto const w = to_normalized_width(FontString::get_text_width_normalized(text, float(fontHeight)));
         auto const h = fontHeight;
-        auto const region = Squaref{windowOffset.x, windowOffset.y, w, h};
+        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, w, h};
 
-        add_region_as_child_of_current_menu({windowOffset.x, windowOffset.y, 0, fontHeight});
-        textToDraw.push_back({std::move(text), fontHeight, windowOffset.x, windowOffset.y});
+        add_region_as_child_of_current_menu(region);
+        textToDraw.push_back({std::move(text), region.h, region.x, region.y});
 
-        auto const screenSpaceRegion = to_screen_space(region);
+        auto const screenSpaceRegion = to_screen_space({float(region.x), float(region.y), float(w), float(h)});
         return clicked && point_is_in_rect(cursor, screenSpaceRegion);
     }
 
@@ -100,8 +100,8 @@ namespace UI {
         assert(menus.empty());
 
         for (auto const& text : textToDraw) {
-            auto fontString = FontString::from_height_normalized(text.text, text.textSize);
-            draw_font_string_normalized(bb, fontString, text.x, text.y);
+            auto fontString = FontString::from_height_normalized(text.text, float(text.textSize));
+            draw_font_string_normalized(bb, fontString, float(text.x), float(text.y));
         }
         textToDraw.clear();
 
@@ -109,8 +109,8 @@ namespace UI {
         clicked = false;
     }
 
-    auto begin_menu(Squaref const region) -> void {
-        auto const regionRelativeToWindow = turn_relative_offset_into_window_space(region);
+    auto begin_menu(RelativeScaleRect const region) -> void {
+        auto const regionRelativeToWindow = to_window_scale(region);
         add_region_as_child_of_current_menu(regionRelativeToWindow);
         menus.push_back({regionRelativeToWindow, {}});
     }
