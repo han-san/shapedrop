@@ -506,11 +506,13 @@ auto run() -> void
             auto menuY = 1.f / 10.f;
             auto menuFontSize = 1.f / 10.f;
             auto menuFontRegion = Squaref{0, menuY, 1.f, 1.f - menuY};
-            UI::begin_menu("MENU", menuFontSize, menuFontRegion);
+            UI::begin_menu(menuFontRegion);
+            UI::label("MENU", menuFontSize, {});
             if (UI::button("PLAY", menuFontSize, {0, 0})) {
                 levelType = LevelType::GAME;
                 gameState.reset();
             }
+            UI::label("TEST", menuFontSize, {});
             UI::end_menu();
         }
 

@@ -1,3 +1,4 @@
+#include <cassert>
 #include <string>
 #include <vector>
 
@@ -18,58 +19,72 @@ namespace UI {
         float textSize;
         float x;
         float y;
-        bool centered;
     };
     auto static textToDraw = std::vector<TextInfo>{};
 
     struct Menu {
-        std::string title;
         Squaref region;
-        int children = 0;
+        std::vector<Squaref> children;
     };
     auto static menus = std::vector<Menu>{};
 
-    auto adjust_coords_for_menu(Positionf coords, float const fontHeight) -> Positionf {
-        if (!menus.empty()) {
-            // if there is an active menu, the coordinates should be based on
-            // its region instead of the window's.
-            auto& menu = menus.back();
-            coords.x = menu.region.x + menu.region.w * coords.x;
-            coords.y = menu.region.y + menu.region.h * coords.y;
-            // y should be advanced based on the amount of children (+1 since the menu's label is drawn at the very top)
-            coords.y += (1 + menu.children) * fontHeight;
-            // FIXME: probably shouldn't increment this here since the
-            // functions that want to call this might also call each other,
-            // e.g. button() calling label() thereby incrementing it twice even
-            // though it's really just the one button
-            ++menu.children;
+    auto static get_current_ui_region() -> Squaref {
+        if (menus.empty()) {
+            return {0.f, 0.f, 1.f, 1.f};
+        } else {
+            // if there is a child, the region's y coordinate should start from
+            // where the child's y coordinate ends.
+            auto const& menu = menus.back();
+            auto currentRegion = menu.region;
+            if (!menu.children.empty()) {
+                auto const& child = menu.children.back();
+                currentRegion.y = child.y + child.h;
+                currentRegion.h = menu.region.h - (currentRegion.y - menu.region.y);
+            }
+            return currentRegion;
         }
-        return coords;
     }
 
-    auto begin_menu(std::string const title, float const fontHeight, Squaref const region) -> void {
-        menus.push_back({title, region});
-        textToDraw.push_back({std::move(title), fontHeight, region.x, region.y});
+    auto static turn_relative_offset_into_window_space(Positionf const offset) -> Positionf {
+        auto const workingRegion = get_current_ui_region();
+        auto const x = workingRegion.x + offset.x * workingRegion.w;
+        auto const y = workingRegion.y + offset.y * workingRegion.h;
+        return {x, y};
     }
 
-    auto end_menu() -> void {
-        menus.pop_back();
+    auto static turn_relative_offset_into_window_space(Squaref const region) -> Squaref {
+        auto const workingRegion = get_current_ui_region();
+        auto const x = workingRegion.x + region.x * workingRegion.w;
+        auto const y = workingRegion.y + region.y * workingRegion.h;
+        auto const w = region.w * workingRegion.w;
+        auto const h = region.h * workingRegion.h;
+        return {x, y, w, h};
     }
 
-    auto label(std::string const text, float const fontHeight, Positionf pos, bool const centered) -> void {
-        pos = adjust_coords_for_menu(pos, fontHeight);
-        textToDraw.push_back({std::move(text), fontHeight, pos.x, pos.y, centered});
+    auto static add_region_as_child_of_current_menu(Squaref const region) {
+        if (!menus.empty()) {
+            menus.back().children.push_back(region);
+        }
     }
 
-    auto button(std::string const text, float const fontHeight, Positionf const pos, bool const centered) -> bool {
+    // TODO: The font height is currently always considered to be relative to the window space. Should it?
+    auto label(std::string const text, float const fontHeight, Positionf const offset, bool const centered) -> void {
+        auto const windowOffset = turn_relative_offset_into_window_space(offset);
+        add_region_as_child_of_current_menu({windowOffset.x, windowOffset.y, 0, fontHeight});
+        textToDraw.push_back({std::move(text), fontHeight, windowOffset.x, windowOffset.y});
+    }
+
+    // TODO: The font height is currently always considered to be relative to the window space. Should it?
+    auto button(std::string const text, float const fontHeight, Positionf const offset, bool const centered) -> bool {
+        auto const windowOffset = turn_relative_offset_into_window_space(offset);
         auto const w = to_normalized_width(FontString::get_text_width_normalized(text, fontHeight));
         auto const h = fontHeight;
-        auto const coords = adjust_coords_for_menu(pos, fontHeight);
-        auto const region = Squaref{coords.x, coords.y, w, h};
+        auto const region = Squaref{windowOffset.x, windowOffset.y, w, h};
+
+        add_region_as_child_of_current_menu({windowOffset.x, windowOffset.y, 0, fontHeight});
+        textToDraw.push_back({std::move(text), fontHeight, windowOffset.x, windowOffset.y});
+
         auto const screenSpaceRegion = to_screen_space(region);
-
-        textToDraw.push_back({std::move(text), fontHeight, coords.x, coords.y, centered});
-
         return clicked && point_is_in_rect(cursor, screenSpaceRegion);
     }
 
@@ -82,6 +97,8 @@ namespace UI {
     }
 
     auto draw(BackBuffer bb) -> void {
+        assert(menus.empty());
+
         for (auto const& text : textToDraw) {
             auto fontString = FontString::from_height_normalized(text.text, text.textSize);
             draw_font_string_normalized(bb, fontString, text.x, text.y);
@@ -90,6 +107,16 @@ namespace UI {
 
         // FIXME: temporarily(?) reset clicked here since it should be reset before each frame
         clicked = false;
+    }
+
+    auto begin_menu(Squaref const region) -> void {
+        auto const regionRelativeToWindow = turn_relative_offset_into_window_space(region);
+        add_region_as_child_of_current_menu(regionRelativeToWindow);
+        menus.push_back({regionRelativeToWindow, {}});
+    }
+
+    auto end_menu() -> void {
+        menus.pop_back();
     }
 
 } // namespace UI
