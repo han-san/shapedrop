@@ -98,45 +98,50 @@ namespace UI {
         return to_normalized_width(FontString::get_text_width_normalized(text, float(fontHeight)));
     }
 
+    // Assumes region.w and region.h are the correct sizes for the resulting FontString.
+    auto static label(std::string const text, WindowScaleRect const region) {
+        add_region_as_child_of_current_menu(region);
+        textToDraw.push_back({std::move(text), region.h, region.x, region.y});
+    }
+
     auto label(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> void {
-        auto const w = get_text_window_scale_width(text, fontHeight);
-        auto const windowOffset = to_window_scale(xAlign, yOffset, w);
-        add_region_as_child_of_current_menu({windowOffset.x, windowOffset.y, w, fontHeight});
-        textToDraw.push_back({std::move(text), fontHeight, windowOffset.x, windowOffset.y});
+        auto const textWidth = get_text_window_scale_width(text, fontHeight);
+        auto const windowOffset = to_window_scale(xAlign, yOffset, textWidth);
+        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
+
+        label(std::move(text), region);
     }
 
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
     auto label(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void {
         auto const windowOffset = to_window_scale(offset);
-        add_region_as_child_of_current_menu({windowOffset.x, windowOffset.y, 0, fontHeight});
-        textToDraw.push_back({std::move(text), fontHeight, windowOffset.x, windowOffset.y});
+        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, 0, fontHeight};
+
+        label(std::move(text), region);
+    }
+
+    auto static button(std::string const text, WindowScaleRect const region) -> bool {
+        label(std::move(text), region);
+
+        auto const screenSpaceRegion = to_screen_space({float(region.x), float(region.y), float(region.w), float(region.h)});
+        return clicked && point_is_in_rect(cursor, screenSpaceRegion);
     }
 
     auto button(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> bool {
-        auto const w = get_text_window_scale_width(text, fontHeight);
-        auto const windowOffset = to_window_scale(xAlign, yOffset, w);
-        auto const h = fontHeight;
-        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, w, h};
+        auto const textWidth = get_text_window_scale_width(text, fontHeight);
+        auto const windowOffset = to_window_scale(xAlign, yOffset, textWidth);
+        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
 
-        add_region_as_child_of_current_menu(region);
-        textToDraw.push_back({std::move(text), region.h, region.x, region.y});
-
-        auto const screenSpaceRegion = to_screen_space({float(region.x), float(region.y), float(w), float(h)});
-        return clicked && point_is_in_rect(cursor, screenSpaceRegion);
+        return button(std::move(text), region);
     }
 
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
     auto button(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset) -> bool {
+        auto const textWidth = get_text_window_scale_width(text, fontHeight);
         auto const windowOffset = to_window_scale(offset);
-        auto const w = get_text_window_scale_width(text, fontHeight);
-        auto const h = fontHeight;
-        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, w, h};
+        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
 
-        add_region_as_child_of_current_menu(region);
-        textToDraw.push_back({std::move(text), region.h, region.x, region.y});
-
-        auto const screenSpaceRegion = to_screen_space({float(region.x), float(region.y), float(w), float(h)});
-        return clicked && point_is_in_rect(cursor, screenSpaceRegion);
+        return button(std::move(text), region);
     }
 
     auto update_state(Message const message) -> void {
