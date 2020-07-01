@@ -89,8 +89,16 @@ namespace UI {
     using RelativeScalePoint = V2Generic<RelativeScale>;
     using RelativeScaleRect = V4Generic<RelativeScale>;
 
-    auto label(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, bool centered = false) -> void;
-    auto button(std::string const text, WindowScale const fontHeight, RelativeScalePoint const pos, bool const centered = false) -> bool;
+    enum class XAlignment {
+        LEFT,
+        CENTER,
+        RIGHT
+    };
+
+    auto label(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void;
+    auto label(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset = 0.f) -> void;
+    auto button(std::string const text, WindowScale const fontHeight, RelativeScalePoint const pos) -> bool;
+    auto button(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset = 0.f) -> bool;
     auto begin_menu(RelativeScaleRect const region) -> void;
     auto end_menu() -> void;
     auto draw(BackBuffer bb) -> void;

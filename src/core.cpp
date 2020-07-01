@@ -506,12 +506,23 @@ auto run() -> void
             auto menuY = 1.f / 10.f;
             auto menuFontSize = 1.f / 10.f;
             UI::begin_menu({0.f, menuY, 1.f, 1.f - menuY});
-            UI::label("MENU", menuFontSize, {});
-            if (UI::button("PLAY", menuFontSize, {0, 0})) {
+            UI::label("MENU", menuFontSize, UI::XAlignment::CENTER);
+            if (UI::button("PLAY", menuFontSize, UI::XAlignment::CENTER)) {
                 levelType = LevelType::GAME;
                 gameState.reset();
             }
-            UI::label("TEST", menuFontSize, {});
+            UI::label("Left", menuFontSize, UI::XAlignment::LEFT);
+            UI::label("Center", menuFontSize, UI::XAlignment::CENTER);
+            UI::label("Right", menuFontSize, UI::XAlignment::RIGHT);
+            if (UI::button("RightButton", menuFontSize / 2, UI::XAlignment::RIGHT)) {
+                std::cout << "Pressed RightButton\n";
+            }
+            if (UI::button("CenterButton", menuFontSize / 2, UI::XAlignment::CENTER)) {
+                std::cout << "Pressed CenterButton\n";
+            }
+            if (UI::button("LeftButton", menuFontSize / 2, UI::XAlignment::LEFT)) {
+                std::cout << "Pressed LeftButton\n";
+            }
             UI::end_menu();
         }
 

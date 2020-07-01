@@ -61,23 +61,74 @@ namespace UI {
         return {x, y, w, h};
     }
 
+    auto static to_window_scale(XAlignment const xAlign, RelativeScale const yOffset, WindowScale const width) -> WindowScalePoint {
+        auto const workingRegion = get_current_ui_region();
+        auto const y = workingRegion.y + float(yOffset) * workingRegion.h;
+        auto const x = [xAlign, workingRegion, width]() {
+            switch (xAlign) {
+                case XAlignment::LEFT: {
+                    return workingRegion.x;
+                } break;
+                case XAlignment::CENTER: {
+                    return workingRegion.x + (workingRegion.w / 2.f) - (width / 2.f);
+                } break;
+                case XAlignment::RIGHT: {
+                    return workingRegion.x + workingRegion.w - width;
+                } break;
+                default: {
+                    // Gotta return something by default even though all valid
+                    // enumerators are handled. Yay C++.
+                    // TODO: @LOG
+                    assert(0);
+                    return workingRegion.x;
+                }
+            }
+        }();
+
+        return {x, y};
+    }
+
     auto static add_region_as_child_of_current_menu(WindowScaleRect const region) {
         if (!menus.empty()) {
             menus.back().children.push_back(region);
         }
     }
 
+    auto get_text_window_scale_width(std::string_view const text, WindowScale const fontHeight) -> WindowScale {
+        return to_normalized_width(FontString::get_text_width_normalized(text, float(fontHeight)));
+    }
+
+    auto label(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> void {
+        auto const w = get_text_window_scale_width(text, fontHeight);
+        auto const windowOffset = to_window_scale(xAlign, yOffset, w);
+        add_region_as_child_of_current_menu({windowOffset.x, windowOffset.y, w, fontHeight});
+        textToDraw.push_back({std::move(text), fontHeight, windowOffset.x, windowOffset.y});
+    }
+
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
-    auto label(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, bool const centered) -> void {
+    auto label(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void {
         auto const windowOffset = to_window_scale(offset);
         add_region_as_child_of_current_menu({windowOffset.x, windowOffset.y, 0, fontHeight});
         textToDraw.push_back({std::move(text), fontHeight, windowOffset.x, windowOffset.y});
     }
 
+    auto button(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> bool {
+        auto const w = get_text_window_scale_width(text, fontHeight);
+        auto const windowOffset = to_window_scale(xAlign, yOffset, w);
+        auto const h = fontHeight;
+        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, w, h};
+
+        add_region_as_child_of_current_menu(region);
+        textToDraw.push_back({std::move(text), region.h, region.x, region.y});
+
+        auto const screenSpaceRegion = to_screen_space({float(region.x), float(region.y), float(w), float(h)});
+        return clicked && point_is_in_rect(cursor, screenSpaceRegion);
+    }
+
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
-    auto button(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, bool const centered) -> bool {
+    auto button(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset) -> bool {
         auto const windowOffset = to_window_scale(offset);
-        auto const w = to_normalized_width(FontString::get_text_width_normalized(text, float(fontHeight)));
+        auto const w = get_text_window_scale_width(text, fontHeight);
         auto const h = fontHeight;
         auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, w, h};
 
