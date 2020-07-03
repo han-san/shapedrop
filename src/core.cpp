@@ -496,12 +496,20 @@ auto run() -> void
 
                 }
             }
+
+            auto fontSize = 0.048f;
+            auto scoreString = "Score: "s + std::to_string(gameState.score);
+            UI::label(scoreString, fontSize, UI::XAlignment::RIGHT);
+
+            // FIXME: linesCleared and linesRequired get weird if you don't start at level 1.
+            auto linesRequired = gameState.level * 10;
+            auto levelString = "Level: "s + std::to_string(gameState.level) + " (" + std::to_string(gameState.linesCleared) + "/" + std::to_string(linesRequired) + ")";
+            UI::label(levelString, fontSize, UI::XAlignment::RIGHT, fontSize);
+
         } else if (levelType == LevelType::MENU) {
             auto highScoreString = "High Score: "s + std::to_string(highScore);
             auto highScoreFontSize = 0.048f;
-            auto stringWidthNormalized = to_normalized_width(FontString::get_text_width_normalized(highScoreString, highScoreFontSize));
-            // TODO: should add a right-aligned option to label instead of calculating it here
-            UI::label(highScoreString, highScoreFontSize, {1.0f - stringWidthNormalized - 0.01f, 0.01f});
+            UI::label(highScoreString, highScoreFontSize, UI::XAlignment::RIGHT);
 
             auto menuY = 1.f / 10.f;
             auto menuFontSize = 1.f / 10.f;
@@ -532,7 +540,6 @@ auto run() -> void
 
         switch (levelType) {
             case LevelType::MENU: {
-                UI::draw(bb);
             } break;
             case LevelType::GAME: {
                 // draw playarea background
@@ -593,16 +600,6 @@ auto run() -> void
                     ++i;
                 }
 
-                // draw score
-                auto scoreString = "Score: "s + std::to_string(gameState.score);
-                auto scoreFontString = FontString::from_height_normalized(scoreString, 0.048f);
-                draw_font_string_normalized(bb, scoreFontString, 1.0f - scoreFontString.normalizedW - 0.01f, 0.01f);
-
-                // draw level
-                auto levelString = "Level: "s + std::to_string(gameState.level) + " (" + std::to_string(gameState.linesCleared) + "/" + std::to_string(gameState.level * 10) + ")";
-                auto levelFontString = FontString::from_height_normalized(levelString, 0.048f);
-                draw_font_string_normalized(bb, levelFontString, 1.0f - levelFontString.normalizedW - 0.01f, 0.01f + levelFontString.normalizedH);
-
                 // draw held shape
                 Squaref holdShapeDim{};
                 holdShapeDim.x = gHoldShapeDim.x * float(scale);
@@ -636,6 +633,8 @@ auto run() -> void
                 assert(false);
             } break;
         }
+
+        UI::draw(bb);
 
         swap_buffer();
     }
