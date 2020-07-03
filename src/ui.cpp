@@ -146,27 +146,51 @@ namespace UI {
         return button(std::move(text), region);
     }
 
-    auto spinbox(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
-        auto const windowOffset = to_window_scale(offset);
+    struct SpinBox {
+        std::string text;
+        size_t& value;
+        size_t maxValue;
+        size_t minValue;
+        WindowScaleRect region;
 
-        // handle increase/decrease button interactions
-        auto const buttonsString = "<>"s;
-        auto const buttonsWidth = get_text_window_scale_width(buttonsString, fontHeight);
-        auto const firstButtonScreenSpaceRegion = to_screen_space({float(windowOffset.x), float(windowOffset.y), float(buttonsWidth / 2.f), float(fontHeight)});
-        auto const secondButtonScreenSpaceRegion = to_screen_space({float(windowOffset.x) + float(buttonsWidth / 2.f), float(windowOffset.y), float(buttonsWidth / 2.f), float(fontHeight)});
+        std::string_view static constexpr buttonsString = "<>";
+
+        SpinBox(std::string const name, WindowScale const fontHeight, WindowScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue)
+            : value{value},
+            maxValue{maxValue},
+            minValue{minValue}
+        {
+            text = std::string(buttonsString) + " "s + std::move(name) + ": "s;
+            auto const textWidth = get_text_window_scale_width(text, fontHeight);
+            auto const maxValueWidth = get_text_window_scale_width(std::to_string(maxValue), fontHeight);
+            auto const fullTextWidth = textWidth + maxValueWidth;
+
+            region = WindowScaleRect{offset.x, offset.y, fullTextWidth, fontHeight};
+        }
+    };
+
+    // base spinbox function
+    auto spinbox(SpinBox spinBox) -> void {
+        auto const buttonWidth = get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) / 2.f;
+        auto const decreaseButtonScreenSpaceRegion = to_screen_space({float(spinBox.region.x), float(spinBox.region.y), float(buttonWidth), float(spinBox.region.h)});
+        auto const increaseButtonScreenSpaceRegion = to_screen_space({float(spinBox.region.x + buttonWidth), float(spinBox.region.y), float(buttonWidth), float(spinBox.region.h)});
+
         if (clicked) {
-            if (point_is_in_rect(cursor, firstButtonScreenSpaceRegion)) {
-                if (value > min) --value;
-            } else if (point_is_in_rect(cursor, secondButtonScreenSpaceRegion)) {
-                if (value < max) ++value;
+            if (point_is_in_rect(cursor, decreaseButtonScreenSpaceRegion)) {
+                if (spinBox.value > spinBox.minValue) --spinBox.value;
+            } else if (point_is_in_rect(cursor, increaseButtonScreenSpaceRegion)) {
+                if (spinBox.value < spinBox.maxValue) ++spinBox.value;
             }
         }
 
-        auto const fullText = buttonsString + " "s + std::move(text) + ": "s + std::to_string(value);
-        auto const textWidth = get_text_window_scale_width(fullText, fontHeight);
-        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
+        spinBox.text += std::to_string(spinBox.value);
+        label(std::move(spinBox.text), spinBox.region);
+    }
 
-        label(std::move(fullText), region);
+    auto spinbox(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
+        auto const windowOffset = to_window_scale(offset);
+        auto spinBox = SpinBox(std::move(text), fontHeight, windowOffset, value, minValue, maxValue);
+        spinbox(std::move(spinBox));
     }
 
     auto update_state(Message const message) -> void {
