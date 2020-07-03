@@ -524,6 +524,8 @@ auto run() -> void
                 std::cout << "Pressed LeftButton\n";
             }
             UI::spinbox("Level", menuFontSize / 2.f, {}, gameState.level, gMinLevel, gMaxLevel);
+            UI::spinbox("CenteredLevel", menuFontSize / 2.f, UI::XAlignment::CENTER, 0.f, gameState.level, gMinLevel, gMaxLevel);
+            UI::spinbox("RightLevel", menuFontSize / 2.f, UI::XAlignment::RIGHT, 0.f, gameState.level, gMinLevel, gMaxLevel);
             UI::end_menu();
         }
 
