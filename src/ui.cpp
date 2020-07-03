@@ -9,6 +9,8 @@
 
 #include "ui.hpp"
 
+using namespace std::string_literals;
+
 namespace UI {
 
     auto static cursor = Positionf{};
@@ -142,6 +144,29 @@ namespace UI {
         auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
 
         return button(std::move(text), region);
+    }
+
+    auto spinbox(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
+        auto const windowOffset = to_window_scale(offset);
+
+        // handle increase/decrease button interactions
+        auto const buttonsString = "<>"s;
+        auto const buttonsWidth = get_text_window_scale_width(buttonsString, fontHeight);
+        auto const firstButtonScreenSpaceRegion = to_screen_space({float(windowOffset.x), float(windowOffset.y), float(buttonsWidth / 2.f), float(fontHeight)});
+        auto const secondButtonScreenSpaceRegion = to_screen_space({float(windowOffset.x) + float(buttonsWidth / 2.f), float(windowOffset.y), float(buttonsWidth / 2.f), float(fontHeight)});
+        if (clicked) {
+            if (point_is_in_rect(cursor, firstButtonScreenSpaceRegion)) {
+                if (value > min) --value;
+            } else if (point_is_in_rect(cursor, secondButtonScreenSpaceRegion)) {
+                if (value < max) ++value;
+            }
+        }
+
+        auto const fullText = buttonsString + " "s + std::move(text) + ": "s + std::to_string(value);
+        auto const textWidth = get_text_window_scale_width(fullText, fontHeight);
+        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
+
+        label(std::move(fullText), region);
     }
 
     auto update_state(Message const message) -> void {

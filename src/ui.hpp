@@ -99,6 +99,7 @@ namespace UI {
     auto label(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset = 0.f) -> void;
     auto button(std::string const text, WindowScale const fontHeight, RelativeScalePoint const pos) -> bool;
     auto button(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset = 0.f) -> bool;
+    auto spinbox(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void;
     auto begin_menu(RelativeScaleRect const region) -> void;
     auto end_menu() -> void;
     auto draw(BackBuffer bb) -> void;
