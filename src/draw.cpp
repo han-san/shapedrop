@@ -127,16 +127,11 @@ auto draw_hollow_square(BackBuffer& buf, Squaref sqr, RGB color, int a, int bord
             auto currbyteindex = pixely * buf.w + pixelx;
             auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
-            auto alpha_blend = [](uint bg, uint fg, uint alpha) {
-                auto alphaRatio = alpha / 255.0;
-                return fg * alphaRatio + bg * (1 - alphaRatio);
-            };
-
-            *currbyte = u8(alpha_blend(*currbyte, color.b, a));
+            *currbyte = u8(alpha_blend_channel(*currbyte, color.b, a));
             ++currbyte;
-            *currbyte = u8(alpha_blend(*currbyte, color.g, a));
+            *currbyte = u8(alpha_blend_channel(*currbyte, color.g, a));
             ++currbyte;
-            *currbyte = u8(alpha_blend(*currbyte, color.r, a));
+            *currbyte = u8(alpha_blend_channel(*currbyte, color.r, a));
         }
     }
 }
