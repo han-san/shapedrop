@@ -150,6 +150,11 @@ enum class BackToBackType {
 auto constexpr gMinLevel = 1;
 auto constexpr gMaxLevel = 99;
 
+struct MenuState {
+    size_t level = gMinLevel;
+};
+auto menuState = MenuState{};
+
 // For variables which are unique to their instance of a game
 // i.e. should be reset when starting a new one
 struct GameState {
@@ -163,8 +168,8 @@ struct GameState {
     // shared for all shapes
     bool isSoftDropping = false;
     size_t linesCleared = 0;
-    size_t startingLevel = 1;
-    size_t level = gMinLevel;
+    size_t startingLevel = menuState.level;
+    size_t level = startingLevel;
     size_t score = 0;
     bool hasHeld = false;
     std::optional<BackToBackType> backToBackType = {};
@@ -519,7 +524,7 @@ auto run() -> void
                 levelType = LevelType::GAME;
                 gameState.reset();
             }
-            UI::spinbox("Level", menuFontSize / 2.f, UI::XAlignment::CENTER, 0.f, gameState.level, gMinLevel, gMaxLevel);
+            UI::spinbox("Level", menuFontSize / 2.f, UI::XAlignment::CENTER, 0.f, menuState.level, gMinLevel, gMaxLevel);
             UI::end_menu();
         }
 
