@@ -30,6 +30,10 @@ namespace UI {
     };
     auto static menus = std::vector<Menu>{};
 
+    auto static to_squaref(WindowScaleRect const rect) -> Squaref {
+        return {float(rect.x), float(rect.y), float(rect.w), float(rect.h)};
+    }
+
     auto static get_current_ui_region() -> WindowScaleRect {
         if (menus.empty()) {
             return {0.f, 0.f, 1.f, 1.f};
@@ -125,7 +129,7 @@ namespace UI {
     auto static button(std::string const text, WindowScaleRect const region) -> bool {
         label(std::move(text), region);
 
-        auto const screenSpaceRegion = to_screen_space({float(region.x), float(region.y), float(region.w), float(region.h)});
+        auto const screenSpaceRegion = to_screen_space(to_squaref(region));
         return clicked && point_is_in_rect(cursor, screenSpaceRegion);
     }
 
@@ -172,8 +176,10 @@ namespace UI {
     // base spinbox function
     auto spinbox(SpinBox spinBox) -> void {
         auto const buttonWidth = get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) / 2.f;
-        auto const decreaseButtonScreenSpaceRegion = to_screen_space({float(spinBox.region.x), float(spinBox.region.y), float(buttonWidth), float(spinBox.region.h)});
-        auto const increaseButtonScreenSpaceRegion = to_screen_space({float(spinBox.region.x + buttonWidth), float(spinBox.region.y), float(buttonWidth), float(spinBox.region.h)});
+        auto const decreaseButtonRegion = WindowScaleRect{spinBox.region.x, spinBox.region.y, buttonWidth, spinBox.region.h};
+        auto const increaseButtonRegion = WindowScaleRect{spinBox.region.x + buttonWidth, spinBox.region.y, buttonWidth, spinBox.region.h};
+        auto const decreaseButtonScreenSpaceRegion = to_screen_space(to_squaref(decreaseButtonRegion));
+        auto const increaseButtonScreenSpaceRegion = to_screen_space(to_squaref(increaseButtonRegion));
 
         if (clicked) {
             if (point_is_in_rect(cursor, decreaseButtonScreenSpaceRegion)) {
