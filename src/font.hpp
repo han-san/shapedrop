@@ -20,7 +20,7 @@ public:
     float scale;
     float advance;
 
-    FontCharacter(char c, float pixelHeight, char nextChar);
+    FontCharacter(char const c, float const pixelHeight, char const nextChar);
     ~FontCharacter();
 
     FontCharacter(FontCharacter&&) = default;
@@ -37,20 +37,20 @@ public:
     float normalizedW = 0;
     float normalizedH;
 
-    auto static from_width(std::string string, float desiredPixelWidth) -> FontString;
-    auto static from_width_normalized(std::string string, float desiredWidth) -> FontString;
-    auto static from_height(std::string string, float desiredPixelHeight) -> FontString {
+    auto static from_width(std::string const string, float const desiredPixelWidth) -> FontString;
+    auto static from_width_normalized(std::string const string, float const desiredWidth) -> FontString;
+    auto static from_height(std::string const string, float const desiredPixelHeight) -> FontString {
         return FontString(string, desiredPixelHeight);
     }
-    auto static from_height_normalized(std::string string, float desiredHeight) -> FontString {
+    auto static from_height_normalized(std::string const string, float const desiredHeight) -> FontString {
         return from_height(string, get_window_dimensions().h * desiredHeight);
     }
     auto static get_text_width(std::string_view const text, float const fontSize) -> float;
     auto static get_text_width_normalized(std::string_view const text, float const fontSize) -> float;
 
 private:
-    FontString(std::string string, float pixelHeight);
+    FontString(std::string const string, float const pixelHeight);
 };
 
-auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, float scale) -> float;
-auto init_font(std::string_view filePath) -> bool;
+auto get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, float const scale) -> float;
+auto init_font(std::string_view const filePath) -> bool;
