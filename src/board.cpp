@@ -3,7 +3,7 @@
 
 #include "board.hpp"
 
-auto Board::get_shadow(Shape& shape) -> Shape {
+auto Board::get_shadow(Shape const& shape) -> Shape {
     auto shapeShadow = shape;
     while (is_valid_move(shapeShadow, {0, 1})) {
         ++shapeShadow.pos.y;
@@ -11,7 +11,7 @@ auto Board::get_shadow(Shape& shape) -> Shape {
     return shapeShadow;
 };
 
-auto Board::try_move(Shape& shape, V2 move) -> bool {
+auto Board::try_move(Shape& shape, V2 const move) -> bool {
     if (is_valid_move(shape, move)) {
         shape.pos.x += move.x;
         shape.pos.y += move.y;
@@ -20,7 +20,7 @@ auto Board::try_move(Shape& shape, V2 move) -> bool {
     return false;
 }
 
-auto Board::rotate_shape(Shape& shape, Shape::Rotation dir) -> std::optional<Shape::RotationType> {
+auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) -> std::optional<Shape::RotationType> {
     auto rotatingShape = shape;
     rotatingShape.rotationIndex += dir == Shape::Rotation::RIGHT ? 1 : -1;
     if (rotatingShape.rotationIndex == -1) rotatingShape.rotationIndex = 3;
@@ -102,7 +102,6 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation dir) -> std::optional<Sha
                     assert(false);
                 } break;
             }
-
         } break;
         case Shape::Type::O: {
             // should have already returned true in the is_valid() check
@@ -113,7 +112,7 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation dir) -> std::optional<Sha
         }
     }
 
-    for (auto kickMove : kicks) {
+    for (auto const kickMove : kicks) {
         rotatingShape.pos = shape.pos;
         rotatingShape.pos.x += kickMove.x;
         // the y in kicks is bottom up while it's top down for the shape position
@@ -127,26 +126,26 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation dir) -> std::optional<Sha
     return {};
 }
 
-auto Board::is_valid_spot(Position pos) -> bool {
+auto Board::is_valid_spot(Position const pos) -> bool {
     if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
         return false;
     } else {
-        auto index = pos.y * columns + pos.x;
+        auto const index = pos.y * columns + pos.x;
         return !data[index].isActive;
     }
 }
 
-auto Board::is_valid_move(Shape& shape, V2 move) -> bool {
+auto Board::is_valid_move(Shape& shape, V2 const move) -> bool {
     shape.pos.x += move.x;
     shape.pos.y += move.y;
-    auto valid = is_valid_shape(shape);
+    auto const valid = is_valid_shape(shape);
     shape.pos.x -= move.x;
     shape.pos.y -= move.y;
     return valid;
 }
 
 auto Board::is_valid_shape(Shape& shape) -> bool {
-    for (auto position : shape.get_absolute_block_positions()) {
+    for (auto const position : shape.get_absolute_block_positions()) {
         if (!is_valid_spot(position)) {
             return false;
         }
@@ -157,11 +156,11 @@ auto Board::is_valid_shape(Shape& shape) -> bool {
 // If the shape is a T, its last movement was a rotation, and 3 or more of its
 // corners are occupied by other pieces it counts as a T-spin. If the rotation
 // was a wallkick it only counts as a T-spin mini.
-auto Board::check_for_tspin(Shape& shape, Shape::RotationType rotationType) -> std::optional<TspinType> {
+auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotationType) -> std::optional<TspinType> {
     if (shape.type == Shape::Type::T) {
         V2 const cornerOffsets[] = {{0, 0}, {2, 0}, {0, 2}, {2, 2}};
         auto cornersOccupied = 0;
-        for (auto offset : cornerOffsets) {
+        for (auto const offset : cornerOffsets) {
             cornersOccupied += !is_valid_spot({shape.pos.x + offset.x, shape.pos.y + offset.y});
         }
         if (cornersOccupied >= 3) {
@@ -179,7 +178,7 @@ auto Board::remove_full_rows() -> int {
     for (auto y = 0; y < rows; ++y) {
         auto rowIsFull = true;
         for (auto x = 0; x < columns; ++x) {
-            auto boardIndex = y * columns + x;
+            auto const boardIndex = y * columns + x;
             if (!data[boardIndex].isActive) {
                 rowIsFull = false;
                 break;
@@ -193,18 +192,18 @@ auto Board::remove_full_rows() -> int {
 
     if (!rowsCleared.empty()) {
         // remove rows
-        for (auto y : rowsCleared) {
+        for (auto const y : rowsCleared) {
             for (auto x = 0; x < columns; ++x) {
-                auto index = y * columns + x;
+                auto const index = y * columns + x;
                 data[index].isActive = false;
             }
         }
 
-        auto move_row_down = [this](int rowNumber, int distance) {
+        auto move_row_down = [this](int const rowNumber, int const distance) {
             assert(distance > 0);
             for (auto x = 0; x < columns; ++x) {
-                auto index = rowNumber * columns + x;
-                auto newIndex = (rowNumber + distance) * columns + x;
+                auto const index = rowNumber * columns + x;
+                auto const newIndex = (rowNumber + distance) * columns + x;
                 assert((rowNumber + distance) < rows);
                 auto& oldBlock = this->data[index];
                 auto& newBlock = this->data[newIndex];
@@ -218,8 +217,8 @@ auto Board::remove_full_rows() -> int {
 
         // first move any potential rows between the cleared ones
         if (rowsCleared.size() == 2 || rowsCleared.size() == 3) {
-            auto topRow = rowsCleared.front();
-            auto botRow = rowsCleared.back();
+            auto const topRow = rowsCleared.front();
+            auto const botRow = rowsCleared.back();
             assert(topRow >= 0 && topRow < rows);
             assert(botRow >= 0 && botRow < rows);
             assert(botRow >= topRow);
@@ -227,7 +226,7 @@ auto Board::remove_full_rows() -> int {
             auto emptyRowsPassed = 0;
             for (auto y = botRow; y != topRow; --y) {
                 auto found = false;
-                for (auto row : rowsCleared) {
+                for (auto const row : rowsCleared) {
                     if (row == y) {
                         found = true;
                         break;
@@ -259,8 +258,8 @@ auto Board::print_board() -> void {
     for (auto y = 0; y < rows; ++y) {
         std::cout << '|';
         for (auto x = 0; x < columns; ++x) {
-            auto index = y * columns + x;
-            auto currBlock = data[index];
+            auto const index = y * columns + x;
+            auto const currBlock = data[index];
 
             std::cout << (currBlock.isActive ? "O" : " ");
         }
