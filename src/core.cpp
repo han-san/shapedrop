@@ -506,8 +506,8 @@ auto run() -> void
             auto scoreString = "Score: "s + std::to_string(gameState.score);
             UI::label(scoreString, fontSize, UI::XAlignment::RIGHT);
 
-            // FIXME: linesCleared and linesRequired get weird if you don't start at level 1.
-            auto linesRequired = gameState.level * 10;
+            // Round up linesCleared to nearest 10
+            auto linesRequired = (gameState.linesCleared / 10 + 1) * 10;
             auto levelString = "Level: "s + std::to_string(gameState.level) + " (" + std::to_string(gameState.linesCleared) + "/" + std::to_string(linesRequired) + ")";
             UI::label(levelString, fontSize, UI::XAlignment::RIGHT, fontSize);
 
