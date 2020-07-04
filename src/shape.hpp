@@ -216,7 +216,7 @@ public:
     RGB color;
     Position pos;
 
-    Shape(Type type);
+    Shape(Type const type);
 
     auto get_block_positions() -> ArrayStack<Position, 4>;
     auto get_absolute_block_positions() -> ArrayStack<Position, 4>;

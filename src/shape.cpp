@@ -6,10 +6,10 @@
 
 #include "shape.hpp"
 
-Shape::Shape(Type type)
+Shape::Shape(Type const type)
     : pos{Board::columns / 2 - 2, 0} // spawn centrally
+    , type{type}
 {
-    this->type = type;
     switch (type) {
         case Type::I: {
             color = RGB(0x00, 0xf0, 0xf0);
