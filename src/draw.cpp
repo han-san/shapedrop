@@ -4,30 +4,30 @@
 
 #include "draw.hpp"
 
-auto alpha_blend_channel(int bg, int fg, int alpha) -> float
+auto alpha_blend_channel(int const bg, int const fg, int const alpha) -> float
 {
     assert(bg >= 0 && bg <= 255);
     assert(fg >= 0 && fg <= 255);
     assert(alpha >= 0 && alpha <= 255);
 
-    auto alphaRatio = alpha / 255.f;
+    auto const alphaRatio = alpha / 255.f;
     return fg * alphaRatio + bg * (1 - alphaRatio);
 }
 
-auto draw_font_character(BackBuffer& buf, FontCharacter& fontCharacter, int realX, int realY) -> void
+auto draw_font_character(BackBuffer& buf, FontCharacter const& fontCharacter, int const realX, int const realY) -> void
 {
     for (auto y = 0; y < fontCharacter.h; ++y) {
-        auto currY = realY + y + fontCharacter.yoff + (int)(fontCharacter.ascent * fontCharacter.scale);
+        auto const currY = realY + y + fontCharacter.yoff + (int)(fontCharacter.ascent * fontCharacter.scale);
         if (currY < 0 || currY >= buf.h) continue;
         for (auto x = 0; x < fontCharacter.w; ++x) {
-            auto currX = realX + x + fontCharacter.xoff;
+            auto const currX = realX + x + fontCharacter.xoff;
             if (currX < 0 || currX >= buf.w) continue;
 
-            auto currbyteindex = currY * buf.w + currX;
+            auto const currbyteindex = currY * buf.w + currX;
             auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
-            auto relativeIndex = y * fontCharacter.w + x;
-            auto a = fontCharacter.bitmap[relativeIndex];
+            auto const relativeIndex = y * fontCharacter.w + x;
+            auto const a = fontCharacter.bitmap[relativeIndex];
 
             *currbyte = u8(alpha_blend_channel(*currbyte, 0, a));
             ++currbyte;
@@ -38,51 +38,44 @@ auto draw_font_character(BackBuffer& buf, FontCharacter& fontCharacter, int real
     }
 }
 
-auto draw_font_string(BackBuffer& buf, FontString& fontString, int x, int y) -> void
+auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int const y) -> void
 {
-    for (auto& fontCharacter : fontString.data) {
+    for (auto const& fontCharacter : fontString.data) {
         draw_font_character(buf, fontCharacter, x, y);
         x += int(fontCharacter.advance);
     }
 }
 
-auto draw_font_string_normalized(BackBuffer& buf, FontString& fontString, float x, float y) -> void
+auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, float const x, float const y) -> void
 {
-    x *= buf.w;
-    y *= buf.h;
-
-    draw_font_string(buf, fontString, int(x), int(y));
+    draw_font_string(buf, fontString, int(x * buf.w), int(y * buf.h));
 }
 
-auto draw_text(BackBuffer& buf, std::string_view text, int x, int y, float pixelHeight) -> void
+auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int const y, float const pixelHeight) -> void
 {
-    auto fontString = FontString::from_height(std::string(text), pixelHeight);
+    auto const fontString = FontString::from_height(std::string(text), pixelHeight);
     draw_font_string(buf, fontString, x, y);
 }
 
-auto draw_text_normalized(BackBuffer& buf, std::string_view text, float x, float y, float pixelHeight) -> void
+auto draw_text_normalized(BackBuffer& buf, std::string_view const text, float const x, float const y, float const pixelHeight) -> void
 {
-    x *= buf.w;
-    y *= buf.h;
-    pixelHeight *= buf.h;
-
-    draw_text(buf, text, int(x), int(y), pixelHeight);
+    draw_text(buf, text, int(x * buf.w), int(y * buf.h), pixelHeight * buf.h);
 }
 
-auto draw_solid_square(BackBuffer& buf, Squaref sqr, RGB color, uint a) -> void
+auto draw_solid_square(BackBuffer& buf, Squaref const sqr, RGB const color, uint const a) -> void
 {
     for (auto y = 0; y < sqr.h; ++y) {
-        auto pixely = (int)sqr.y + y;
+        auto const pixely = (int)sqr.y + y;
         if (pixely < 0 || pixely >= buf.h) {
             continue;
         }
         for (auto x = 0; x < sqr.w; ++x) {
-            auto pixelx = (int)sqr.x + x;
+            auto const pixelx = (int)sqr.x + x;
             if (pixelx < 0 || pixelx >= buf.w) {
                 continue;
             }
 
-            auto currbyteindex = pixely * buf.w + pixelx;
+            auto const currbyteindex = pixely * buf.w + pixelx;
             auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
             *currbyte = u8(alpha_blend_channel(*currbyte, color.b, a));
@@ -94,7 +87,7 @@ auto draw_solid_square(BackBuffer& buf, Squaref sqr, RGB color, uint a) -> void
     }
 }
 
-auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, uint a) -> void
+auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, RGB const color, uint const a) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
@@ -104,15 +97,15 @@ auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, uint 
     draw_solid_square(buf, sqr, color, a);
 }
 
-auto draw_hollow_square(BackBuffer& buf, Squaref sqr, RGB color, int a, int borderSize) -> void
+auto draw_hollow_square(BackBuffer& buf, Squaref const sqr, RGB const color, int const a, int const borderSize) -> void
 {
     for (auto y = 0; y < sqr.h; ++y) {
-        auto pixely = (int)sqr.y + y;
+        auto const pixely = (int)sqr.y + y;
         if (pixely < 0 || pixely >= buf.h) {
             continue;
         }
         for (auto x = 0; x < sqr.w; ++x) {
-            auto pixelx = (int)sqr.x + x;
+            auto const pixelx = (int)sqr.x + x;
             if (pixelx < 0 || pixelx >= buf.w) {
                 continue;
             }
@@ -124,7 +117,7 @@ auto draw_hollow_square(BackBuffer& buf, Squaref sqr, RGB color, int a, int bord
                 continue;
             }
 
-            auto currbyteindex = pixely * buf.w + pixelx;
+            auto const currbyteindex = pixely * buf.w + pixelx;
             auto currbyte = ((u8*)buf.memory + currbyteindex * buf.bpp);
 
             *currbyte = u8(alpha_blend_channel(*currbyte, color.b, a));
@@ -136,7 +129,7 @@ auto draw_hollow_square(BackBuffer& buf, Squaref sqr, RGB color, int a, int bord
     }
 }
 
-auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, int a, int borderSize) -> void
+auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, RGB const color, int const a, int const borderSize) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
@@ -146,28 +139,28 @@ auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, int 
     draw_hollow_square(buf, sqr, color, a, borderSize);
 }
 
-auto draw_image(BackBuffer& backBuf, Position dest, BackBuffer& img) -> void
+auto draw_image(BackBuffer& backBuf, Position const dest, BackBuffer& img) -> void
 {
     for (auto y = 0; y < img.h; ++y) {
-        auto pixely = (int)dest.y + y;
+        auto const pixely = (int)dest.y + y;
         if (pixely < 0 || pixely >= backBuf.h) {
             continue;
         }
         for (auto x = 0; x < img.w; ++x) {
-            auto pixelx = (int)dest.x + x;
+            auto const pixelx = (int)dest.x + x;
             if (pixelx < 0 || pixelx >= backBuf.w) {
                 continue;
             }
 
-            auto currBBbyteindex = pixely * backBuf.w + pixelx;
+            auto const currBBbyteindex = pixely * backBuf.w + pixelx;
             auto currBBbyte = ((u8*)backBuf.memory + currBBbyteindex * backBuf.bpp);
-            auto currimgbyteindex = y * img.w + x;
+            auto const currimgbyteindex = y * img.w + x;
             auto currimgbyte = ((u8*)img.memory + currimgbyteindex * img.bpp);
 
-            auto r = *currimgbyte++;
-            auto g = *currimgbyte++;
-            auto b = *currimgbyte++;
-            auto a = *currimgbyte++;
+            auto const r = *currimgbyte++;
+            auto const g = *currimgbyte++;
+            auto const b = *currimgbyte++;
+            auto const a = *currimgbyte++;
 
             // FIXME: hack
             if (!a) {
