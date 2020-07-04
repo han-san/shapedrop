@@ -6,8 +6,8 @@
 
 namespace tests {
     auto remove_full_rows() -> void {
-        auto y = Block { {}, true };
-        auto n = Block { {}, false };
+        auto const y = Block { {}, true };
+        auto const n = Block { {}, false };
         Board boardStart;
         boardStart.data = {
             n, n, n, n, n, n, n, n, n, n,

@@ -14,7 +14,7 @@ struct V2Generic {
     };
 
     constexpr V2Generic() = default;
-    constexpr V2Generic(T a, T b): x{a}, y{b} {}
+    constexpr V2Generic(T const a, T const b): x{a}, y{b} {}
 };
 
 template <typename T>
@@ -33,7 +33,7 @@ struct V3Generic {
     };
 
     constexpr V3Generic() = default;
-    constexpr V3Generic(T a, T b, T c): x{a}, y{b}, z{c} {}
+    constexpr V3Generic(T const a, T const b, T const c): x{a}, y{b}, z{c} {}
 };
 
 template <typename T>
@@ -56,7 +56,7 @@ struct V4Generic {
     };
 
     constexpr V4Generic() = default;
-    constexpr V4Generic(T a, T b, T c, T d): x{a}, y{b}, w{c}, h{d} {}
+    constexpr V4Generic(T const a, T const b, T const c, T const d): x{a}, y{b}, w{c}, h{d} {}
 };
 using V2 = V2Generic<int>;
 using V3 = V3Generic<int>;
@@ -78,11 +78,11 @@ class ArrayStack {
 public:
     using value_type = T;
     using reference = value_type&;
-    using const_reference = const value_type&;
+    using const_reference = value_type const&;
     using pointer = value_type*;
-    using const_pointer = const value_type*;
+    using const_pointer = value_type const*;
     using iterator = pointer;
-    using const_iterator = const pointer;
+    using const_iterator = pointer const;
     using size_type = size_t;
     using difference_type = ptrdiff_t;
 

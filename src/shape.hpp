@@ -228,7 +228,7 @@ class ShapePool {
     decltype(shapePool.begin()) currentShapeIterator;
 
 public:
-    ShapePool(const std::array<Shape, 7>& shapes);
+    ShapePool(std::array<Shape, 7> const& shapes);
     ShapePool(ShapePool const& other);
     ShapePool& operator=(ShapePool const& other);
 

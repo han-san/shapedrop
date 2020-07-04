@@ -41,7 +41,7 @@ auto get_window_dimensions() -> V2
     return {window.surface->w, window.surface->h};
 }
 
-auto resize_window(V2 dimensions) {
+auto resize_window(V2 const dimensions) {
     SDL_SetWindowSize(window.handle, dimensions.w, dimensions.h);
     window.surface = SDL_GetWindowSurface(window.handle);
     assert(window.surface);
@@ -149,8 +149,8 @@ auto init_window() {
     }
     --newScale;
     windowScale = newScale;
-    auto initialWindowWidth = gBaseWindowWidth * windowScale;
-    auto initialWindowHeight = gBaseWindowHeight * windowScale;
+    auto const initialWindowWidth = gBaseWindowWidth * windowScale;
+    auto const initialWindowHeight = gBaseWindowHeight * windowScale;
 
     window.handle = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,

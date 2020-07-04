@@ -48,11 +48,11 @@ Shape::Shape(Type const type)
 
 auto Shape::get_block_positions() -> ArrayStack<Position, 4> {
     ArrayStack<Position, 4> positions = {};
-    auto& layout = (*rotations)[rotationIndex];
+    auto const& layout = (*rotations)[rotationIndex];
     auto constexpr size = 4;
     for (auto y = 0; y < size; ++y) {
         for (auto x = 0; x < size; ++x) {
-            auto index = y * size + x;
+            auto const index = y * size + x;
             if (layout[index]) {
                 positions.push_back({x, y});
                 if (positions.size() == 4) {
@@ -73,7 +73,7 @@ auto Shape::get_absolute_block_positions() -> ArrayStack<Position, 4> {
     return positions;
 }
 
-ShapePool::ShapePool(const std::array<Shape, 7>& shapes)
+ShapePool::ShapePool(std::array<Shape, 7> const& shapes)
 {
     shapePool = {
         &shapes[0], &shapes[1], &shapes[2],

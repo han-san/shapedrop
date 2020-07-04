@@ -195,7 +195,7 @@ namespace UI {
 
     auto spinbox(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
         auto const windowOffset = to_window_scale(offset);
-        auto spinBox = SpinBox(std::move(text), fontHeight, windowOffset, value, minValue, maxValue);
+        auto const spinBox = SpinBox(std::move(text), fontHeight, windowOffset, value, minValue, maxValue);
         spinbox(std::move(spinBox));
     }
 
@@ -223,7 +223,7 @@ namespace UI {
         assert(menus.empty());
 
         for (auto const& text : textToDraw) {
-            auto fontString = FontString::from_height_normalized(text.text, float(text.textSize));
+            auto const fontString = FontString::from_height_normalized(text.text, float(text.textSize));
             draw_font_string_normalized(bb, fontString, float(text.x), float(text.y));
         }
         textToDraw.clear();
