@@ -57,15 +57,15 @@ auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, 
     draw_font_string(buf, fontString, int(x * buf.w), int(y * buf.h));
 }
 
-auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int const y, float const pixelHeight) -> void
+auto draw_text(BackBuffer& buf, std::string const text, int const x, int const y, float const pixelHeight) -> void
 {
-    auto const fontString = FontString::from_height(std::string(text), pixelHeight);
+    auto const fontString = FontString::from_height(std::move(text), pixelHeight);
     draw_font_string(buf, fontString, x, y);
 }
 
-auto draw_text_normalized(BackBuffer& buf, std::string_view const text, float const x, float const y, float const pixelHeight) -> void
+auto draw_text_normalized(BackBuffer& buf, std::string const text, float const x, float const y, float const pixelHeight) -> void
 {
-    draw_text(buf, text, int(x * buf.w), int(y * buf.h), pixelHeight * buf.h);
+    draw_text(buf, std::move(text), int(x * buf.w), int(y * buf.h), pixelHeight * buf.h);
 }
 
 auto draw_solid_square(BackBuffer& buf, Squaref const sqr, RGB const color, int const a) -> void
