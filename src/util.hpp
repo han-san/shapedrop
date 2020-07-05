@@ -75,16 +75,17 @@ using Positionf = V2f;
 
 template <typename T, size_t I>
 class ArrayStack {
+    using ArrayType = std::array<T, I>;
 public:
-    using value_type = T;
-    using reference = value_type&;
-    using const_reference = value_type const&;
-    using pointer = value_type*;
-    using const_pointer = value_type const*;
-    using iterator = pointer;
-    using const_iterator = const_pointer;
-    using size_type = size_t;
-    using difference_type = ptrdiff_t;
+    using value_type = typename ArrayType::value_type;
+    using reference = typename ArrayType::reference;
+    using const_reference = typename ArrayType::const_reference;
+    using pointer = typename ArrayType::pointer;
+    using const_pointer = typename ArrayType::const_pointer;
+    using iterator = typename ArrayType::iterator;
+    using const_iterator = typename ArrayType::const_iterator;
+    using size_type = typename ArrayType::size_type;
+    using difference_type = typename ArrayType::difference_type;
 
     auto constexpr begin() noexcept -> iterator { return &m_data[0]; }
     auto constexpr begin() const noexcept -> const_iterator { return &m_data[0]; }
@@ -103,7 +104,7 @@ public:
     auto constexpr empty() -> bool { return !m_size; }
 
 private:
-    std::array<value_type, I> m_data;
+    ArrayType m_data;
     size_type m_size = 0;
 };
 
