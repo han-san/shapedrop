@@ -99,7 +99,8 @@ public:
     auto constexpr back() const -> const_reference { return m_data[m_size - 1]; }
     auto constexpr size() const noexcept -> size_type { return m_size; }
     auto constexpr max_size() const noexcept -> size_type { return I; }
-    auto constexpr push_back(value_type i) -> void { m_data[m_size++] = i; }
+    auto constexpr push_back(const_reference i) -> void { m_data[m_size++] = i; }
+    auto constexpr push_back(value_type&& i) -> void { m_data[m_size++] = i; }
     auto constexpr pop_back() -> void { m_data[--m_size].~T(); }
     auto constexpr empty() const noexcept -> bool { return !m_size; }
 
