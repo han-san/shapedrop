@@ -223,8 +223,7 @@ namespace UI {
         assert(menus.empty());
 
         for (auto const& text : textToDraw) {
-            auto const fontString = FontString::from_height_normalized(text.text, float(text.textSize));
-            draw_font_string_normalized(bb, fontString, float(text.x), float(text.y));
+            draw_text_normalized(bb, std::move(text.text), float(text.x), float(text.y), float(text.textSize));
         }
         textToDraw.clear();
 
