@@ -103,7 +103,7 @@ public:
     auto constexpr empty() -> bool { return !m_size; }
 
 private:
-    std::array<value_type, I> m_data = {};
+    std::array<value_type, I> m_data;
     size_type m_size = 0;
 };
 
