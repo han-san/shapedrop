@@ -82,7 +82,7 @@ public:
     using pointer = value_type*;
     using const_pointer = value_type const*;
     using iterator = pointer;
-    using const_iterator = pointer const;
+    using const_iterator = const_pointer;
     using size_type = size_t;
     using difference_type = ptrdiff_t;
 
