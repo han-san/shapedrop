@@ -6,7 +6,9 @@
 
 class Shape {
 public:
-    using ShapeLayout = std::array<bool, 16>;
+    size_t static constexpr layoutW = 4;
+    size_t static constexpr layoutH = 4;
+    using ShapeLayout = std::array<bool, layoutW * layoutH>;
     using RotationMap = std::array<ShapeLayout, 4>;
 
     RotationMap static constexpr IRotationMap = {
@@ -218,22 +220,31 @@ public:
 
     Shape(Type const type);
 
-    auto get_block_positions() -> ArrayStack<Position, 4>;
-    auto get_absolute_block_positions() -> ArrayStack<Position, 4>;
+    // All shapes are composed of 4 blocks.
+    size_t static constexpr BLOCK_COUNT = 4;
+    using BlockStack = ArrayStack<Position, BLOCK_COUNT>;
+
+    auto get_block_positions() -> BlockStack;
+    auto get_absolute_block_positions() -> BlockStack;
 };
 
 class ShapePool {
-    std::array<const Shape*, 7> shapePool;
+public:
+    size_t static constexpr SIZE = 7;
+
+private:
+    std::array<const Shape*, SIZE> shapePool;
+
     decltype(shapePool) previewPool;
     decltype(shapePool.begin()) currentShapeIterator;
 
 public:
-    ShapePool(std::array<Shape, 7> const& shapes);
+    ShapePool(std::array<Shape, SIZE> const& shapes);
     ShapePool(ShapePool const& other);
     ShapePool& operator=(ShapePool const& other);
 
     auto reshuffle() -> void;
     auto next_shape() -> Shape;
     auto current_shape() -> Shape;
-    auto get_preview_shapes_array() -> ArrayStack<Shape const*, 14>;
+    auto get_preview_shapes_array() -> ArrayStack<Shape const*, SIZE * 2>;
 };

@@ -46,16 +46,15 @@ Shape::Shape(Type const type)
     }
 }
 
-auto Shape::get_block_positions() -> ArrayStack<Position, 4> {
-    ArrayStack<Position, 4> positions = {};
+auto Shape::get_block_positions() -> BlockStack {
+    BlockStack positions = {};
     auto const& layout = (*rotations)[rotationIndex];
-    auto constexpr size = 4;
-    for (auto y = 0; y < size; ++y) {
-        for (auto x = 0; x < size; ++x) {
-            auto const index = y * size + x;
+    for (auto y = 0; y < layoutH; ++y) {
+        for (auto x = 0; x < layoutW; ++x) {
+            auto const index = y * layoutW + x;
             if (layout[index]) {
                 positions.push_back({x, y});
-                if (positions.size() == 4) {
+                if (positions.size() == positions.max_size()) {
                     return positions;
                 }
             }
@@ -64,7 +63,7 @@ auto Shape::get_block_positions() -> ArrayStack<Position, 4> {
     assert(false);
 }
 
-auto Shape::get_absolute_block_positions() -> ArrayStack<Position, 4> {
+auto Shape::get_absolute_block_positions() -> BlockStack {
     auto positions = get_block_positions();
     for (auto& position : positions) {
         position.x += pos.x;
@@ -73,7 +72,7 @@ auto Shape::get_absolute_block_positions() -> ArrayStack<Position, 4> {
     return positions;
 }
 
-ShapePool::ShapePool(std::array<Shape, 7> const& shapes)
+ShapePool::ShapePool(std::array<Shape, ShapePool::SIZE> const& shapes)
 {
     shapePool = {
         &shapes[0], &shapes[1], &shapes[2],
@@ -124,9 +123,9 @@ auto ShapePool::current_shape() -> Shape
     return **currentShapeIterator;
 }
 
-auto ShapePool::get_preview_shapes_array() -> ArrayStack<Shape const*, 14>
+auto ShapePool::get_preview_shapes_array() -> ArrayStack<Shape const*, ShapePool::SIZE * 2>
 {
-    ArrayStack<Shape const*, 14> lookaheadArray = {};
+    ArrayStack<Shape const*, ShapePool::SIZE * 2> lookaheadArray = {};
     for (auto it = currentShapeIterator + 1; it != shapePool.end(); ++it) {
         lookaheadArray.push_back(*it);
     }

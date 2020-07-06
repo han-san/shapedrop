@@ -132,7 +132,7 @@ auto constexpr static initialDropDelay = 1.0;
 auto constexpr static softDropDelay = 0.1;
 bool running = true;
 
-std::array<Shape, 7> const initialShapes {
+std::array<Shape, ShapePool::SIZE> const initialShapes {
     Shape::Type::I,
     Shape::Type::L,
     Shape::Type::J,
