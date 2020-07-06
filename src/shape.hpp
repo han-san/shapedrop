@@ -231,12 +231,14 @@ public:
 class ShapePool {
 public:
     size_t static constexpr SIZE = 7;
-
 private:
-    std::array<const Shape*, SIZE> shapePool;
+    using ShapePoolType = std::array<Shape const*, SIZE>;
+    using PreviewStack = ArrayStack<Shape const*, SIZE * 2>;
 
-    decltype(shapePool) previewPool;
-    decltype(shapePool.begin()) currentShapeIterator;
+    ShapePoolType shapePool;
+
+    ShapePoolType previewPool;
+    ShapePoolType::iterator currentShapeIterator;
 
 public:
     ShapePool(std::array<Shape, SIZE> const& shapes);
@@ -246,5 +248,5 @@ public:
     auto reshuffle() -> void;
     auto next_shape() -> Shape;
     auto current_shape() const -> Shape;
-    auto get_preview_shapes_array() const -> ArrayStack<Shape const*, SIZE * 2>;
+    auto get_preview_shapes_array() const -> PreviewStack;
 };
