@@ -47,7 +47,7 @@ FontString::FontString(std::string_view const string, float const pixelHeight)
     data.reserve(size);
     for (size_t i = 0; i < size; ++i) {
         auto const c = string[i];
-        auto const nextChar = i + 1 == size ? 0 : string[i + 1];
+        auto const nextChar = i + 1 == size ? '\0' : string[i + 1];
         auto const& fontCharacter = data.emplace_back(c, pixelHeight, nextChar);
         w += fontCharacter.advance;
     }
@@ -63,7 +63,7 @@ auto FontString::get_text_width(std::string_view const text, float const fontHei
     auto const size = text.size();
     for (size_t i = 0; i < size; ++i) {
         auto const c = text[i];
-        auto const nextChar = (i + 1 == size) ? 0 : text[i + 1];
+        auto const nextChar = (i + 1 == size) ? '\0' : text[i + 1];
         auto const advance = get_codepoint_kern_advance(c, nextChar, scale);
         width += advance;
     }
