@@ -33,7 +33,7 @@ public:
 class FontString {
 public:
     std::vector<FontCharacter> data;
-    float normalizedW = 0;
+    float normalizedW;
     float normalizedH;
 
     auto static from_width(std::string_view const string, float const desiredPixelWidth) -> FontString;
