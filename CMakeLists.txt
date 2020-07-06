@@ -10,6 +10,12 @@ find_package(SDL2 REQUIRED)
 target_include_directories(ShapeDrop PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${SDL2_INCLUDE_DIR})
 target_compile_features(ShapeDrop PRIVATE cxx_std_17)
 
+if(MSVC)
+    target_compile_options(ShapeDrop PRIVATE /W4)
+else()
+    target_compile_options(ShapeDrop PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
 target_link_libraries(ShapeDrop ${SDL2_LIBRARIES})
 
 install(TARGETS ShapeDrop RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin)
