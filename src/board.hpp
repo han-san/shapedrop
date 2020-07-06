@@ -31,7 +31,7 @@ public:
     auto check_for_tspin(Shape const& shape, Shape::RotationType const rotationType) const -> std::optional<TspinType>;
     auto is_valid_spot(Position const pos) const -> bool;
     auto is_valid_move(Shape shape, V2 const move) const -> bool;
-    auto is_valid_shape(Shape& shape) const -> bool;
+    auto is_valid_shape(Shape const& shape) const -> bool;
     auto remove_full_rows() -> int;
     auto print_board() const -> void;
 };
