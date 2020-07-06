@@ -187,62 +187,64 @@ auto Board::remove_full_rows() -> int {
     }
     assert(rowsCleared.size() <= 4);
 
-    if (!rowsCleared.empty()) {
-        // remove rows
-        for (auto const y : rowsCleared) {
-            for (auto x = 0; x < columns; ++x) {
-                auto const index = y * columns + x;
-                data[index].isActive = false;
-            }
+    if (rowsCleared.empty()) {
+        return 0;
+    }
+
+    // remove rows
+    for (auto const y : rowsCleared) {
+        for (auto x = 0; x < columns; ++x) {
+            auto const index = y * columns + x;
+            data[index].isActive = false;
         }
+    }
 
-        auto move_row_down = [this](int const rowNumber, int const distance) {
-            assert(distance > 0);
-            for (auto x = 0; x < columns; ++x) {
-                auto const index = rowNumber * columns + x;
-                auto const newIndex = (rowNumber + distance) * columns + x;
-                assert((rowNumber + distance) < rows);
-                auto& oldBlock = this->data[index];
-                auto& newBlock = this->data[newIndex];
-                newBlock = oldBlock;
-                oldBlock.isActive = false;
-            }
-        };
+    auto move_row_down = [this](int const rowNumber, int const distance) {
+        assert(distance > 0);
+        for (auto x = 0; x < columns; ++x) {
+            auto const index = rowNumber * columns + x;
+            auto const newIndex = (rowNumber + distance) * columns + x;
+            assert((rowNumber + distance) < rows);
+            auto& oldBlock = this->data[index];
+            auto& newBlock = this->data[newIndex];
+            newBlock = oldBlock;
+            oldBlock.isActive = false;
+        }
+    };
 
-        // if the amount of rows is 2 or 3, there could be non-full rows
-        // between full rows which need to be moved different amounts
+    // if the amount of rows is 2 or 3, there could be non-full rows
+    // between full rows which need to be moved different amounts
 
-        // first move any potential rows between the cleared ones
-        if (rowsCleared.size() == 2 || rowsCleared.size() == 3) {
-            auto const topRow = rowsCleared.front();
-            auto const botRow = rowsCleared.back();
-            assert(topRow >= 0 && topRow < rows);
-            assert(botRow >= 0 && botRow < rows);
-            assert(botRow >= topRow);
+    // first move any potential rows between the cleared ones
+    if (rowsCleared.size() == 2 || rowsCleared.size() == 3) {
+        auto const topRow = rowsCleared.front();
+        auto const botRow = rowsCleared.back();
+        assert(topRow >= 0 && topRow < rows);
+        assert(botRow >= 0 && botRow < rows);
+        assert(botRow >= topRow);
 
-            auto emptyRowsPassed = 0;
-            for (auto y = botRow; y != topRow; --y) {
-                auto found = false;
-                for (auto const row : rowsCleared) {
-                    if (row == y) {
-                        found = true;
-                        break;
-                    }
+        auto emptyRowsPassed = 0;
+        for (auto y = botRow; y != topRow; --y) {
+            auto found = false;
+            for (auto const row : rowsCleared) {
+                if (row == y) {
+                    found = true;
+                    break;
                 }
-                if (!found) {
-                    // a non-full row between full rows
-                    // move down the amount of empty rows that have been passed
-                    move_row_down(y, emptyRowsPassed);
-                    emptyRowsPassed = 0;
-                }
-                ++emptyRowsPassed;
             }
+            if (!found) {
+                // a non-full row between full rows
+                // move down the amount of empty rows that have been passed
+                move_row_down(y, emptyRowsPassed);
+                emptyRowsPassed = 0;
+            }
+            ++emptyRowsPassed;
         }
+    }
 
-        // then move all rows above removed rows
-        for (auto y = rowsCleared.front() - 1; y >= 0; --y) {
-            move_row_down(y, rowsCleared.size());
-        }
+    // then move all rows above removed rows
+    for (auto y = rowsCleared.front() - 1; y >= 0; --y) {
+        move_row_down(y, rowsCleared.size());
     }
 
     return rowsCleared.size();
