@@ -50,7 +50,7 @@ Shape::Shape(Type const type)
     }
 }
 
-auto Shape::get_block_positions() -> BlockStack {
+auto Shape::get_block_positions() const -> BlockStack {
     BlockStack positions = {};
     auto const& layout = (*rotations)[rotationIndex];
     for (size_t y = 0; y < layoutH; ++y) {
@@ -67,7 +67,7 @@ auto Shape::get_block_positions() -> BlockStack {
     throw std::logic_error("The rotation map in rotationIndex ("s + std::to_string(rotationIndex) + ") has fewer than 4 blocks active."s);
 }
 
-auto Shape::get_absolute_block_positions() -> BlockStack {
+auto Shape::get_absolute_block_positions() const -> BlockStack {
     auto positions = get_block_positions();
     for (auto& position : positions) {
         position.x += pos.x;
@@ -122,12 +122,12 @@ auto ShapePool::next_shape() -> Shape
     return **currentShapeIterator;
 }
 
-auto ShapePool::current_shape() -> Shape
+auto ShapePool::current_shape() const -> Shape
 {
     return **currentShapeIterator;
 }
 
-auto ShapePool::get_preview_shapes_array() -> ArrayStack<Shape const*, ShapePool::SIZE * 2>
+auto ShapePool::get_preview_shapes_array() const -> ArrayStack<Shape const*, ShapePool::SIZE * 2>
 {
     ArrayStack<Shape const*, ShapePool::SIZE * 2> lookaheadArray = {};
     for (auto it = currentShapeIterator + 1; it != shapePool.end(); ++it) {

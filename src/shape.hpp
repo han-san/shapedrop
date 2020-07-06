@@ -224,8 +224,8 @@ public:
     size_t static constexpr BLOCK_COUNT = 4;
     using BlockStack = ArrayStack<Position, BLOCK_COUNT>;
 
-    auto get_block_positions() -> BlockStack;
-    auto get_absolute_block_positions() -> BlockStack;
+    auto get_block_positions() const -> BlockStack;
+    auto get_absolute_block_positions() const -> BlockStack;
 };
 
 class ShapePool {
@@ -245,6 +245,6 @@ public:
 
     auto reshuffle() -> void;
     auto next_shape() -> Shape;
-    auto current_shape() -> Shape;
-    auto get_preview_shapes_array() -> ArrayStack<Shape const*, SIZE * 2>;
+    auto current_shape() const -> Shape;
+    auto get_preview_shapes_array() const -> ArrayStack<Shape const*, SIZE * 2>;
 };

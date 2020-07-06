@@ -3,7 +3,7 @@
 
 #include "board.hpp"
 
-auto Board::get_shadow(Shape const& shape) -> Shape {
+auto Board::get_shadow(Shape const& shape) const -> Shape {
     auto shapeShadow = shape;
     while (is_valid_move(shapeShadow, {0, 1})) {
         ++shapeShadow.pos.y;
@@ -11,7 +11,7 @@ auto Board::get_shadow(Shape const& shape) -> Shape {
     return shapeShadow;
 }
 
-auto Board::try_move(Shape& shape, V2 const move) -> bool {
+auto Board::try_move(Shape& shape, V2 const move) const -> bool {
     if (is_valid_move(shape, move)) {
         shape.pos.x += move.x;
         shape.pos.y += move.y;
@@ -20,7 +20,7 @@ auto Board::try_move(Shape& shape, V2 const move) -> bool {
     return false;
 }
 
-auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) -> std::optional<Shape::RotationType> {
+auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::optional<Shape::RotationType> {
     auto rotatingShape = shape;
     rotatingShape.rotationIndex += dir == Shape::Rotation::RIGHT ? 1 : -1;
     if (rotatingShape.rotationIndex == -1) rotatingShape.rotationIndex = 3;
@@ -126,7 +126,7 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) -> std::option
     return {};
 }
 
-auto Board::is_valid_spot(Position const pos) -> bool {
+auto Board::is_valid_spot(Position const pos) const -> bool {
     if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
         return false;
     } else {
@@ -135,13 +135,13 @@ auto Board::is_valid_spot(Position const pos) -> bool {
     }
 }
 
-auto Board::is_valid_move(Shape shape, V2 const move) -> bool {
+auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
     shape.pos.x += move.x;
     shape.pos.y += move.y;
     return is_valid_shape(shape);
 }
 
-auto Board::is_valid_shape(Shape& shape) -> bool {
+auto Board::is_valid_shape(Shape& shape) const -> bool {
     for (auto const position : shape.get_absolute_block_positions()) {
         if (!is_valid_spot(position)) {
             return false;
@@ -153,7 +153,7 @@ auto Board::is_valid_shape(Shape& shape) -> bool {
 // If the shape is a T, its last movement was a rotation, and 3 or more of its
 // corners are occupied by other pieces it counts as a T-spin. If the rotation
 // was a wallkick it only counts as a T-spin mini.
-auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotationType) -> std::optional<TspinType> {
+auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotationType) const -> std::optional<TspinType> {
     if (shape.type == Shape::Type::T) {
         V2 const cornerOffsets[] = {{0, 0}, {2, 0}, {0, 2}, {2, 2}};
         auto cornersOccupied = 0;
@@ -248,7 +248,7 @@ auto Board::remove_full_rows() -> int {
     return rowsCleared.size();
 }
 
-auto Board::print_board() -> void {
+auto Board::print_board() const -> void {
     std::cout << ' ';
     for (auto i = 0; i < columns; ++i) std::cout << "_";
     std::cout << '\n';
