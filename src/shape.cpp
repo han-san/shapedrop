@@ -53,11 +53,11 @@ Shape::Shape(Type const type)
 auto Shape::get_block_positions() -> BlockStack {
     BlockStack positions = {};
     auto const& layout = (*rotations)[rotationIndex];
-    for (auto y = 0; y < layoutH; ++y) {
-        for (auto x = 0; x < layoutW; ++x) {
+    for (size_t y = 0; y < layoutH; ++y) {
+        for (size_t x = 0; x < layoutW; ++x) {
             auto const index = y * layoutW + x;
             if (layout[index]) {
-                positions.push_back({x, y});
+                positions.push_back({int(x), int(y)});
                 if (positions.size() == positions.max_size()) {
                     return positions;
                 }
