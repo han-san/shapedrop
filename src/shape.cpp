@@ -1,10 +1,14 @@
 #include <algorithm>
 #include <cassert>
 #include <random>
+#include <stdexcept>
+#include <string>
 
 #include "board.hpp"
 
 #include "shape.hpp"
+
+using namespace std::string_literals;
 
 Shape::Shape(Type const type)
     : pos{Board::columns / 2 - 2, 0} // spawn centrally
@@ -60,7 +64,7 @@ auto Shape::get_block_positions() -> BlockStack {
             }
         }
     }
-    assert(false);
+    throw std::logic_error("The rotation map in rotationIndex ("s + std::to_string(rotationIndex) + ") has fewer than 4 blocks active."s);
 }
 
 auto Shape::get_absolute_block_positions() -> BlockStack {
