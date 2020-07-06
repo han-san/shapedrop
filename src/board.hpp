@@ -30,7 +30,7 @@ public:
     auto get_shadow(Shape const& shape) -> Shape;
     auto check_for_tspin(Shape const& shape, Shape::RotationType const rotationType) -> std::optional<TspinType>;
     auto is_valid_spot(Position const pos) -> bool;
-    auto is_valid_move(Shape& shape, V2 const move) -> bool;
+    auto is_valid_move(Shape shape, V2 const move) -> bool;
     auto is_valid_shape(Shape& shape) -> bool;
     auto remove_full_rows() -> int;
     auto print_board() -> void;

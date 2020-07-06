@@ -135,13 +135,10 @@ auto Board::is_valid_spot(Position const pos) -> bool {
     }
 }
 
-auto Board::is_valid_move(Shape& shape, V2 const move) -> bool {
+auto Board::is_valid_move(Shape shape, V2 const move) -> bool {
     shape.pos.x += move.x;
     shape.pos.y += move.y;
-    auto const valid = is_valid_shape(shape);
-    shape.pos.x -= move.x;
-    shape.pos.y -= move.y;
-    return valid;
+    return is_valid_shape(shape);
 }
 
 auto Board::is_valid_shape(Shape& shape) -> bool {
