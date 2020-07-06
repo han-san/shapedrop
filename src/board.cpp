@@ -9,7 +9,7 @@ auto Board::get_shadow(Shape const& shape) -> Shape {
         ++shapeShadow.pos.y;
     }
     return shapeShadow;
-};
+}
 
 auto Board::try_move(Shape& shape, V2 const move) -> bool {
     if (is_valid_move(shape, move)) {

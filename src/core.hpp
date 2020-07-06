@@ -47,7 +47,7 @@ auto constexpr gSidebarDim = Square {
 
 auto constexpr constexpr_round(float const val) -> int {
     return int(val + 0.5);
-};
+}
 
 auto constexpr gBaseWindowWidth = constexpr_round(float(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize));
 auto constexpr gBaseWindowHeight = constexpr_round(float(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize));

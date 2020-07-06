@@ -11,8 +11,8 @@
 using namespace std::string_literals;
 
 Shape::Shape(Type const type)
-    : pos{Board::columns / 2 - 2, 0} // spawn centrally
-    , type{type}
+    : type{type}
+    , pos{Board::columns / 2 - 2, 0} // spawn centrally
 {
     switch (type) {
         case Type::I: {

@@ -88,7 +88,7 @@ public:
     using difference_type = typename ArrayType::difference_type;
 
     auto constexpr begin() noexcept -> iterator { return m_data.begin(); }
-    auto constexpr begin() const noexcept -> const_iterator { return m_data.begin() }
+    auto constexpr begin() const noexcept -> const_iterator { return m_data.begin(); }
     auto constexpr end() noexcept -> iterator { return begin() + m_size; }
     auto constexpr end() const noexcept -> const_iterator { return begin() + m_size; }
     auto constexpr cbegin() const noexcept -> const_iterator { return m_data.cbegin(); }
