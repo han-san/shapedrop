@@ -129,7 +129,7 @@ auto ShapePool::current_shape() const -> Shape
 
 auto ShapePool::get_preview_shapes_array() const -> PreviewStack
 {
-    PreviewStack lookaheadArray = {};
+    PreviewStack lookaheadArray;
     for (auto it = currentShapeIterator + 1; it != shapePool.end(); ++it) {
         lookaheadArray.push_back(*it);
     }
