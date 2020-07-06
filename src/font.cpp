@@ -39,9 +39,7 @@ FontCharacter::~FontCharacter()
     stbtt_FreeBitmap(bitmap, font.userdata); // TODO: find out this actually does
 }
 
-FontString::FontString(std::string const string, float const pixelHeight)
-    // TODO: maybe move string? If so the parameter can't be used in the body
-    : string{string}
+FontString::FontString(std::string_view const string, float const pixelHeight)
 {
     auto w = 0.f;
 
@@ -77,7 +75,7 @@ auto FontString::get_text_width_normalized(std::string_view const text, float co
     return get_text_width(text, get_window_dimensions().h * fontHeightNormalized);
 }
 
-auto FontString::from_width(std::string const string, float const desiredPixelWidth) -> FontString
+auto FontString::from_width(std::string_view const string, float const desiredPixelWidth) -> FontString
 {
     // start with a reasonable pixelheight value
     auto pixelHeight = 12.f;
@@ -94,11 +92,10 @@ auto FontString::from_width(std::string const string, float const desiredPixelWi
         }
     }
 
-    // TODO: maybe move string here?
     return FontString(string, pixelHeight);
 }
 
-auto FontString::from_width_normalized(std::string const string, float const desiredWidth) -> FontString
+auto FontString::from_width_normalized(std::string_view const string, float const desiredWidth) -> FontString
 {
     return from_width(string, get_window_dimensions().w * desiredWidth);
 }

@@ -32,24 +32,23 @@ public:
 
 class FontString {
 public:
-    std::string string;
     std::vector<FontCharacter> data;
     float normalizedW = 0;
     float normalizedH;
 
-    auto static from_width(std::string const string, float const desiredPixelWidth) -> FontString;
-    auto static from_width_normalized(std::string const string, float const desiredWidth) -> FontString;
-    auto static from_height(std::string const string, float const desiredPixelHeight) -> FontString {
+    auto static from_width(std::string_view const string, float const desiredPixelWidth) -> FontString;
+    auto static from_width_normalized(std::string_view const string, float const desiredWidth) -> FontString;
+    auto static from_height(std::string_view const string, float const desiredPixelHeight) -> FontString {
         return FontString(string, desiredPixelHeight);
     }
-    auto static from_height_normalized(std::string const string, float const desiredHeight) -> FontString {
+    auto static from_height_normalized(std::string_view const string, float const desiredHeight) -> FontString {
         return from_height(string, get_window_dimensions().h * desiredHeight);
     }
     auto static get_text_width(std::string_view const text, float const fontSize) -> float;
     auto static get_text_width_normalized(std::string_view const text, float const fontSize) -> float;
 
 private:
-    FontString(std::string const string, float const pixelHeight);
+    FontString(std::string_view const string, float const pixelHeight);
 };
 
 auto get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, float const scale) -> float;
