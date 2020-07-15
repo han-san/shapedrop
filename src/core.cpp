@@ -184,7 +184,7 @@ struct GameState {
     std::optional<Shape> holdShape = {};
 
     auto reset() {
-        *this = std::move(GameState {});
+        *this = GameState {};
     }
 
     auto drop_delay_for_level() const {
