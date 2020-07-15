@@ -176,7 +176,7 @@ auto main(int argc, char** argv) -> int {
 
     platform::SDL::init_window();
 
-    if (!init_font("c:/windows/fonts/arialbd.ttf")) {
+    if (!init_font("DejaVuSans.ttf")) {
         assert(false);
         return 1;
     }

@@ -16,3 +16,4 @@ else()
 endif()
 
 target_link_libraries(ShapeDrop PUBLIC SDL2-static)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/font/DejaVuSans.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 #include <vector>
 
 #include "jint.h"
@@ -52,4 +51,4 @@ private:
 };
 
 auto get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, float const scale) -> float;
-auto init_font(std::string_view const filePath) -> bool;
+auto init_font(std::string const filePath) -> bool;

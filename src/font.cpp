@@ -1,3 +1,5 @@
+#include <string>
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
@@ -8,8 +10,16 @@
 uchar static ttf_buffer[1<<25];
 stbtt_fontinfo font;
 
-auto init_font(std::string_view const filePath) -> bool
+// FIXME: Temporary implementation. Should probably use std::path or something.
+//        Also the path shouldn't be relative to the current working directory.
+auto get_font_path() -> std::string
 {
+    return "./";
+}
+
+auto init_font(std::string const fontName) -> bool
+{
+    auto const filePath = get_font_path() + std::move(fontName);
     auto file = fopen(filePath.data(), "rb");
     if (!file) return false;
     fread(ttf_buffer, 1, 1<<25, file);
