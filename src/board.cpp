@@ -32,7 +32,7 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::
 
     std::array<V2, 4> kicks = {};
 
-    // do wall kicks to see if valid
+    // Do wall kicks to see if valid. Shapes J, L, S, T, and Z all have the same wall kicks while I has its own.
     switch (shape.type) {
         case Shape::Type::J:
         case Shape::Type::L:
@@ -63,6 +63,7 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::
                     kicks = { V2 {-1, 0}, {-1, -1}, {0, 2}, {-1, 2} };
                 } break;
                 default: {
+                    // There are only 4 different rotation states, so rotationIndex can only be between 0 and 3.
                     assert(false);
                 } break;
             }
@@ -98,6 +99,7 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::
                     }
                 } break;
                 default: {
+                    // There are only 4 different rotation states, so rotationIndex can only be between 0 and 3.
                     assert(false);
                 } break;
             }
@@ -107,11 +109,13 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::
             assert(false);
         } break;
         default: {
+            // All shape types should have already had its own case.
             assert(false);
         }
     }
 
     for (auto const kickMove : kicks) {
+        // rotatingShape has the new rotationIndex and has to reset its position every time it checks a new kick.
         rotatingShape.pos = shape.pos;
         rotatingShape.pos.x += kickMove.x;
         // the y in kicks is bottom up while it's top down for the shape position

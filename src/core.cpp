@@ -525,6 +525,10 @@ auto run() -> void
             UI::begin_menu({0.f, menuY, 1.f, 1.f - menuY});
             UI::label("ShapeDrop", menuFontSize, UI::XAlignment::CENTER);
             if (UI::button("Play", menuFontSize, UI::XAlignment::CENTER)) {
+                // FIXME: This will cause the game field to render this frame,
+                // but the UI being rendered this frame will be the main menu's
+                // instead of the game field's since that's the simulation
+                // branch we're currently on.
                 levelType = LevelType::GAME;
                 gameState.reset();
             }
