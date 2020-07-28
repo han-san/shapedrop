@@ -15,6 +15,17 @@ struct V2Generic {
 
     constexpr V2Generic() = default;
     constexpr V2Generic(T const a, T const b): x{a}, y{b} {}
+
+    using ThisType = V2Generic<T>;
+
+    auto constexpr operator +=(ThisType const& rhs) -> ThisType& {
+        x += rhs.x;
+        y += rhs.y;
+        return *this;
+    }
+    auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
+        return lhs += rhs;
+    }
 };
 
 template <typename T>
@@ -34,6 +45,18 @@ struct V3Generic {
 
     constexpr V3Generic() = default;
     constexpr V3Generic(T const a, T const b, T const c): x{a}, y{b}, z{c} {}
+
+    using ThisType = V3Generic<T>;
+
+    auto constexpr operator +=(ThisType const& rhs) -> ThisType& {
+        x += rhs.x;
+        y += rhs.y;
+        z += rhs.z;
+        return *this;
+    }
+    auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
+        return lhs += rhs;
+    }
 };
 
 template <typename T>
@@ -57,7 +80,21 @@ struct V4Generic {
 
     constexpr V4Generic() = default;
     constexpr V4Generic(T const a, T const b, T const c, T const d): x{a}, y{b}, w{c}, h{d} {}
+
+    using ThisType = V4Generic<T>;
+
+    auto constexpr operator +=(ThisType const& rhs) -> ThisType& {
+        x += rhs.x;
+        y += rhs.y;
+        w += rhs.w;
+        h += rhs.h;
+        return *this;
+    }
+    auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
+        return lhs += rhs;
+    }
 };
+
 using V2 = V2Generic<int>;
 using V3 = V3Generic<int>;
 using V4 = V4Generic<int>;

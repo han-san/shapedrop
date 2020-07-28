@@ -13,8 +13,7 @@ auto Board::get_shadow(Shape const& shape) const -> Shape {
 
 auto Board::try_move(Shape& shape, V2 const move) const -> bool {
     if (is_valid_move(shape, move)) {
-        shape.pos.x += move.x;
-        shape.pos.y += move.y;
+        shape.pos += move;
         return true;
     }
     return false;
@@ -136,8 +135,7 @@ auto Board::is_valid_spot(Position const pos) const -> bool {
 }
 
 auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
-    shape.pos.x += move.x;
-    shape.pos.y += move.y;
+    shape.pos += move;
     return is_valid_shape(shape);
 }
 
@@ -158,7 +156,7 @@ auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotati
         V2 const cornerOffsets[] = {{0, 0}, {2, 0}, {0, 2}, {2, 2}};
         auto cornersOccupied = 0;
         for (auto const offset : cornerOffsets) {
-            cornersOccupied += !is_valid_spot({shape.pos.x + offset.x, shape.pos.y + offset.y});
+            cornersOccupied += !is_valid_spot(shape.pos + offset);
         }
         if (cornersOccupied >= 3) {
             return (rotationType == Shape::RotationType::WALLKICK) ? TspinType::MINI : TspinType::REGULAR;
