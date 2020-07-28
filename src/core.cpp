@@ -108,6 +108,11 @@ auto get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin
             } break;
         }
     }
+
+    // Getting here means rowsCleared was above 4 in a release build (BAD).
+    auto const errMsg = "The amount of rows cleared should be between 0 and 4, but is currently ("s + std::to_string(rowsCleared) + ")";
+    std::cerr << errMsg; // TODO: Log instead of stderr
+    throw std::logic_error(errMsg);
 }
 
 auto calculate_score(ClearType const clearType, int const level) {
