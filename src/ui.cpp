@@ -30,6 +30,12 @@ namespace UI {
     };
     auto static menus = std::vector<Menu>{};
 
+    struct Background {
+        WindowScaleRect region;
+        RGBA color;
+    };
+    auto static backgrounds = std::vector<Background>{};
+
     auto static to_squaref(WindowScaleRect const rect) -> Squaref {
         return {float(rect.x), float(rect.y), float(rect.w), float(rect.h)};
     }
@@ -222,6 +228,11 @@ namespace UI {
     auto draw(BackBuffer bb) -> void {
         assert(menus.empty());
 
+        for (auto const& bg : backgrounds) {
+            draw_solid_square_normalized(bb, to_squaref(bg.region), {bg.color.r, bg.color.g, bg.color.b}, bg.color.a);
+        }
+        backgrounds.clear();
+
         for (auto const& text : textToDraw) {
             draw_text_normalized(bb, std::move(text.text), float(text.x), float(text.y), float(text.textSize));
         }
@@ -231,10 +242,15 @@ namespace UI {
         clicked = false;
     }
 
-    auto begin_menu(RelativeScaleRect const region) -> void {
+    auto begin_menu(RelativeScaleRect const region, RGBA const bgColor) -> void {
         auto const regionRelativeToWindow = to_window_scale(region);
         add_region_as_child_of_current_menu(regionRelativeToWindow);
         menus.push_back({regionRelativeToWindow, {}});
+
+        // Don't draw fully transparent backgrounds
+        if (bgColor.a) {
+            backgrounds.push_back({regionRelativeToWindow, bgColor});
+        }
     }
 
     auto end_menu() -> void {
