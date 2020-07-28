@@ -84,13 +84,12 @@ auto constexpr clearTypeScores = std::array {
     1200  // T-Spin Mini Double
 };
 
-auto get_clear_type(int const rowsCleared, std::optional<TspinType> const tspin) {
+auto get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin) {
     assert(rowsCleared <= 4);
-    assert(rowsCleared >= 0);
     if (!tspin) {
         return static_cast<ClearType>(rowsCleared);
     } else {
-        assert(rowsCleared <= 3);
+        assert(rowsCleared <= 3); // A t-spin can't clear more than 3 rows.
         switch (rowsCleared) {
             case 0: {
                 return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI : ClearType::TSPIN;
