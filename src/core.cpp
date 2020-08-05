@@ -186,6 +186,7 @@ struct GameState {
     Shape currentShapeShadow = board.get_shadow(currentShape);
     std::optional<Shape::RotationType> currentRotationType = {};
     std::optional<Shape> holdShape = {};
+    bool paused = false;
 
     auto reset() {
         *this = GameState {};
@@ -337,6 +338,11 @@ auto run() -> void
                         auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
                         update_shadow_and_clocks(isGrounded);
                     }
+                } else if (message.type == Message::Type::PAUSE) {
+                    gameState.paused = !gameState.paused;
+                    // TODO: maybe save the amount of clocks left when the game was paused and set them again here.
+                    gameState.dropClock = frameStartClock;
+                    gameState.lockClock = frameStartClock;
                 }
             }
         }
@@ -352,158 +358,161 @@ auto run() -> void
                 }
             }();
 
-            // TODO: make it possible for shapes to drop more than one block
-            // (e.g. at max drop speed it should drop all the way to the bottom
-            // instantly)
-            auto nextdropClock = gameState.dropClock + dropDelay * CLOCKS_PER_SEC;
-            if (frameStartClock > nextdropClock) {
-                gameState.dropClock = frameStartClock;
-                if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
-                    gameState.lockClock = frameStartClock;
-                    gameState.currentRotationType = {};
+            if (!gameState.paused) {
+                // TODO: make it possible for shapes to drop more than one block
+                // (e.g. at max drop speed it should drop all the way to the bottom
+                // instantly)
+                auto nextdropClock = gameState.dropClock + dropDelay * CLOCKS_PER_SEC;
+                if (frameStartClock > nextdropClock) {
+                    gameState.dropClock = frameStartClock;
+                    if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
+                        gameState.lockClock = frameStartClock;
+                        gameState.currentRotationType = {};
 
-                    if (gameState.isSoftDropping) {
-                        ++gameState.softDropRowCount;
-                    } else {
-                        gameState.softDropRowCount = 0;
-                    }
-                }
-            }
-
-            if (frameStartClock > gameState.lockClock + lockDelay) {
-                // only care about locking if currentShape is on top of a block
-                if (!gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
-                    // game over if entire piece is above visible portion
-                    // of board
-                    auto gameOver = true;
-                    for (auto pos : gameState.currentShape.get_absolute_block_positions()) {
-                        if (pos.y > 1) {
-                            gameOver = false;
+                        if (gameState.isSoftDropping) {
+                            ++gameState.softDropRowCount;
+                        } else {
+                            gameState.softDropRowCount = 0;
                         }
                     }
-
-                    // fix currentBlocks position on board
-                    for (auto position : gameState.currentShape.get_absolute_block_positions()) {
-                        assert(gameState.board.is_valid_spot(position));
-                        auto boardIndex = position.y * gameState.board.columns + position.x;
-                        gameState.board.data[boardIndex] = {gameState.currentShape.color, true};
-                    }
-
-                    auto const tspin = gameState.currentRotationType ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType) : std::nullopt;
-
-                    auto rowsCleared = gameState.board.remove_full_rows();
-                    gameState.linesCleared += rowsCleared;
-                    auto clearType = get_clear_type(rowsCleared, tspin);
-                    auto constexpr clearTypeToName = std::array {
-                        ""sv,
-                        "Single"sv,
-                        "Double"sv,
-                        "Triple"sv,
-                        "Tetris"sv,
-                        "T-Spin"sv,
-                        "T-Spin Single"sv,
-                        "T-Spin Double"sv,
-                        "T-Spin Triple"sv,
-                        "T-Spin Mini"sv,
-                        "T-Spin Mini Single"sv,
-                        "T-Spin Mini Double"sv,
-                    };
-                    auto const clearName = clearTypeToName[static_cast<int>(clearType)];
-                    if (!clearName.empty()) {
-                        std::cout << clearName << std::endl;
-                    }
-
-                    // only regular clears count, but if it's a t-spin then
-                    // droppedRows should have been set to 0 from rotating the shape
-                    // so it SHOULDN'T be necessary to check explicitly.
-                    if (clearType != ClearType::NONE) {
-                        // you shouldn't be able to soft drop and hard drop at the same time.
-                        assert(!gameState.droppedRows || !gameState.softDropRowCount);
-                        gameState.score += 2 * gameState.droppedRows;
-                        gameState.score += gameState.softDropRowCount;
-                    }
-                    // needs to be reset for the next piece
-                    gameState.softDropRowCount = 0;
-                    gameState.droppedRows = 0;
-
-                    // handle combos
-                    switch (clearType) {
-                        case ClearType::SINGLE:
-                        case ClearType::DOUBLE:
-                        case ClearType::TRIPLE:
-                        case ClearType::TETRIS:
-                        case ClearType::TSPIN_SINGLE:
-                        case ClearType::TSPIN_DOUBLE:
-                        case ClearType::TSPIN_TRIPLE:
-                        case ClearType::TSPIN_MINI_SINGLE:
-                        case ClearType::TSPIN_MINI_DOUBLE: {
-                            ++gameState.comboCounter;
-                            auto const comboScore = 50 * gameState.comboCounter * gameState.level;
-                            gameState.score += comboScore;
-                            if (comboScore) {
-                                std::cerr << "Combo " << gameState.comboCounter << "! " << comboScore << " pts.\n";
-                            }
-                        } break;
-                        default: {
-                            gameState.comboCounter = -1;
-                        } break;
-                    }
-
-                    // check for back to back tetris/t-spin
-                    auto backToBackModifier = 1.0;
-                    switch (clearType) {
-                        case ClearType::TETRIS: {
-                            if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::TETRIS)) {
-                                std::cerr << "Back to back Tetris\n";
-                                backToBackModifier = 1.5;
-                            } else {
-                                gameState.backToBackType = BackToBackType::TETRIS;
-                            }
-                        } break;
-                        case ClearType::TSPIN:
-                        case ClearType::TSPIN_MINI:
-                        case ClearType::TSPIN_SINGLE:
-                        case ClearType::TSPIN_MINI_SINGLE:
-                        case ClearType::TSPIN_DOUBLE:
-                        case ClearType::TSPIN_MINI_DOUBLE:
-                        case ClearType::TSPIN_TRIPLE: {
-                            if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::TSPIN)) {
-                                std::cerr << "Back to back T-Spin\n";
-                                backToBackModifier = 1.5;
-                            } else {
-                                gameState.backToBackType = BackToBackType::TSPIN;
-                            }
-                        } break;
-                        default: {
-                            gameState.backToBackType = {};
-                        } break;
-                    }
-
-                    auto clearScore = size_t(calculate_score(clearType, gameState.level) * backToBackModifier);
-                    gameState.score += clearScore;
-
-                    gameState.level = gameState.linesCleared / 10 + gameState.startingLevel;
-
-                    gameState.currentShape = gameState.shapePool.next_shape();
-                    // update shape shadow
-                    gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
-
-                    gameState.lockClock = frameStartClock;
-
-                    gameState.hasHeld = false;
-
-                    // game over if the new shape spawned on top of another shape
-                    if (!gameState.board.is_valid_shape(gameState.currentShape)) {
-                        gameOver = true;
-                    }
-
-                    if (gameOver) {
-                        std::cout << "Game Over!\n";
-                        if (gameState.score > highScore) highScore = gameState.score;
-                        levelType = LevelType::MENU;
-                    }
-
                 }
+
+                if (frameStartClock > gameState.lockClock + lockDelay) {
+                    // only care about locking if currentShape is on top of a block
+                    if (!gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
+                        // game over if entire piece is above visible portion
+                        // of board
+                        auto gameOver = true;
+                        for (auto pos : gameState.currentShape.get_absolute_block_positions()) {
+                            if (pos.y > 1) {
+                                gameOver = false;
+                            }
+                        }
+
+                        // fix currentBlocks position on board
+                        for (auto position : gameState.currentShape.get_absolute_block_positions()) {
+                            assert(gameState.board.is_valid_spot(position));
+                            auto boardIndex = position.y * gameState.board.columns + position.x;
+                            gameState.board.data[boardIndex] = {gameState.currentShape.color, true};
+                        }
+
+                        auto const tspin = gameState.currentRotationType ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType) : std::nullopt;
+
+                        auto rowsCleared = gameState.board.remove_full_rows();
+                        gameState.linesCleared += rowsCleared;
+                        auto clearType = get_clear_type(rowsCleared, tspin);
+                        auto constexpr clearTypeToName = std::array {
+                            ""sv,
+                                "Single"sv,
+                                "Double"sv,
+                                "Triple"sv,
+                                "Tetris"sv,
+                                "T-Spin"sv,
+                                "T-Spin Single"sv,
+                                "T-Spin Double"sv,
+                                "T-Spin Triple"sv,
+                                "T-Spin Mini"sv,
+                                "T-Spin Mini Single"sv,
+                                "T-Spin Mini Double"sv,
+                        };
+                        auto const clearName = clearTypeToName[static_cast<int>(clearType)];
+                        if (!clearName.empty()) {
+                            std::cout << clearName << std::endl;
+                        }
+
+                        // only regular clears count, but if it's a t-spin then
+                        // droppedRows should have been set to 0 from rotating the shape
+                        // so it SHOULDN'T be necessary to check explicitly.
+                        if (clearType != ClearType::NONE) {
+                            // you shouldn't be able to soft drop and hard drop at the same time.
+                            assert(!gameState.droppedRows || !gameState.softDropRowCount);
+                            gameState.score += 2 * gameState.droppedRows;
+                            gameState.score += gameState.softDropRowCount;
+                        }
+                        // needs to be reset for the next piece
+                        gameState.softDropRowCount = 0;
+                        gameState.droppedRows = 0;
+
+                        // handle combos
+                        switch (clearType) {
+                            case ClearType::SINGLE:
+                            case ClearType::DOUBLE:
+                            case ClearType::TRIPLE:
+                            case ClearType::TETRIS:
+                            case ClearType::TSPIN_SINGLE:
+                            case ClearType::TSPIN_DOUBLE:
+                            case ClearType::TSPIN_TRIPLE:
+                            case ClearType::TSPIN_MINI_SINGLE:
+                            case ClearType::TSPIN_MINI_DOUBLE: {
+                                ++gameState.comboCounter;
+                                auto const comboScore = 50 * gameState.comboCounter * gameState.level;
+                                gameState.score += comboScore;
+                                if (comboScore) {
+                                    std::cerr << "Combo " << gameState.comboCounter << "! " << comboScore << " pts.\n";
+                                }
+                            } break;
+                            default: {
+                                gameState.comboCounter = -1;
+                            } break;
+                        }
+
+                        // check for back to back tetris/t-spin
+                        auto backToBackModifier = 1.0;
+                        switch (clearType) {
+                            case ClearType::TETRIS: {
+                                if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::TETRIS)) {
+                                    std::cerr << "Back to back Tetris\n";
+                                    backToBackModifier = 1.5;
+                                } else {
+                                    gameState.backToBackType = BackToBackType::TETRIS;
+                                }
+                            } break;
+                            case ClearType::TSPIN:
+                            case ClearType::TSPIN_MINI:
+                            case ClearType::TSPIN_SINGLE:
+                            case ClearType::TSPIN_MINI_SINGLE:
+                            case ClearType::TSPIN_DOUBLE:
+                            case ClearType::TSPIN_MINI_DOUBLE:
+                            case ClearType::TSPIN_TRIPLE: {
+                                if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::TSPIN)) {
+                                    std::cerr << "Back to back T-Spin\n";
+                                    backToBackModifier = 1.5;
+                                } else {
+                                    gameState.backToBackType = BackToBackType::TSPIN;
+                                }
+                            } break;
+                            default: {
+                                gameState.backToBackType = {};
+                            } break;
+                        }
+
+                        auto clearScore = size_t(calculate_score(clearType, gameState.level) * backToBackModifier);
+                        gameState.score += clearScore;
+
+                        gameState.level = gameState.linesCleared / 10 + gameState.startingLevel;
+
+                        gameState.currentShape = gameState.shapePool.next_shape();
+                        // update shape shadow
+                        gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
+
+                        gameState.lockClock = frameStartClock;
+
+                        gameState.hasHeld = false;
+
+                        // game over if the new shape spawned on top of another shape
+                        if (!gameState.board.is_valid_shape(gameState.currentShape)) {
+                            gameOver = true;
+                        }
+
+                        if (gameOver) {
+                            std::cout << "Game Over!\n";
+                            if (gameState.score > highScore) highScore = gameState.score;
+                            levelType = LevelType::MENU;
+                        }
+
+                    }
+                }
+
             }
 
             auto fontSize = 0.048f;
@@ -514,6 +523,26 @@ auto run() -> void
             auto linesRequired = (gameState.linesCleared / 10 + 1) * 10;
             auto levelString = "Level: "s + std::to_string(gameState.level) + " (" + std::to_string(gameState.linesCleared) + "/" + std::to_string(linesRequired) + ")";
             UI::label(levelString, fontSize, UI::XAlignment::RIGHT, fontSize);
+
+            if (gameState.paused) {
+                UI::begin_menu({0.2f, 0.2f, 0.6f, 0.6f}, {0x00, 0xff, 0xff, 0xff});
+                UI::label("Paused", 0.06f, UI::XAlignment::CENTER);
+                if (UI::button("Resume", 0.06f, UI::XAlignment::CENTER)) {
+                    gameState.paused = false;
+
+                    // TODO: maybe save the amount of clocks left when the game was paused and set them again here.
+                    gameState.dropClock = frameStartClock;
+                    gameState.lockClock = frameStartClock;
+                }
+                if (UI::button("Main Menu", 0.06f, UI::XAlignment::CENTER)) {
+                    levelType = LevelType::MENU;
+                }
+                if (UI::button("Quit", 0.06f, UI::XAlignment::CENTER)) {
+                    running = false;
+                }
+
+                UI::end_menu();
+            }
 
         } else if (levelType == LevelType::MENU) {
             auto highScoreString = "High Score: "s + std::to_string(highScore);

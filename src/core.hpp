@@ -26,6 +26,7 @@ struct Message {
         INCREASE_WINDOW_SIZE,
         DECREASE_WINDOW_SIZE,
         MOUSEBUTTONDOWN,
+        PAUSE,
     };
 
     Type type;

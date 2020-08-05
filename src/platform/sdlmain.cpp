@@ -114,6 +114,9 @@ auto handle_input() -> Message
             case SDLK_SPACE: {
                 msg.type = Message::Type::HOLD;
             } break;
+            case SDLK_ESCAPE: {
+                msg.type = Message::Type::PAUSE;
+            } break;
             default: {
             } break;
             }
