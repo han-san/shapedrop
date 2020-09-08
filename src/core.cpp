@@ -9,6 +9,8 @@
 #include <string_view>
 #include <vector>
 
+#include "fmt/core.h"
+
 #include "jint.h"
 
 #include "board.hpp"
@@ -110,7 +112,7 @@ auto get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin
     }
 
     // Getting here means rowsCleared was above 4 in a release build (BAD).
-    auto const errMsg = "The amount of rows cleared should be between 0 and 4, but is currently ("s + std::to_string(rowsCleared) + ")";
+    auto const errMsg = fmt::format("The amount of rows cleared should be between 0 and 4, but is currently ({})", rowsCleared);
     std::cerr << errMsg; // TODO: Log instead of stderr
     throw std::logic_error(errMsg);
 }
@@ -448,7 +450,7 @@ auto run() -> void
                                 auto const comboScore = 50 * gameState.comboCounter * gameState.level;
                                 gameState.score += comboScore;
                                 if (comboScore) {
-                                    std::cerr << "Combo " << gameState.comboCounter << "! " << comboScore << " pts.\n";
+                                    fmt::print(stderr, "Combo {}! {} pts.\n", gameState.comboCounter, comboScore);
                                 }
                             } break;
                             default: {
@@ -515,14 +517,15 @@ auto run() -> void
 
             }
 
-            auto fontSize = 0.048f;
-            auto scoreString = "Score: "s + std::to_string(gameState.score);
-            UI::label(scoreString, fontSize, UI::XAlignment::RIGHT);
+            {
+                auto const fontSize = 0.048f;
+                UI::label(fmt::format("Score: {}", gameState.score), fontSize, UI::XAlignment::RIGHT);
 
-            // Round up linesCleared to nearest 10
-            auto linesRequired = (gameState.linesCleared / 10 + 1) * 10;
-            auto levelString = "Level: "s + std::to_string(gameState.level) + " (" + std::to_string(gameState.linesCleared) + "/" + std::to_string(linesRequired) + ")";
-            UI::label(levelString, fontSize, UI::XAlignment::RIGHT, fontSize);
+                // Round up linesCleared to nearest 10
+                auto const linesRequired = (gameState.linesCleared / 10 + 1) * 10;
+                auto levelString = fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired);
+                UI::label(std::move(levelString), fontSize, UI::XAlignment::RIGHT, fontSize);
+            }
 
             if (gameState.paused) {
                 UI::begin_menu({0.2f, 0.2f, 0.6f, 0.6f}, {0x00, 0xff, 0xff, 0xff});
@@ -545,9 +548,8 @@ auto run() -> void
             }
 
         } else if (levelType == LevelType::MENU) {
-            auto highScoreString = "High Score: "s + std::to_string(highScore);
-            auto highScoreFontSize = 0.048f;
-            UI::label(highScoreString, highScoreFontSize, UI::XAlignment::RIGHT);
+            auto const highScoreFontSize = 0.048f;
+            UI::label(fmt::format("High Score: {}", highScore), highScoreFontSize, UI::XAlignment::RIGHT);
 
             auto menuY = 1.f / 10.f;
             auto menuFontSize = 1.f / 10.f;

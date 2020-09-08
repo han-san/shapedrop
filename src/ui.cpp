@@ -2,6 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "fmt/core.h"
+
 #include "core.hpp"
 #include "draw.hpp"
 #include "font.hpp"
@@ -165,13 +167,12 @@ namespace UI {
 
         std::string_view static constexpr buttonsString = "<>";
 
-        SpinBox(std::string name, WindowScale const fontHeight, WindowScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue)
+        SpinBox(std::string_view const name, WindowScale const fontHeight, WindowScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue)
             : value{value},
             maxValue{maxValue},
-            minValue{minValue}
+            minValue{minValue},
+            text{fmt::format("{} {}: ", buttonsString, name)}
         {
-            // TODO: can probably just put this in the initializer list
-            text = std::string(buttonsString) + " "s + std::move(name) + ": "s;
             auto const textWidth = get_text_window_scale_width(text, fontHeight);
             auto const maxValueWidth = get_text_window_scale_width(std::to_string(maxValue), fontHeight);
             auto const fullTextWidth = textWidth + maxValueWidth;
