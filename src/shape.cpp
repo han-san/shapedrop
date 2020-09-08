@@ -66,7 +66,7 @@ auto Shape::get_block_positions() const -> BlockStack {
             }
         }
     }
-    throw std::logic_error(fmt::format("The rotation map in rotationIndex ({}) has fewer than 4 blocks active.", rotationIndex);
+    throw std::logic_error(fmt::format("The rotation map in rotationIndex ({}) has fewer than 4 blocks active.", rotationIndex));
 }
 
 auto Shape::get_absolute_block_positions() const -> BlockStack {
