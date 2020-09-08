@@ -17,9 +17,9 @@ auto get_font_path() -> std::string
     return "./";
 }
 
-auto init_font(std::string const fontName) -> bool
+auto init_font(std::string const& fontName) -> bool
 {
-    auto const filePath = get_font_path() + std::move(fontName);
+    auto const filePath = get_font_path() + fontName;
     auto file = fopen(filePath.data(), "rb");
     if (!file) return false;
     fread(ttf_buffer, 1, 1<<25, file);

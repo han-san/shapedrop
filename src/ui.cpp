@@ -111,12 +111,12 @@ namespace UI {
     }
 
     // Assumes region.w and region.h are the correct sizes for the resulting FontString.
-    auto static label(std::string const text, WindowScaleRect const region) {
+    auto static label(std::string text, WindowScaleRect const region) {
         add_region_as_child_of_current_menu(region);
         textToDraw.push_back({std::move(text), region.h, region.x, region.y});
     }
 
-    auto label(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> void {
+    auto label(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> void {
         auto const textWidth = get_text_window_scale_width(text, fontHeight);
         auto const windowOffset = to_window_scale(xAlign, yOffset, textWidth);
         auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
@@ -125,21 +125,21 @@ namespace UI {
     }
 
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
-    auto label(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void {
+    auto label(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void {
         auto const windowOffset = to_window_scale(offset);
         auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, 0, fontHeight};
 
         label(std::move(text), region);
     }
 
-    auto static button(std::string const text, WindowScaleRect const region) -> bool {
+    auto static button(std::string text, WindowScaleRect const region) -> bool {
         label(std::move(text), region);
 
         auto const screenSpaceRegion = to_screen_space(to_squaref(region));
         return clicked && point_is_in_rect(cursor, screenSpaceRegion);
     }
 
-    auto button(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> bool {
+    auto button(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> bool {
         auto const textWidth = get_text_window_scale_width(text, fontHeight);
         auto const windowOffset = to_window_scale(xAlign, yOffset, textWidth);
         auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
@@ -148,7 +148,7 @@ namespace UI {
     }
 
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
-    auto button(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset) -> bool {
+    auto button(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset) -> bool {
         auto const textWidth = get_text_window_scale_width(text, fontHeight);
         auto const windowOffset = to_window_scale(offset);
         auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
@@ -165,11 +165,12 @@ namespace UI {
 
         std::string_view static constexpr buttonsString = "<>";
 
-        SpinBox(std::string const name, WindowScale const fontHeight, WindowScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue)
+        SpinBox(std::string name, WindowScale const fontHeight, WindowScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue)
             : value{value},
             maxValue{maxValue},
             minValue{minValue}
         {
+            // TODO: can probably just put this in the initializer list
             text = std::string(buttonsString) + " "s + std::move(name) + ": "s;
             auto const textWidth = get_text_window_scale_width(text, fontHeight);
             auto const maxValueWidth = get_text_window_scale_width(std::to_string(maxValue), fontHeight);
@@ -199,13 +200,13 @@ namespace UI {
         label(std::move(spinBox.text), spinBox.region);
     }
 
-    auto spinbox(std::string const text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
+    auto spinbox(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
         auto const windowOffset = to_window_scale(offset);
         auto const spinBox = SpinBox(std::move(text), fontHeight, windowOffset, value, minValue, maxValue);
         spinbox(std::move(spinBox));
     }
 
-    auto spinbox(std::string const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
+    auto spinbox(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
         // A SpinBox's width and height aren't dependent on the region given,
         // so the correct region can be calculated after its creation.
         auto spinBox = SpinBox(std::move(text), fontHeight, {}, value, minValue, maxValue);
@@ -234,7 +235,7 @@ namespace UI {
         backgrounds.clear();
 
         for (auto const& text : textToDraw) {
-            draw_text_normalized(bb, std::move(text.text), float(text.x), float(text.y), float(text.textSize));
+            draw_text_normalized(bb, text.text, float(text.x), float(text.y), float(text.textSize));
         }
         textToDraw.clear();
 

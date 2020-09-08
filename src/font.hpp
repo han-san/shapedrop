@@ -51,4 +51,4 @@ private:
 };
 
 auto get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, float const scale) -> float;
-auto init_font(std::string const filePath) -> bool;
+auto init_font(std::string const& filePath) -> bool;

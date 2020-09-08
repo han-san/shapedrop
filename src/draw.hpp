@@ -35,5 +35,5 @@ auto draw_hollow_square(BackBuffer& buf, Squaref const sqr, RGB const color, int
 auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, RGB const color, int const a = 0xff, int const borderSize = 1) -> void;
 auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int const y) -> void;
 auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, float const x, float const y) -> void;
-auto draw_text(BackBuffer& buf, std::string const text, int const x, int const y, float const pixelHeight) -> void;
-auto draw_text_normalized(BackBuffer& buf, std::string const text, float const x, float const y, float const pixelHeight) -> void;
+auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int const y, float const pixelHeight) -> void;
+auto draw_text_normalized(BackBuffer& buf, std::string_view const text, float const x, float const y, float const pixelHeight) -> void;
