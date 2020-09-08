@@ -201,16 +201,14 @@ namespace UI {
         label(std::move(spinBox.text), spinBox.region);
     }
 
-    auto spinbox(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
-        auto const windowOffset = to_window_scale(offset);
-        auto const spinBox = SpinBox(std::move(text), fontHeight, windowOffset, value, minValue, maxValue);
-        spinbox(std::move(spinBox));
+    auto spinbox(std::string_view const text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
+        spinbox(SpinBox(text, fontHeight, to_window_scale(offset), value, minValue, maxValue));
     }
 
-    auto spinbox(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
+    auto spinbox(std::string_view const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
         // A SpinBox's width and height aren't dependent on the region given,
         // so the correct region can be calculated after its creation.
-        auto spinBox = SpinBox(std::move(text), fontHeight, {}, value, minValue, maxValue);
+        auto spinBox = SpinBox(text, fontHeight, {}, value, minValue, maxValue);
 
         auto const windowOffset = to_window_scale(xAlign, yOffset, spinBox.region.w);
         spinBox.region.x = windowOffset.x;
