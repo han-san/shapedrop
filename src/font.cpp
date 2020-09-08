@@ -1,4 +1,5 @@
 #include <string>
+#include <string_view>
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"

@@ -1,4 +1,5 @@
 #include <cassert>
+#include <string_view>
 
 #include "core.hpp"
 
