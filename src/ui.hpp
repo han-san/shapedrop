@@ -96,14 +96,14 @@ namespace UI {
         RIGHT
     };
 
-    auto label(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void;
-    auto label(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset = 0.f) -> void;
-    auto button(std::string text, WindowScale const fontHeight, RelativeScalePoint const pos) -> bool;
-    auto button(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset = 0.f) -> bool;
-    auto spinbox(std::string_view const text, WindowScale const fontHeight, RelativeScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue) -> void;
-    auto spinbox(std::string_view const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset, size_t& value, size_t const minValue, size_t const maxValue) -> void;
-    auto begin_menu(RelativeScaleRect const region, RGBA const color = {}) -> void;
+    auto label(std::string text, WindowScale fontHeight, RelativeScalePoint offset) -> void;
+    auto label(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.f) -> void;
+    auto button(std::string text, WindowScale fontHeight, RelativeScalePoint pos) -> bool;
+    auto button(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.f) -> bool;
+    auto spinbox(std::string_view text, WindowScale fontHeight, RelativeScalePoint offset, size_t& value, size_t minValue, size_t maxValue) -> void;
+    auto spinbox(std::string_view text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset, size_t& value, size_t minValue, size_t maxValue) -> void;
+    auto begin_menu(RelativeScaleRect region, RGBA color = {}) -> void;
     auto end_menu() -> void;
     auto draw(BackBuffer bb) -> void;
-    auto update_state(Message const message) -> void;
+    auto update_state(Message message) -> void;
 }
