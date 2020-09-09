@@ -218,7 +218,7 @@ public:
     RGB color;
     Position pos;
 
-    Shape(Type type);
+    Shape(Type type) noexcept;
 
     // All shapes are composed of 4 blocks.
     size_t static constexpr BLOCK_COUNT = 4;

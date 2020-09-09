@@ -14,9 +14,9 @@ namespace UI {
     class WindowScale {
         float value;
     public:
-        WindowScale() = default;
+        WindowScale() noexcept = default;
         constexpr explicit operator float() const { return value; };
-        constexpr WindowScale(float const from) : value{from} {};
+        constexpr WindowScale(float const from) noexcept : value{from} {};
 
         auto constexpr operator +=(WindowScale const& rhs) -> WindowScale& {
             value += float(rhs);
@@ -51,9 +51,9 @@ namespace UI {
     class RelativeScale {
         float value;
     public:
-        RelativeScale() = default;
+        RelativeScale() noexcept = default;
         constexpr explicit operator float() const { return value; };
-        constexpr RelativeScale(float const from) : value{from} {};
+        constexpr RelativeScale(float const from) noexcept : value{from} {};
 
         auto constexpr operator +=(RelativeScale const& rhs) -> RelativeScale& {
             value += float(rhs);
