@@ -119,7 +119,9 @@ auto get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin
 }
 
 auto calculate_score(ClearType const clearType, int const level) {
-    return clearTypeScores[static_cast<size_t>(clearType)] * level;
+    auto const index = static_cast<std::size_t>(clearType);
+    assert(index < clearTypeScores.size());
+    return clearTypeScores[index] * level;
 }
 
 auto calculate_score(int const rowsCleared, std::optional<TspinType> tspin, int const level) {
