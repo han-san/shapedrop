@@ -100,9 +100,9 @@ struct V4Generic {
 using V2 = V2Generic<int>;
 using V3 = V3Generic<int>;
 using V4 = V4Generic<int>;
-using V2f = V2Generic<float>;
-using V3f = V3Generic<float>;
-using V4f = V4Generic<float>;
+using V2f = V2Generic<double>;
+using V3f = V3Generic<double>;
+using V4f = V4Generic<double>;
 
 using RGB = V3;
 using RGBA = V4;

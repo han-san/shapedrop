@@ -28,7 +28,7 @@ auto init_font(std::string const& fontName) -> bool
     return true;
 }
 
-auto get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, float const scale) -> float
+auto get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, double const scale) -> double
 {
     int advance;
     int lsb;
@@ -36,7 +36,7 @@ auto get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, 
     return scale * (advance + stbtt_GetCodepointKernAdvance(&font, codepoint, nextCodepoint));
 }
 
-FontCharacter::FontCharacter(char const c, float const pixelHeight, char const nextChar)
+FontCharacter::FontCharacter(char const c, double const pixelHeight, char const nextChar)
   : character(c),
     scale(stbtt_ScaleForPixelHeight(&font, pixelHeight)),
     advance(get_codepoint_kern_advance(c, nextChar, scale))
@@ -50,7 +50,7 @@ FontCharacter::~FontCharacter()
     stbtt_FreeBitmap(bitmap, font.userdata); // TODO: find out this actually does
 }
 
-FontString::FontString(std::string_view const string, float const pixelHeight)
+FontString::FontString(std::string_view const string, double const pixelHeight)
 {
     auto w = 0.f;
 
@@ -68,7 +68,7 @@ FontString::FontString(std::string_view const string, float const pixelHeight)
     normalizedW = w / windim.w;
 }
 
-auto FontString::get_text_width(std::string_view const text, float const fontHeight) -> float {
+auto FontString::get_text_width(std::string_view const text, double const fontHeight) -> double {
     auto width = 0.f;
     auto const scale = stbtt_ScaleForPixelHeight(&font, fontHeight);
     auto const size = text.size();
@@ -82,11 +82,11 @@ auto FontString::get_text_width(std::string_view const text, float const fontHei
     return width;
 }
 
-auto FontString::get_text_width_normalized(std::string_view const text, float const fontHeightNormalized) -> float {
+auto FontString::get_text_width_normalized(std::string_view const text, double const fontHeightNormalized) -> double {
     return get_text_width(text, get_window_dimensions().h * fontHeightNormalized);
 }
 
-auto FontString::from_width(std::string_view const string, float const desiredPixelWidth) -> FontString
+auto FontString::from_width(std::string_view const string, double const desiredPixelWidth) -> FontString
 {
     // start with a reasonable pixelheight value
     auto pixelHeight = 12.f;
@@ -106,7 +106,7 @@ auto FontString::from_width(std::string_view const string, float const desiredPi
     return FontString(string, pixelHeight);
 }
 
-auto FontString::from_width_normalized(std::string_view const string, float const desiredWidth) -> FontString
+auto FontString::from_width_normalized(std::string_view const string, double const desiredWidth) -> FontString
 {
     return from_width(string, get_window_dimensions().w * desiredWidth);
 }

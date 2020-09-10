@@ -576,11 +576,11 @@ auto run() -> void
         for (auto y = 0; y < windim.h; ++y) {
             for (auto x = 0; x < windim.w; ++x) {
                 auto color = RGB {
-                    int(Color::maxChannelValue * (float(x) / windim.w)),
-                    int(Color::maxChannelValue * (1 - (float(x) / windim.w) * (float(y) / windim.h))),
-                    int(Color::maxChannelValue * (float(y) / windim.h)),
+                    int(Color::maxChannelValue * (double(x) / windim.w)),
+                    int(Color::maxChannelValue * (1 - (double(x) / windim.w) * (double(y) / windim.h))),
+                    int(Color::maxChannelValue * (double(y) / windim.h)),
                 };
-                draw_solid_square(bb, {float(x), float(y), 1, 1}, color);
+                draw_solid_square(bb, {double(x), double(y), 1, 1}, color);
             }
         }
 
@@ -595,10 +595,10 @@ auto run() -> void
                         auto& block = gameState.board.data[currindex];
                         auto color = block.isActive ? block.color : RGB { 0, 0, 0 };
                         auto square = Squaref {
-                            float((x + gPlayAreaDim.x) * scale),
-                            float((y - 2 + gPlayAreaDim.y) * scale),
-                            float(scale),
-                            float(scale)
+                            double((x + gPlayAreaDim.x) * scale),
+                            double((y - 2 + gPlayAreaDim.y) * scale),
+                            double(scale),
+                            double(scale)
                         };
                         draw_solid_square(bb, square, color);
                     }
@@ -613,10 +613,10 @@ auto run() -> void
                         // don't draw if square is above the playarea
                         if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) continue;
                         auto square = Squaref {
-                            float((position.x + gPlayAreaDim.x) * scale),
-                            float((actualYPosition + gPlayAreaDim.y) * scale),
-                            float(scale),
-                            float(scale)
+                            double((position.x + gPlayAreaDim.x) * scale),
+                            double((actualYPosition + gPlayAreaDim.y) * scale),
+                            double(scale),
+                            double(scale)
                         };
 
                         draw_solid_square(bb, square, shape.color, transparency);
@@ -636,10 +636,10 @@ auto run() -> void
                     shape.pos.y = gSidebarDim.y + ySpacing * i;
                     for (auto& position : shape.get_absolute_block_positions()) {
                         auto square = Squaref {
-                            float((position.x) * scale),
-                            float((position.y) * scale),
-                            float(scale),
-                            float(scale)
+                            double((position.x) * scale),
+                            double((position.y) * scale),
+                            double(scale),
+                            double(scale)
                         };
                         draw_solid_square(bb, square, shape.color);
                     }
@@ -648,10 +648,10 @@ auto run() -> void
 
                 // draw held shape
                 Squaref holdShapeDim{};
-                holdShapeDim.x = gHoldShapeDim.x * float(scale);
-                holdShapeDim.y = gHoldShapeDim.y * float(scale);
-                holdShapeDim.w = gHoldShapeDim.w * float(scale);
-                holdShapeDim.h = gHoldShapeDim.h * float(scale);
+                holdShapeDim.x = gHoldShapeDim.x * double(scale);
+                holdShapeDim.y = gHoldShapeDim.y * double(scale);
+                holdShapeDim.w = gHoldShapeDim.w * double(scale);
+                holdShapeDim.h = gHoldShapeDim.h * double(scale);
                 draw_solid_square(bb, holdShapeDim, {0, 0, 0});
                 if (gameState.holdShape) {
                     auto shape = *gameState.holdShape;
@@ -666,10 +666,10 @@ auto run() -> void
 
                     for (auto& position : shape.get_absolute_block_positions()) {
                         auto square = Squaref {
-                            float((position.x + gHoldShapeDim.x + xOffset) * scale),
-                            float((position.y + gHoldShapeDim.y + yOffset) * scale),
-                            float(scale),
-                            float(scale)
+                            double((position.x + gHoldShapeDim.x + xOffset) * scale),
+                            double((position.y + gHoldShapeDim.y + yOffset) * scale),
+                            double(scale),
+                            double(scale)
                         };
                         draw_solid_square(bb, square, shape.color);
                     }

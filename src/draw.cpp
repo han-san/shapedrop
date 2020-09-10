@@ -5,7 +5,7 @@
 
 #include "draw.hpp"
 
-auto alpha_blend_channel(int const bg, int const fg, int const alpha) -> float
+auto alpha_blend_channel(int const bg, int const fg, int const alpha) -> double
 {
     assert(bg >= 0 && bg <= 255);
     assert(fg >= 0 && fg <= 255);
@@ -53,18 +53,18 @@ auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int 
     }
 }
 
-auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, float const x, float const y) -> void
+auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, double const x, double const y) -> void
 {
     draw_font_string(buf, fontString, int(x * buf.w), int(y * buf.h));
 }
 
-auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int const y, float const pixelHeight) -> void
+auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int const y, double const pixelHeight) -> void
 {
     auto const fontString = FontString::from_height(text, pixelHeight);
     draw_font_string(buf, fontString, x, y);
 }
 
-auto draw_text_normalized(BackBuffer& buf, std::string_view const text, float const x, float const y, float const pixelHeight) -> void
+auto draw_text_normalized(BackBuffer& buf, std::string_view const text, double const x, double const y, double const pixelHeight) -> void
 {
     draw_text(buf, text, int(x * buf.w), int(y * buf.h), pixelHeight * buf.h);
 }

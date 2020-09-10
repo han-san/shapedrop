@@ -46,11 +46,11 @@ auto constexpr gSidebarDim = Square {
     4, (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)
 };
 
-auto constexpr constexpr_round(float const val) -> int {
+auto constexpr constexpr_round(double const val) -> int {
     return int(val + 0.5);
 }
 
-auto constexpr gBaseWindowWidth = constexpr_round(float(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize));
-auto constexpr gBaseWindowHeight = constexpr_round(float(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize));
+auto constexpr gBaseWindowWidth = constexpr_round(double(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize));
+auto constexpr gBaseWindowHeight = constexpr_round(double(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize));
 
 auto run() -> void;
