@@ -530,7 +530,7 @@ auto run() -> void
             }
 
             if (gameState.paused) {
-                UI::begin_menu({0.2f, 0.2f, 0.6f, 0.6f}, {0x00, 0xff, 0xff, 0xff});
+                UI::begin_menu({0.2f, 0.2f, 0.6f, 0.6f}, Color::cyan);
                 UI::label("Paused", 0.06f, UI::XAlignment::CENTER);
                 if (UI::button("Resume", 0.06f, UI::XAlignment::CENTER)) {
                     gameState.paused = false;

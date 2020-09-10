@@ -103,6 +103,7 @@ namespace UI {
     auto spinbox(std::string_view text, WindowScale fontHeight, RelativeScalePoint offset, size_t& value, size_t minValue, size_t maxValue) -> void;
     auto spinbox(std::string_view text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset, size_t& value, size_t minValue, size_t maxValue) -> void;
     auto begin_menu(RelativeScaleRect region, RGBA color = {}) -> void;
+    auto begin_menu(RelativeScaleRect region, RGB color, u8 alpha = Color::Alpha::opaque) -> void;
     auto end_menu() -> void;
     auto draw(BackBuffer bb) -> void;
     auto update_state(Message message) -> void;

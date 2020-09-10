@@ -249,6 +249,10 @@ namespace UI {
         }
     }
 
+    auto begin_menu(RelativeScaleRect const region, RGB const bgColor, u8 const alpha) -> void {
+        begin_menu(region, {bgColor.r, bgColor.g, bgColor.b, alpha});
+    }
+
     auto end_menu() -> void {
         menus.pop_back();
     }
