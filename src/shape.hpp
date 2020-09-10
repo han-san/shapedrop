@@ -6,8 +6,8 @@
 
 class Shape {
 public:
-    size_t static constexpr layoutW {4};
-    size_t static constexpr layoutH {4};
+    std::size_t static constexpr layoutW {4};
+    std::size_t static constexpr layoutH {4};
     using ShapeLayout = std::array<bool, layoutW * layoutH>;
     using RotationMap = std::array<ShapeLayout, 4>;
 
@@ -247,7 +247,7 @@ public:
     Shape(Type type) noexcept;
 
     // All shapes are composed of 4 blocks.
-    size_t static constexpr BLOCK_COUNT {4};
+    std::size_t static constexpr BLOCK_COUNT {4};
     using BlockStack = ArrayStack<Position, BLOCK_COUNT>;
 
     auto get_block_positions() const -> BlockStack;
@@ -257,7 +257,7 @@ public:
 
 class ShapePool {
 public:
-    size_t static constexpr SIZE {7};
+    std::size_t static constexpr SIZE {7};
 private:
     using ShapePoolType = std::array<Shape const*, SIZE>;
     using PreviewStack = ArrayStack<Shape const*, SIZE * 2>;

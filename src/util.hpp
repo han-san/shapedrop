@@ -136,7 +136,7 @@ using Squaref = V4f;
 using Position = V2;
 using Positionf = V2f;
 
-template <typename T, size_t I>
+template <typename T, std::size_t I>
 class ArrayStack {
     using ArrayType = std::array<T, I>;
 public:

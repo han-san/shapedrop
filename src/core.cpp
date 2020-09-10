@@ -131,7 +131,7 @@ enum class LevelType {
 };
 
 LevelType levelType {LevelType::MENU};
-size_t highScore {0};
+std::size_t highScore {0};
 time_t constexpr static lockDelay {CLOCKS_PER_SEC / 2};
 auto constexpr static initialDropDelay {1.0};
 auto constexpr static softDropDelay {0.1};
@@ -156,7 +156,7 @@ auto constexpr gMinLevel {1};
 auto constexpr gMaxLevel {99};
 
 struct MenuState {
-    size_t level {gMinLevel};
+    std::size_t level {gMinLevel};
 };
 MenuState menuState {};
 
@@ -167,15 +167,15 @@ struct GameState {
     // unique to current shape
     time_t dropClock {clock()};
     time_t lockClock {dropClock};
-    size_t droppedRows {0};
-    size_t softDropRowCount {0};
+    std::size_t droppedRows {0};
+    std::size_t softDropRowCount {0};
 
     // shared for all shapes
     bool isSoftDropping {false};
-    size_t linesCleared {0};
-    size_t startingLevel {menuState.level};
-    size_t level {startingLevel};
-    size_t score {0};
+    std::size_t linesCleared {0};
+    std::size_t startingLevel {menuState.level};
+    std::size_t level {startingLevel};
+    std::size_t score {0};
     bool hasHeld {false};
     std::optional<BackToBackType> backToBackType {};
     // Starts at -1 since the first clear advances the counter, but only the
@@ -490,7 +490,7 @@ auto run() -> void
                             } break;
                         }
 
-                        auto clearScore {size_t(calculate_score(clearType, gameState.level) * backToBackModifier)};
+                        auto clearScore {static_cast<std::size_t>(calculate_score(clearType, gameState.level) * backToBackModifier)};
                         gameState.score += clearScore;
 
                         gameState.level = gameState.linesCleared / 10 + gameState.startingLevel;
