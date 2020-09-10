@@ -261,7 +261,7 @@ auto run() -> void
                     }
                 };
 
-                auto rotate_current_shape = [&] (Shape::Rotation rot) {
+                auto rotate_current_shape = [&] (Shape::RotationDirection rot) {
                     // if currentShape is on top of a block before rotation,
                     // the drop clock needs to be reset
                     auto isGrounded = !gameState.board.is_valid_move(gameState.currentShape, {0, 1});
@@ -315,9 +315,9 @@ auto run() -> void
                         gameState.softDropRowCount = 0;
                     }
                 } else if (message.type == Message::Type::ROTATE_LEFT) {
-                    rotate_current_shape(Shape::Rotation::LEFT);
+                    rotate_current_shape(Shape::RotationDirection::LEFT);
                 } else if (message.type == Message::Type::ROTATE_RIGHT) {
-                    rotate_current_shape(Shape::Rotation::RIGHT);
+                    rotate_current_shape(Shape::RotationDirection::RIGHT);
                 } else if (message.type == Message::Type::ROTATE_RIGHT) {
                 } else if (message.type == Message::Type::HOLD) {
                     if (!gameState.hasHeld) {

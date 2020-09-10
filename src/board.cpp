@@ -20,9 +20,9 @@ auto Board::try_move(Shape& shape, V2 const move) const -> bool {
     return false;
 }
 
-auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::optional<Shape::RotationType> {
+auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const -> std::optional<Shape::RotationType> {
     auto rotatingShape = shape;
-    rotatingShape.rotationIndex += dir == Shape::Rotation::RIGHT ? 1 : -1;
+    rotatingShape.rotationIndex += dir == Shape::RotationDirection::RIGHT ? 1 : -1;
     if (rotatingShape.rotationIndex == -1) rotatingShape.rotationIndex = 3;
     else if (rotatingShape.rotationIndex == 4) rotatingShape.rotationIndex = 0;
     if (is_valid_shape(rotatingShape)) {
@@ -43,7 +43,7 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::
         case Shape::Type::Z: {
             switch (shape.rotationIndex) {
                 case 0: {
-                    if (dir == Shape::Rotation::RIGHT) {
+                    if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
                     } else {
                         kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
@@ -54,7 +54,7 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::
                     kicks = { V2 {1, 0}, {1, -1}, {0, 2}, {1, 2} };
                 } break;
                 case 2: {
-                    if (dir == Shape::Rotation::RIGHT) {
+                    if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
                     } else {
                         kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
@@ -69,28 +69,28 @@ auto Board::rotate_shape(Shape& shape, Shape::Rotation const dir) const -> std::
         case Shape::Type::I: {
             switch (shape.rotationIndex) {
                 case 0: {
-                    if (dir == Shape::Rotation::RIGHT) {
+                    if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
                     } else {
                         kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
                     }
                 } break;
                 case 1: {
-                    if (dir == Shape::Rotation::RIGHT) {
+                    if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
                     } else {
                         kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
                     }
                 } break;
                 case 2: {
-                    if (dir == Shape::Rotation::RIGHT) {
+                    if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
                     } else {
                         kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
                     }
                 } break;
                 case 3: {
-                    if (dir == Shape::Rotation::RIGHT) {
+                    if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
                     } else {
                         kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };

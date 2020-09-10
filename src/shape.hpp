@@ -207,7 +207,7 @@ public:
 
     V2 static constexpr dimensions[] = { {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
 
-    enum class Rotation {
+    enum class RotationDirection {
         LEFT,
         RIGHT
     };

@@ -26,7 +26,7 @@ public:
 
     std::array<Block, rows * columns> data;
 
-    auto rotate_shape(Shape& shape, Shape::Rotation dir) const -> std::optional<Shape::RotationType>;
+    auto rotate_shape(Shape& shape, Shape::RotationDirection dir) const -> std::optional<Shape::RotationType>;
     auto try_move(Shape& shape, V2 move) const -> bool;
     auto get_shadow(Shape const& shape) const -> Shape;
     auto check_for_tspin(Shape const& shape, Shape::RotationType rotationType) const -> std::optional<TspinType>;
