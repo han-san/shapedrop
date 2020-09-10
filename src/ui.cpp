@@ -81,23 +81,18 @@ namespace UI {
         auto const y = workingRegion.y + float(yOffset) * workingRegion.h;
         auto const x = [xAlign, workingRegion, width]() {
             switch (xAlign) {
-                case XAlignment::LEFT: {
+                case XAlignment::LEFT:
                     return workingRegion.x;
-                } break;
-                case XAlignment::CENTER: {
+                case XAlignment::CENTER:
                     return workingRegion.x + (workingRegion.w / 2.f) - (width / 2.f);
-                } break;
-                case XAlignment::RIGHT: {
+                case XAlignment::RIGHT:
                     return workingRegion.x + workingRegion.w - width;
-                } break;
-                default: {
-                    // Gotta return something by default even though all valid
-                    // enumerators are handled. Yay C++.
-                    // TODO: @LOG
-                    assert(0);
-                    return workingRegion.x;
-                }
             }
+            // Gotta return something even though all valid
+            // enumerations are handled. Yay C++.
+            // TODO: @LOG
+            assert(0);
+            return workingRegion.x;
         }();
 
         return {x, y};

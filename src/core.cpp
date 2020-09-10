@@ -94,27 +94,23 @@ auto get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin
 
     assert(rowsCleared <= 3); // A t-spin can't clear more than 3 rows.
     switch (rowsCleared) {
-        case 0: {
+        case 0:
             return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI : ClearType::TSPIN;
-        } break;
-        case 1: {
+        case 1:
             return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI_SINGLE : ClearType::TSPIN_SINGLE;
-        } break;
-        case 2: {
+        case 2:
             return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI_DOUBLE : ClearType::TSPIN_DOUBLE;
-        } break;
-        case 3: {
+        case 3:
             // T-spin triple requires a wallkick so there is no
             // distinction between regular and mini (although it's
             // going to be represented internally as a mini).
             return ClearType::TSPIN_TRIPLE;
-        } break;
         default: {
             // Getting here means rowsCleared was above 4 in a release build (BAD).
             auto const errMsg = fmt::format("The amount of rows cleared should be between 0 and 4, but is currently ({})", rowsCleared);
             std::cerr << errMsg; // TODO: Log instead of stderr
             throw std::logic_error(errMsg);
-        } break;
+        }
     }
 }
 
@@ -456,7 +452,10 @@ auto run() -> void
                                     fmt::print(stderr, "Combo {}! {} pts.\n", gameState.comboCounter, comboScore);
                                 }
                             } break;
-                            default: {
+                            // These aren't technically clears and will reset your combo
+                            case ClearType::NONE:
+                            case ClearType::TSPIN:
+                            case ClearType::TSPIN_MINI: {
                                 gameState.comboCounter = -1;
                             } break;
                         }
@@ -675,9 +674,6 @@ auto run() -> void
                         draw_solid_square(bb, square, shape.color);
                     }
                 }
-            } break;
-            default: {
-                assert(false);
             } break;
         }
 

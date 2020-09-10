@@ -45,10 +45,6 @@ Shape::Shape(Type const type) noexcept
             color = RGB(0xa0, 0x00, 0xf0);
             rotations = &TRotationMap;
         } break;
-        default: {
-            // shouldn't be possible
-            assert(false);
-        } break;
     }
 }
 
