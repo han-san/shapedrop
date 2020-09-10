@@ -62,7 +62,7 @@ namespace tests {
 
         boardStart.remove_full_rows();
 
-        for (auto i = 0ul; i < boardStart.data.size(); ++i) {
+        for (size_t i = 0; i < boardStart.data.size(); ++i) {
             assert(boardStart.data[i].isActive == boardEnd.data[i].isActive);
         }
     }

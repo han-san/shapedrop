@@ -97,9 +97,9 @@ namespace UI {
     };
 
     auto label(std::string text, WindowScale fontHeight, RelativeScalePoint offset) -> void;
-    auto label(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.f) -> void;
+    auto label(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> void;
     auto button(std::string text, WindowScale fontHeight, RelativeScalePoint pos) -> bool;
-    auto button(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.f) -> bool;
+    auto button(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> bool;
     auto spinbox(std::string_view text, WindowScale fontHeight, RelativeScalePoint offset, size_t& value, size_t minValue, size_t maxValue) -> void;
     auto spinbox(std::string_view text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset, size_t& value, size_t minValue, size_t maxValue) -> void;
     auto begin_menu(RelativeScaleRect region, RGBA color = {}) -> void;

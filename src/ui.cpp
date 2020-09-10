@@ -45,7 +45,7 @@ namespace UI {
 
     auto static get_current_ui_region() -> WindowScaleRect {
         if (menus.empty()) {
-            return {0.f, 0.f, 1.f, 1.f};
+            return {0., 0., 1., 1.};
         } else {
             // if there is a child, the region's y coordinate should start from
             // where the child's y coordinate ends.
@@ -179,7 +179,7 @@ namespace UI {
 
     // base spinbox function
     auto spinbox(SpinBox spinBox) -> void {
-        auto const buttonWidth = get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) / 2.f;
+        auto const buttonWidth = get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) / 2.;
         auto const decreaseButtonRegion = WindowScaleRect{spinBox.region.x, spinBox.region.y, buttonWidth, spinBox.region.h};
         auto const increaseButtonRegion = WindowScaleRect{spinBox.region.x + buttonWidth, spinBox.region.y, buttonWidth, spinBox.region.h};
         auto const decreaseButtonScreenSpaceRegion = to_screen_space(to_squaref(decreaseButtonRegion));

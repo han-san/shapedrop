@@ -11,7 +11,7 @@ auto alpha_blend_channel(int const bg, int const fg, int const alpha) -> double
     assert(fg >= 0 && fg <= 255);
     assert(alpha >= 0 && alpha <= 255);
 
-    auto const alphaRatio = alpha / 255.f;
+    auto const alphaRatio = alpha / 255.;
     return fg * alphaRatio + bg * (1 - alphaRatio);
 }
 

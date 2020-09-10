@@ -520,7 +520,7 @@ auto run() -> void
             }
 
             {
-                auto const fontSize = 0.048f;
+                auto const fontSize = 0.048;
                 UI::label(fmt::format("Score: {}", gameState.score), fontSize, UI::XAlignment::RIGHT);
 
                 // Round up linesCleared to nearest 10
@@ -530,19 +530,19 @@ auto run() -> void
             }
 
             if (gameState.paused) {
-                UI::begin_menu({0.2f, 0.2f, 0.6f, 0.6f}, Color::cyan);
-                UI::label("Paused", 0.06f, UI::XAlignment::CENTER);
-                if (UI::button("Resume", 0.06f, UI::XAlignment::CENTER)) {
+                UI::begin_menu({0.2, 0.2, 0.6, 0.6}, Color::cyan);
+                UI::label("Paused", 0.06, UI::XAlignment::CENTER);
+                if (UI::button("Resume", 0.06, UI::XAlignment::CENTER)) {
                     gameState.paused = false;
 
                     // TODO: maybe save the amount of clocks left when the game was paused and set them again here.
                     gameState.dropClock = frameStartClock;
                     gameState.lockClock = frameStartClock;
                 }
-                if (UI::button("Main Menu", 0.06f, UI::XAlignment::CENTER)) {
+                if (UI::button("Main Menu", 0.06, UI::XAlignment::CENTER)) {
                     levelType = LevelType::MENU;
                 }
-                if (UI::button("Quit", 0.06f, UI::XAlignment::CENTER)) {
+                if (UI::button("Quit", 0.06, UI::XAlignment::CENTER)) {
                     running = false;
                 }
 
@@ -550,12 +550,12 @@ auto run() -> void
             }
 
         } else if (levelType == LevelType::MENU) {
-            auto const highScoreFontSize = 0.048f;
+            auto const highScoreFontSize = 0.048;
             UI::label(fmt::format("High Score: {}", highScore), highScoreFontSize, UI::XAlignment::RIGHT);
 
-            auto menuY = 1.f / 10.f;
-            auto menuFontSize = 1.f / 10.f;
-            UI::begin_menu({0.f, menuY, 1.f, 1.f - menuY});
+            auto menuY = 1. / 10.;
+            auto menuFontSize = 1. / 10.;
+            UI::begin_menu({0., menuY, 1., 1. - menuY});
             UI::label("ShapeDrop", menuFontSize, UI::XAlignment::CENTER);
             if (UI::button("Play", menuFontSize, UI::XAlignment::CENTER)) {
                 // FIXME: This will cause the game field to render this frame,
@@ -565,7 +565,7 @@ auto run() -> void
                 levelType = LevelType::GAME;
                 gameState.reset();
             }
-            UI::spinbox("Level", menuFontSize / 2.f, UI::XAlignment::CENTER, 0.f, menuState.level, gMinLevel, gMaxLevel);
+            UI::spinbox("Level", menuFontSize / 2., UI::XAlignment::CENTER, 0., menuState.level, gMinLevel, gMaxLevel);
             UI::end_menu();
         }
 
@@ -661,8 +661,8 @@ auto run() -> void
                     auto is_even = [](auto n) { return (n % 2) == 0; };
                     // offset to center shape inside hold square
                     auto shapeDimensions = Shape::dimensions[int(shape.type)];
-                    auto xOffset = is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0f : 0.5f;
-                    auto yOffset = is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0f : 0.5f;
+                    auto xOffset = is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5;
+                    auto yOffset = is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5;
 
                     for (auto& position : shape.get_absolute_block_positions()) {
                         auto square = Squaref {

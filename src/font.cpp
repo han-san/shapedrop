@@ -52,7 +52,7 @@ FontCharacter::~FontCharacter()
 
 FontString::FontString(std::string_view const string, double const pixelHeight)
 {
-    auto w = 0.f;
+    auto w = 0.;
 
     auto const size = string.size();
     data.reserve(size);
@@ -69,7 +69,7 @@ FontString::FontString(std::string_view const string, double const pixelHeight)
 }
 
 auto FontString::get_text_width(std::string_view const text, double const fontHeight) -> double {
-    auto width = 0.f;
+    auto width = 0.;
     auto const scale = stbtt_ScaleForPixelHeight(&font, fontHeight);
     auto const size = text.size();
     for (size_t i = 0; i < size; ++i) {
@@ -89,15 +89,15 @@ auto FontString::get_text_width_normalized(std::string_view const text, double c
 auto FontString::from_width(std::string_view const string, double const desiredPixelWidth) -> FontString
 {
     // start with a reasonable pixelheight value
-    auto pixelHeight = 12.f;
+    auto pixelHeight = 12.;
 
     while (true) {
         auto width = get_text_width(string, pixelHeight);
 
         if (width > desiredPixelWidth) {
-            pixelHeight -= 1.f;
-        } else if (width < desiredPixelWidth - 2.f) {
-            pixelHeight += 1.f;
+            pixelHeight -= 1.;
+        } else if (width < desiredPixelWidth - 2.) {
+            pixelHeight += 1.;
         } else {
             break;
         }
