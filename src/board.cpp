@@ -28,80 +28,10 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
         return Shape::RotationType::REGULAR;
     }
 
-    std::array<V2, 4> kicks = {};
-
-    // Do wall kicks to see if valid. Shapes J, L, S, T, and Z all have the same wall kicks while I has its own.
-    switch (shape.type) {
-        case Shape::Type::J:
-        case Shape::Type::L:
-        case Shape::Type::S:
-        case Shape::Type::T:
-        case Shape::Type::Z: {
-            switch (shape.rotation) {
-                case Shape::Rotation::r0: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
-                    } else {
-                        kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
-                    }
-                } break;
-                case Shape::Rotation::r90: {
-                    // both directions check same positions
-                    kicks = { V2 {1, 0}, {1, -1}, {0, 2}, {1, 2} };
-                } break;
-                case Shape::Rotation::r180: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
-                    } else {
-                        kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
-                    }
-                } break;
-                case Shape::Rotation::r270: {
-                    // both directions check same positions
-                    kicks = { V2 {-1, 0}, {-1, -1}, {0, 2}, {-1, 2} };
-                } break;
-            }
-        } break;
-        case Shape::Type::I: {
-            switch (shape.rotation) {
-                case Shape::Rotation::r0: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
-                    } else {
-                        kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
-                    }
-                } break;
-                case Shape::Rotation::r90: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
-                    } else {
-                        kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
-                    }
-                } break;
-                case Shape::Rotation::r180: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
-                    } else {
-                        kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
-                    }
-                } break;
-                case Shape::Rotation::r270: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
-                    } else {
-                        kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
-                    }
-                } break;
-            }
-        } break;
-        case Shape::Type::O: {
-            // should have already returned true in the is_valid() check
-            assert(false);
-        } break;
-    }
-
-    for (auto const kickMove : kicks) {
-        // rotatingShape has the new rotation and has to reset its position every time it checks a new kick.
+    // Something is blocking the shape after just rotating it, so it has to be
+    // kicked into a valid position if possible.
+    for (auto const kickMove : shape.get_wallkicks(dir)) {
+        // rotatingShape already has the new rotation, but has to reset its position every time it checks a new kick.
         rotatingShape.pos = shape.pos;
         rotatingShape.pos.x += kickMove.x;
         // the y in kicks is bottom up while it's top down for the shape position

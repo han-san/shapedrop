@@ -252,6 +252,7 @@ public:
 
     auto get_block_positions() const -> BlockStack;
     auto get_absolute_block_positions() const -> BlockStack;
+    auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
 };
 
 class ShapePool {
