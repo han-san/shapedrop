@@ -19,38 +19,39 @@ Shape::Shape(Type const type) noexcept
     switch (type) {
         case Type::I: {
             color = RGB(0x00, 0xf0, 0xf0);
-            rotations = &IRotationMap;
+            rotationMap = &IRotationMap;
         } break;
         case Type::O: {
             color = RGB(0xf0, 0xf0, 0x00);
-            rotations = &ORotationMap;
+            rotationMap = &ORotationMap;
         } break;
         case Type::L: {
             color = RGB(0xf0, 0xa0, 0x00);
-            rotations = &LRotationMap;
+            rotationMap = &LRotationMap;
         } break;
         case Type::J: {
             color = RGB(0x00, 0x00, 0xf0);
-            rotations = &JRotationMap;
+            rotationMap = &JRotationMap;
         } break;
         case Type::S: {
             color = RGB(0x00, 0xf0, 0x00);
-            rotations = &SRotationMap;
+            rotationMap = &SRotationMap;
         } break;
         case Type::Z: {
             color = RGB(0xf0, 0x00, 0x00);
-            rotations = &ZRotationMap;
+            rotationMap = &ZRotationMap;
         } break;
         case Type::T: {
             color = RGB(0xa0, 0x00, 0xf0);
-            rotations = &TRotationMap;
+            rotationMap = &TRotationMap;
         } break;
     }
 }
 
 auto Shape::get_block_positions() const -> BlockStack {
     BlockStack positions = {};
-    auto const& layout = (*rotations)[rotationIndex];
+    auto const rotationIndex = static_cast<RotationMap::size_type>(rotation);
+    auto const& layout = (*rotationMap)[rotationIndex];
     for (size_t y = 0; y < layoutH; ++y) {
         for (size_t x = 0; x < layoutW; ++x) {
             auto const index = y * layoutW + x;

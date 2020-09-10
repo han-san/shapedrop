@@ -212,9 +212,35 @@ public:
         RIGHT
     };
 
+    enum class Rotation {
+        r0, r90, r180, r270
+    };
+
+    auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) -> Rotation& {
+        auto constexpr minRotationValue = static_cast<int>(Rotation::r0);
+        auto constexpr maxRotationValue = static_cast<int>(Rotation::r270);
+        auto rotationInt = static_cast<int>(rotationEnum);
+        switch (direction) {
+            case RotationDirection::LEFT: {
+                --rotationInt;
+                if (rotationInt < minRotationValue) {
+                    rotationInt = maxRotationValue;
+                }
+            } break;
+            case RotationDirection::RIGHT: {
+                ++rotationInt;
+                if (rotationInt > maxRotationValue) {
+                    rotationInt = minRotationValue;
+                }
+            } break;
+        }
+        rotationEnum = static_cast<Rotation>(rotationInt);
+        return rotationEnum;
+    }
+
     Type type;
-    RotationMap const* rotations = nullptr;
-    int rotationIndex = 0;
+    RotationMap const* rotationMap = nullptr;
+    Rotation rotation = Rotation::r0;
     RGB color;
     Position pos;
 

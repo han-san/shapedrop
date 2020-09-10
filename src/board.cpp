@@ -22,74 +22,70 @@ auto Board::try_move(Shape& shape, V2 const move) const -> bool {
 
 auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const -> std::optional<Shape::RotationType> {
     auto rotatingShape = shape;
-    rotatingShape.rotationIndex += dir == Shape::RotationDirection::RIGHT ? 1 : -1;
-    if (rotatingShape.rotationIndex == -1) rotatingShape.rotationIndex = 3;
-    else if (rotatingShape.rotationIndex == 4) rotatingShape.rotationIndex = 0;
+    rotatingShape.rotation += dir;
     if (is_valid_shape(rotatingShape)) {
-        // only rotationindex should have changed
-        shape = rotatingShape;
+        shape.rotation = rotatingShape.rotation;
         return Shape::RotationType::REGULAR;
     }
 
     std::array<V2, 4> kicks = {};
 
     // Do wall kicks to see if valid. Shapes J, L, S, T, and Z all have the same wall kicks while I has its own.
-    assert(shape.rotationIndex >= 0 && shape.rotationIndex < 4);
     switch (shape.type) {
         case Shape::Type::J:
         case Shape::Type::L:
         case Shape::Type::S:
         case Shape::Type::T:
         case Shape::Type::Z: {
-            switch (shape.rotationIndex) {
-                case 0: {
+            switch (shape.rotation) {
+                case Shape::Rotation::r0: {
                     if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
                     } else {
                         kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
                     }
                 } break;
-                case 1: {
+                case Shape::Rotation::r90: {
                     // both directions check same positions
                     kicks = { V2 {1, 0}, {1, -1}, {0, 2}, {1, 2} };
                 } break;
-                case 2: {
+                case Shape::Rotation::r180: {
                     if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
                     } else {
                         kicks = { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
                     }
                 } break;
-                case 3: {
+                case Shape::Rotation::r270: {
                     // both directions check same positions
                     kicks = { V2 {-1, 0}, {-1, -1}, {0, 2}, {-1, 2} };
                 } break;
             }
         } break;
         case Shape::Type::I: {
-            switch (shape.rotationIndex) {
-                case 0: {
+            switch (shape.rotation) {
+                case Shape::Rotation::r0: {
                     if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
                     } else {
                         kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
                     }
                 } break;
-                case 1: {
+                case Shape::Rotation::r90: {
                     if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
                     } else {
                         kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
                     }
                 } break;
-                case 2: {
+                case Shape::Rotation::r180: {
                     if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
                     } else {
                         kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
                     }
                 } break;
-                case 3: {
+                case Shape::Rotation::r270: {
                     if (dir == Shape::RotationDirection::RIGHT) {
                         kicks = { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
                     } else {
@@ -105,7 +101,7 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
     }
 
     for (auto const kickMove : kicks) {
-        // rotatingShape has the new rotationIndex and has to reset its position every time it checks a new kick.
+        // rotatingShape has the new rotation and has to reset its position every time it checks a new kick.
         rotatingShape.pos = shape.pos;
         rotatingShape.pos.x += kickMove.x;
         // the y in kicks is bottom up while it's top down for the shape position
