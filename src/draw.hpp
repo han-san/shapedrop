@@ -7,12 +7,12 @@
 #include "util.hpp"
 
 auto inline to_screen_space(Squaref const square) -> Squaref {
-    auto const dim = get_window_dimensions();
+    auto const dim {get_window_dimensions()};
     return { square.x * dim.w, square.y * dim.h, square.w * dim.w, square.h * dim.h };
 }
 
 auto inline to_normalized(Squaref const square) -> Squaref {
-    auto const dim = get_window_dimensions();
+    auto const dim {get_window_dimensions()};
     return { square.x / dim.w, square.y / dim.h, square.w / dim.w, square.h / dim.h };
 }
 

@@ -16,8 +16,8 @@ using namespace std::string_literals;
 
 namespace UI {
 
-    auto static cursor = Positionf{};
-    auto static clicked = false;
+    Positionf static cursor {};
+    auto static clicked {false};
 
     struct TextInfo {
         std::string text;
@@ -25,19 +25,19 @@ namespace UI {
         WindowScale x;
         WindowScale y;
     };
-    auto static textToDraw = std::vector<TextInfo>{};
+    std::vector<TextInfo> static textToDraw {};
 
     struct Menu {
         WindowScaleRect region;
         std::vector<WindowScaleRect> children;
     };
-    auto static menus = std::vector<Menu>{};
+    std::vector<Menu> static menus {};
 
     struct Background {
         WindowScaleRect region;
         RGBA color;
     };
-    auto static backgrounds = std::vector<Background>{};
+    std::vector<Background> static backgrounds {};
 
     auto static to_squaref(WindowScaleRect const rect) -> Squaref {
         return {double(rect.x), double(rect.y), double(rect.w), double(rect.h)};
@@ -49,10 +49,10 @@ namespace UI {
         } else {
             // if there is a child, the region's y coordinate should start from
             // where the child's y coordinate ends.
-            auto const& menu = menus.back();
-            auto currentRegion = menu.region;
+            auto const& menu {menus.back()};
+            auto currentRegion {menu.region};
             if (!menu.children.empty()) {
-                auto const& child = menu.children.back();
+                auto const& child {menu.children.back()};
                 currentRegion.y = child.y + child.h;
                 currentRegion.h = menu.region.h - (currentRegion.y - menu.region.y);
             }
@@ -61,24 +61,24 @@ namespace UI {
     }
 
     auto static to_window_scale(RelativeScalePoint const offset) -> WindowScalePoint {
-        auto const workingRegion = get_current_ui_region();
-        auto const x = workingRegion.x + double(offset.x) * workingRegion.w;
-        auto const y = workingRegion.y + double(offset.y) * workingRegion.h;
+        auto const workingRegion {get_current_ui_region()};
+        auto const x {workingRegion.x + double(offset.x) * workingRegion.w};
+        auto const y {workingRegion.y + double(offset.y) * workingRegion.h};
         return {x, y};
     }
 
     auto static to_window_scale(RelativeScaleRect const region) -> WindowScaleRect {
-        auto const workingRegion = get_current_ui_region();
-        auto const x = workingRegion.x + double(region.x) * workingRegion.w;
-        auto const y = workingRegion.y + double(region.y) * workingRegion.h;
-        auto const w = double(region.w) * workingRegion.w;
-        auto const h = double(region.h) * workingRegion.h;
+        auto const workingRegion {get_current_ui_region()};
+        auto const x {workingRegion.x + double(region.x) * workingRegion.w};
+        auto const y {workingRegion.y + double(region.y) * workingRegion.h};
+        auto const w {double(region.w) * workingRegion.w};
+        auto const h {double(region.h) * workingRegion.h};
         return {x, y, w, h};
     }
 
     auto static to_window_scale(XAlignment const xAlign, RelativeScale const yOffset, WindowScale const width) -> WindowScalePoint {
-        auto const workingRegion = get_current_ui_region();
-        auto const y = workingRegion.y + double(yOffset) * workingRegion.h;
+        auto const workingRegion {get_current_ui_region()};
+        auto const y {workingRegion.y + double(yOffset) * workingRegion.h};
         auto const x = [xAlign, workingRegion, width]() {
             switch (xAlign) {
                 case XAlignment::LEFT:
@@ -115,17 +115,17 @@ namespace UI {
     }
 
     auto label(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> void {
-        auto const textWidth = get_text_window_scale_width(text, fontHeight);
-        auto const windowOffset = to_window_scale(xAlign, yOffset, textWidth);
-        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
+        auto const textWidth {get_text_window_scale_width(text, fontHeight)};
+        auto const windowOffset {to_window_scale(xAlign, yOffset, textWidth)};
+        auto const region {WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight}};
 
         label(std::move(text), region);
     }
 
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
     auto label(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void {
-        auto const windowOffset = to_window_scale(offset);
-        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, 0, fontHeight};
+        auto const windowOffset {to_window_scale(offset)};
+        auto const region {WindowScaleRect{windowOffset.x, windowOffset.y, 0, fontHeight}};
 
         label(std::move(text), region);
     }
@@ -133,23 +133,23 @@ namespace UI {
     auto static button(std::string text, WindowScaleRect const region) -> bool {
         label(std::move(text), region);
 
-        auto const screenSpaceRegion = to_screen_space(to_squaref(region));
+        auto const screenSpaceRegion {to_screen_space(to_squaref(region))};
         return clicked && point_is_in_rect(cursor, screenSpaceRegion);
     }
 
     auto button(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> bool {
-        auto const textWidth = get_text_window_scale_width(text, fontHeight);
-        auto const windowOffset = to_window_scale(xAlign, yOffset, textWidth);
-        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
+        auto const textWidth {get_text_window_scale_width(text, fontHeight)};
+        auto const windowOffset {to_window_scale(xAlign, yOffset, textWidth)};
+        WindowScaleRect const region {windowOffset.x, windowOffset.y, textWidth, fontHeight};
 
         return button(std::move(text), region);
     }
 
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
     auto button(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset) -> bool {
-        auto const textWidth = get_text_window_scale_width(text, fontHeight);
-        auto const windowOffset = to_window_scale(offset);
-        auto const region = WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight};
+        auto const textWidth {get_text_window_scale_width(text, fontHeight)};
+        auto const windowOffset {to_window_scale(offset)};
+        WindowScaleRect const region {windowOffset.x, windowOffset.y, textWidth, fontHeight};
 
         return button(std::move(text), region);
     }
@@ -161,7 +161,7 @@ namespace UI {
         size_t minValue;
         WindowScaleRect region;
 
-        std::string_view static constexpr buttonsString = "<>";
+        std::string_view static constexpr buttonsString {"<>"};
 
         SpinBox(std::string_view const name, WindowScale const fontHeight, WindowScalePoint const offset, size_t& value, size_t const minValue, size_t const maxValue)
             : value{value},
@@ -169,9 +169,9 @@ namespace UI {
             minValue{minValue},
             text{fmt::format("{} {}: ", buttonsString, name)}
         {
-            auto const textWidth = get_text_window_scale_width(text, fontHeight);
-            auto const maxValueWidth = get_text_window_scale_width(std::to_string(maxValue), fontHeight);
-            auto const fullTextWidth = textWidth + maxValueWidth;
+            auto const textWidth {get_text_window_scale_width(text, fontHeight)};
+            auto const maxValueWidth {get_text_window_scale_width(std::to_string(maxValue), fontHeight)};
+            auto const fullTextWidth {textWidth + maxValueWidth};
 
             region = WindowScaleRect{offset.x, offset.y, fullTextWidth, fontHeight};
         }
@@ -179,11 +179,11 @@ namespace UI {
 
     // base spinbox function
     auto spinbox(SpinBox spinBox) -> void {
-        auto const buttonWidth = get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) / 2.;
-        auto const decreaseButtonRegion = WindowScaleRect{spinBox.region.x, spinBox.region.y, buttonWidth, spinBox.region.h};
-        auto const increaseButtonRegion = WindowScaleRect{spinBox.region.x + buttonWidth, spinBox.region.y, buttonWidth, spinBox.region.h};
-        auto const decreaseButtonScreenSpaceRegion = to_screen_space(to_squaref(decreaseButtonRegion));
-        auto const increaseButtonScreenSpaceRegion = to_screen_space(to_squaref(increaseButtonRegion));
+        auto const buttonWidth {get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) / 2.};
+        WindowScaleRect const decreaseButtonRegion {spinBox.region.x, spinBox.region.y, buttonWidth, spinBox.region.h};
+        WindowScaleRect const increaseButtonRegion {spinBox.region.x + buttonWidth, spinBox.region.y, buttonWidth, spinBox.region.h};
+        auto const decreaseButtonScreenSpaceRegion {to_screen_space(to_squaref(decreaseButtonRegion))};
+        auto const increaseButtonScreenSpaceRegion {to_screen_space(to_squaref(increaseButtonRegion))};
 
         if (clicked) {
             if (point_is_in_rect(cursor, decreaseButtonScreenSpaceRegion)) {
@@ -204,9 +204,9 @@ namespace UI {
     auto spinbox(std::string_view const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset, size_t& value, size_t const minValue, size_t const maxValue) -> void {
         // A SpinBox's width and height aren't dependent on the region given,
         // so the correct region can be calculated after its creation.
-        auto spinBox = SpinBox(text, fontHeight, {}, value, minValue, maxValue);
+        SpinBox spinBox(text, fontHeight, {}, value, minValue, maxValue);
 
-        auto const windowOffset = to_window_scale(xAlign, yOffset, spinBox.region.w);
+        auto const windowOffset {to_window_scale(xAlign, yOffset, spinBox.region.w)};
         spinBox.region.x = windowOffset.x;
         spinBox.region.y = windowOffset.y;
 
@@ -239,7 +239,7 @@ namespace UI {
     }
 
     auto begin_menu(RelativeScaleRect const region, RGBA const bgColor) -> void {
-        auto const regionRelativeToWindow = to_window_scale(region);
+        auto const regionRelativeToWindow {to_window_scale(region)};
         add_region_as_child_of_current_menu(regionRelativeToWindow);
         menus.push_back({regionRelativeToWindow, {}});
 

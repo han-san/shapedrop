@@ -50,12 +50,12 @@ Shape::Shape(Type const type) noexcept
 }
 
 auto Shape::get_block_positions() const -> BlockStack {
-    BlockStack positions = {};
-    auto const rotationIndex = static_cast<RotationMap::size_type>(rotation);
-    auto const& layout = (*rotationMap)[rotationIndex];
-    for (size_t y = 0; y < layoutH; ++y) {
-        for (size_t x = 0; x < layoutW; ++x) {
-            auto const index = y * layoutW + x;
+    BlockStack positions {};
+    auto const rotationIndex {static_cast<RotationMap::size_type>(rotation)};
+    auto const& layout {(*rotationMap)[rotationIndex]};
+    for (size_t y {0}; y < layoutH; ++y) {
+        for (size_t x {0}; x < layoutW; ++x) {
+            auto const index {y * layoutW + x};
             if (layout[index]) {
                 positions.push_back({int(x), int(y)});
                 if (positions.size() == positions.max_size()) {
@@ -68,7 +68,7 @@ auto Shape::get_block_positions() const -> BlockStack {
 }
 
 auto Shape::get_absolute_block_positions() const -> BlockStack {
-    auto positions = get_block_positions();
+    auto positions {get_block_positions()};
     for (auto& position : positions) {
         position.x += pos.x;
         position.y += pos.y;
@@ -80,7 +80,7 @@ auto Shape::get_wallkicks(Shape::RotationDirection const dir) const -> std::arra
     // Shapes J, L, S, T, and Z all have the same wall kicks while I has its
     // own and O can't kick since it doesn't rotate at all.
 
-    auto static constexpr JLSTZKicks = std::array {
+    std::array static constexpr JLSTZKicks {
         // r0
         std::array {
             // left
@@ -107,7 +107,7 @@ auto Shape::get_wallkicks(Shape::RotationDirection const dir) const -> std::arra
         }
     };
 
-    auto static constexpr IKicks = std::array {
+    std::array static constexpr IKicks {
         std::array {
             std::array { V2 {-1, 0}, V2 {2, 0}, V2 {-1, 2}, V2 {2, -1} },
             std::array { V2 {-2, 0}, V2 {1, 0}, V2 {-2, -1}, V2 {1, 2} },
@@ -126,8 +126,8 @@ auto Shape::get_wallkicks(Shape::RotationDirection const dir) const -> std::arra
         },
     };
 
-    auto const i = static_cast<std::size_t>(rotation);
-    auto const j = static_cast<std::size_t>(dir);
+    auto const i {static_cast<std::size_t>(rotation)};
+    auto const j {static_cast<std::size_t>(dir)};
 
     switch (type) {
         case Shape::Type::J:
@@ -199,7 +199,7 @@ auto ShapePool::current_shape() const -> Shape
 auto ShapePool::get_preview_shapes_array() const -> PreviewStack
 {
     PreviewStack lookaheadArray;
-    for (auto it = currentShapeIterator + 1; it != shapePool.end(); ++it) {
+    for (auto it {currentShapeIterator + 1}; it != shapePool.end(); ++it) {
         lookaheadArray.push_back(*it);
     }
     for (auto const& shapePointer : previewPool) {

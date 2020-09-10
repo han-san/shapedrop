@@ -10,7 +10,7 @@
 
 struct Block {
     RGB color;
-    bool isActive = false;
+    bool isActive {false};
 };
 
 enum class TspinType {
@@ -20,9 +20,9 @@ enum class TspinType {
 
 class Board {
 public:
-    int static constexpr rows = 22;
-    int static constexpr columns = 10;
-    int static constexpr visibleRows = rows - 2;
+    int static constexpr rows {22};
+    int static constexpr columns {10};
+    int static constexpr visibleRows {rows - 2};
 
     std::array<Block, rows * columns> data;
 

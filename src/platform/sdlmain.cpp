@@ -11,13 +11,13 @@
 
 namespace platform::SDL {
 
-auto windowScale = 1;
+auto windowScale {1};
 
 struct {
     SDL_Window* handle;
     SDL_Surface* surface;
     SDL_Surface* bbSurface;
-} window = {};
+} window {};
 
 auto get_window_scale() -> int
 {
@@ -69,7 +69,7 @@ auto swap_buffer() -> void
 }
 
 auto window_fits_on_screen(V2 windowDimensions) -> bool {
-    SDL_Rect displayBounds = {};
+    SDL_Rect displayBounds {};
     SDL_GetDisplayUsableBounds(0, &displayBounds);
 
     return windowDimensions.w < displayBounds.w && windowDimensions.h < displayBounds.h;
@@ -77,7 +77,7 @@ auto window_fits_on_screen(V2 windowDimensions) -> bool {
 
 auto handle_input() -> Message
 {
-    auto msg = Message {};
+    Message msg {};
     SDL_Event e;
     if (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) {
@@ -142,9 +142,9 @@ auto handle_input() -> Message
 auto init_window() {
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    auto newScale = windowScale;
+    auto newScale {windowScale};
     {
-        auto dim = V2 {};
+        V2 dim {};
         do {
             ++newScale;
             dim = V2 {gBaseWindowWidth * newScale, gBaseWindowHeight * newScale};
@@ -152,8 +152,8 @@ auto init_window() {
     }
     --newScale;
     windowScale = newScale;
-    auto const initialWindowWidth = gBaseWindowWidth * windowScale;
-    auto const initialWindowHeight = gBaseWindowHeight * windowScale;
+    auto const initialWindowWidth {gBaseWindowWidth * windowScale};
+    auto const initialWindowHeight {gBaseWindowHeight * windowScale};
 
     window.handle = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,

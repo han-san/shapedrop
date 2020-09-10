@@ -7,11 +7,11 @@
 template <typename T>
 struct V2Generic {
     union {
-        T w = 0;
+        T w {0};
         T x;
     };
     union {
-        T h = 0;
+        T h {0};
         T y;
     };
 
@@ -33,15 +33,15 @@ struct V2Generic {
 template <typename T>
 struct V3Generic {
     union {
-        T x = 0;
+        T x {0};
         T r;
     };
     union {
-        T y = 0;
+        T y {0};
         T g;
     };
     union {
-        T z = 0;
+        T z {0};
         T b;
     };
 
@@ -64,19 +64,19 @@ struct V3Generic {
 template <typename T>
 struct V4Generic {
     union {
-        T x = 0;
+        T x {0};
         T r;
     };
     union {
-        T y = 0;
+        T y {0};
         T g;
     };
     union {
-        T w = 0;
+        T w {0};
         T b;
     };
     union {
-        T h = 0;
+        T h {0};
         T a;
     };
 
@@ -169,7 +169,7 @@ public:
 
 private:
     ArrayType m_data;
-    size_type m_size = 0;
+    size_type m_size {0};
 };
 
 auto inline point_is_in_rect(Positionf const point, Squaref const rect) {

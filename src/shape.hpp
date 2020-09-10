@@ -6,12 +6,12 @@
 
 class Shape {
 public:
-    size_t static constexpr layoutW = 4;
-    size_t static constexpr layoutH = 4;
+    size_t static constexpr layoutW {4};
+    size_t static constexpr layoutH {4};
     using ShapeLayout = std::array<bool, layoutW * layoutH>;
     using RotationMap = std::array<ShapeLayout, 4>;
 
-    RotationMap static constexpr IRotationMap = {
+    RotationMap static constexpr IRotationMap {
         ShapeLayout {
             0, 0, 0, 0,
             1, 1, 1, 1,
@@ -37,7 +37,7 @@ public:
             0, 1, 0, 0,
         },
     };
-    RotationMap static constexpr LRotationMap = {
+    RotationMap static constexpr LRotationMap {
         ShapeLayout {
             0, 0, 1, 0,
             1, 1, 1, 0,
@@ -63,7 +63,7 @@ public:
             0, 0, 0, 0,
         },
     };
-    RotationMap static constexpr JRotationMap = {
+    RotationMap static constexpr JRotationMap {
         ShapeLayout {
             1, 0, 0, 0,
             1, 1, 1, 0,
@@ -89,7 +89,7 @@ public:
             0, 0, 0, 0,
         },
     };
-    RotationMap static constexpr ORotationMap = {
+    RotationMap static constexpr ORotationMap {
         ShapeLayout {
             0, 1, 1, 0,
             0, 1, 1, 0,
@@ -115,7 +115,7 @@ public:
             0, 0, 0, 0,
         },
     };
-    RotationMap static constexpr SRotationMap = {
+    RotationMap static constexpr SRotationMap {
         ShapeLayout {
             0, 1, 1, 0,
             1, 1, 0, 0,
@@ -141,7 +141,7 @@ public:
             0, 0, 0, 0,
         },
     };
-    RotationMap static constexpr ZRotationMap = {
+    RotationMap static constexpr ZRotationMap {
         ShapeLayout {
             1, 1, 0, 0,
             0, 1, 1, 0,
@@ -167,7 +167,7 @@ public:
             0, 0, 0, 0,
         },
     };
-    RotationMap static constexpr TRotationMap = {
+    RotationMap static constexpr TRotationMap {
         ShapeLayout {
             0, 1, 0, 0,
             1, 1, 1, 0,
@@ -205,7 +205,7 @@ public:
         I, O, L, J, S, Z, T
     };
 
-    V2 static constexpr dimensions[] = { {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
+    std::array<V2, 7> static constexpr dimensions { V2 {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
 
     enum class RotationDirection {
         LEFT,
@@ -217,9 +217,9 @@ public:
     };
 
     auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) -> Rotation& {
-        auto constexpr minRotationValue = static_cast<int>(Rotation::r0);
-        auto constexpr maxRotationValue = static_cast<int>(Rotation::r270);
-        auto rotationInt = static_cast<int>(rotationEnum);
+        auto constexpr minRotationValue {static_cast<int>(Rotation::r0)};
+        auto constexpr maxRotationValue {static_cast<int>(Rotation::r270)};
+        auto rotationInt {static_cast<int>(rotationEnum)};
         switch (direction) {
             case RotationDirection::LEFT: {
                 --rotationInt;
@@ -239,15 +239,15 @@ public:
     }
 
     Type type;
-    RotationMap const* rotationMap = nullptr;
-    Rotation rotation = Rotation::r0;
+    RotationMap const* rotationMap {nullptr};
+    Rotation rotation {Rotation::r0};
     RGB color;
     Position pos;
 
     Shape(Type type) noexcept;
 
     // All shapes are composed of 4 blocks.
-    size_t static constexpr BLOCK_COUNT = 4;
+    size_t static constexpr BLOCK_COUNT {4};
     using BlockStack = ArrayStack<Position, BLOCK_COUNT>;
 
     auto get_block_positions() const -> BlockStack;
@@ -257,7 +257,7 @@ public:
 
 class ShapePool {
 public:
-    size_t static constexpr SIZE = 7;
+    size_t static constexpr SIZE {7};
 private:
     using ShapePoolType = std::array<Shape const*, SIZE>;
     using PreviewStack = ArrayStack<Shape const*, SIZE * 2>;

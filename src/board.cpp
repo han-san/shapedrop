@@ -5,7 +5,7 @@
 #include "board.hpp"
 
 auto Board::get_shadow(Shape const& shape) const -> Shape {
-    auto shapeShadow = shape;
+    auto shapeShadow {shape};
     while (is_valid_move(shapeShadow, {0, 1})) {
         ++shapeShadow.pos.y;
     }
@@ -21,7 +21,7 @@ auto Board::try_move(Shape& shape, V2 const move) const -> bool {
 }
 
 auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const -> std::optional<Shape::RotationType> {
-    auto rotatingShape = shape;
+    auto rotatingShape {shape};
     rotatingShape.rotation += dir;
     if (is_valid_shape(rotatingShape)) {
         shape.rotation = rotatingShape.rotation;
@@ -49,7 +49,7 @@ auto Board::is_valid_spot(Position const pos) const -> bool {
     if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
         return false;
     } else {
-        auto const index = pos.y * columns + pos.x;
+        auto const index {pos.y * columns + pos.x};
         return !data[index].isActive;
     }
 }
@@ -73,8 +73,8 @@ auto Board::is_valid_shape(Shape const& shape) const -> bool {
 // was a wallkick it only counts as a T-spin mini.
 auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotationType) const -> std::optional<TspinType> {
     if (shape.type == Shape::Type::T) {
-        V2 const cornerOffsets[] = {{0, 0}, {2, 0}, {0, 2}, {2, 2}};
-        auto cornersOccupied = 0;
+        std::array<V2, 4> static constexpr cornerOffsets {V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
+        auto cornersOccupied {0};
         for (auto const offset : cornerOffsets) {
             cornersOccupied += !is_valid_spot(shape.pos + offset);
         }
@@ -90,10 +90,10 @@ auto Board::remove_full_rows() -> int {
     // a maximum of 4 rows can be cleared at once with default shapes
     ArrayStack<int, 4> rowsCleared;
 
-    for (auto y = 0; y < rows; ++y) {
-        auto rowIsFull = true;
-        for (auto x = 0; x < columns; ++x) {
-            auto const boardIndex = y * columns + x;
+    for (auto y {0}; y < rows; ++y) {
+        auto rowIsFull {true};
+        for (auto x {0}; x < columns; ++x) {
+            auto const boardIndex {y * columns + x};
             if (!data[boardIndex].isActive) {
                 rowIsFull = false;
                 break;
@@ -111,20 +111,20 @@ auto Board::remove_full_rows() -> int {
 
     // remove rows
     for (auto const y : rowsCleared) {
-        for (auto x = 0; x < columns; ++x) {
-            auto const index = y * columns + x;
+        for (auto x {0}; x < columns; ++x) {
+            auto const index {y * columns + x};
             data[index].isActive = false;
         }
     }
 
     auto move_row_down = [this](int const rowNumber, int const distance) {
         assert(distance > 0);
-        for (auto x = 0; x < columns; ++x) {
-            auto const index = rowNumber * columns + x;
-            auto const newIndex = (rowNumber + distance) * columns + x;
+        for (auto x {0}; x < columns; ++x) {
+            auto const index {rowNumber * columns + x};
+            auto const newIndex {(rowNumber + distance) * columns + x};
             assert((rowNumber + distance) < rows);
-            auto& oldBlock = this->data[index];
-            auto& newBlock = this->data[newIndex];
+            auto& oldBlock {this->data[index]};
+            auto& newBlock {this->data[newIndex]};
             newBlock = oldBlock;
             oldBlock.isActive = false;
         }
@@ -135,15 +135,15 @@ auto Board::remove_full_rows() -> int {
 
     // first move any potential rows between the cleared ones
     if (rowsCleared.size() == 2 || rowsCleared.size() == 3) {
-        auto const topRow = rowsCleared.front();
-        auto const botRow = rowsCleared.back();
+        auto const topRow {rowsCleared.front()};
+        auto const botRow {rowsCleared.back()};
         assert(topRow >= 0 && topRow < rows);
         assert(botRow >= 0 && botRow < rows);
         assert(botRow >= topRow);
 
-        auto emptyRowsPassed = 0;
-        for (auto y = botRow; y != topRow; --y) {
-            auto found = false;
+        auto emptyRowsPassed {0};
+        for (auto y {botRow}; y != topRow; --y) {
+            auto found {false};
             for (auto const row : rowsCleared) {
                 if (row == y) {
                     found = true;
@@ -161,7 +161,7 @@ auto Board::remove_full_rows() -> int {
     }
 
     // then move all rows above removed rows
-    for (auto y = rowsCleared.front() - 1; y >= 0; --y) {
+    for (auto y {rowsCleared.front() - 1}; y >= 0; --y) {
         move_row_down(y, rowsCleared.size());
     }
 
@@ -170,19 +170,19 @@ auto Board::remove_full_rows() -> int {
 
 auto Board::print_board() const -> void {
     std::cout << ' ';
-    for (auto i = 0; i < columns; ++i) std::cout << "_";
+    for (auto i {0}; i < columns; ++i) std::cout << "_";
     std::cout << '\n';
-    for (auto y = 0; y < rows; ++y) {
+    for (auto y {0}; y < rows; ++y) {
         std::cout << '|';
-        for (auto x = 0; x < columns; ++x) {
-            auto const index = y * columns + x;
-            auto const currBlock = data[index];
+        for (auto x {0}; x < columns; ++x) {
+            auto const index {y * columns + x};
+            auto const currBlock {data[index]};
 
             std::cout << (currBlock.isActive ? "O" : " ");
         }
         std::cout << "|\n";
     }
     std::cout << '|';
-    for (auto i = 0; i < columns; ++i) std::cout << "-";
+    for (auto i {0}; i < columns; ++i) std::cout << "-";
     std::cout << "|\n";
 }

@@ -6,8 +6,8 @@
 
 namespace tests {
     auto remove_full_rows() -> void {
-        auto const y = Block { {}, true };
-        auto const n = Block { {}, false };
+        Block const y { {}, true };
+        Block const n { {}, false };
         Board boardStart;
         boardStart.data = {
             n, n, n, n, n, n, n, n, n, n,
@@ -62,7 +62,7 @@ namespace tests {
 
         boardStart.remove_full_rows();
 
-        for (size_t i = 0; i < boardStart.data.size(); ++i) {
+        for (size_t i {0}; i < boardStart.data.size(); ++i) {
             assert(boardStart.data[i].isActive == boardEnd.data[i].isActive);
         }
     }

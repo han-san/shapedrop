@@ -34,14 +34,14 @@ struct Message {
     int y;
 };
 
-auto constexpr gBorderSize = 1;
+auto constexpr gBorderSize {1};
 
-auto constexpr gHoldShapeDim = Square { gBorderSize, gBorderSize, 5, 3 };
-auto constexpr gPlayAreaDim = Square {
+Square constexpr gHoldShapeDim {gBorderSize, gBorderSize, 5, 3};
+Square constexpr gPlayAreaDim {
     gBorderSize, (gBorderSize + gHoldShapeDim.h + gBorderSize),
     Board::columns, Board::visibleRows
 };
-auto constexpr gSidebarDim = Square {
+Square constexpr gSidebarDim {
     (gBorderSize + gPlayAreaDim.w + gBorderSize), gBorderSize,
     4, (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)
 };
@@ -50,7 +50,7 @@ auto constexpr constexpr_round(double const val) -> int {
     return int(val + 0.5);
 }
 
-auto constexpr gBaseWindowWidth = constexpr_round(double(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize));
-auto constexpr gBaseWindowHeight = constexpr_round(double(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize));
+auto constexpr gBaseWindowWidth {constexpr_round(double(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize))};
+auto constexpr gBaseWindowHeight {constexpr_round(double(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize))};
 
 auto run() -> void;
