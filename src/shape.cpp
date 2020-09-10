@@ -78,67 +78,67 @@ auto Shape::get_absolute_block_positions() const -> BlockStack {
 auto Shape::get_wallkicks(Shape::RotationDirection const dir) const -> std::array<V2, 4> {
     // Shapes J, L, S, T, and Z all have the same wall kicks while I has its
     // own and O can't kick since it doesn't rotate at all.
+
+    auto static constexpr JLSTZKicks = std::array {
+        // r0
+        std::array {
+            // left
+            std::array { V2 {1, 0}, V2 {1, 1}, V2 {0, -2}, V2 {1, -2} },
+            // right
+            std::array { V2 {-1, 0}, V2 {-1, 1}, V2 {0, -2}, V2 {-1, -2} },
+        },
+        // r90
+        std::array {
+            // both directions check the same positions
+            std::array { V2 {1, 0}, V2 {1, -1}, V2 {0, 2}, V2 {1, 2} },
+            std::array { V2 {1, 0}, V2 {1, -1}, V2 {0, 2}, V2 {1, 2} },
+        },
+        // r180
+        std::array {
+            std::array { V2 {-1, 0}, V2 {-1, 1}, V2 {0, -2}, V2 {-1, -2} },
+            std::array { V2 {1, 0}, V2 {1, 1}, V2 {0, -2}, V2 {1, -2} },
+        },
+        // r270
+        std::array {
+            // both directions check the same positions
+            std::array { V2 {-1, 0}, V2 {-1, -1}, V2 {0, 2}, V2 {-1, 2} },
+            std::array { V2 {-1, 0}, V2 {-1, -1}, V2 {0, 2}, V2 {-1, 2} },
+        }
+    };
+
+    auto static constexpr IKicks = std::array {
+        std::array {
+            std::array { V2 {-1, 0}, V2 {2, 0}, V2 {-1, 2}, V2 {2, -1} },
+            std::array { V2 {-2, 0}, V2 {1, 0}, V2 {-2, -1}, V2 {1, 2} },
+        },
+        std::array {
+            std::array { V2 {2, 0}, V2 {-1, 0}, V2 {2, 1}, V2 {-1, -2} },
+            std::array { V2 {-1, 0}, V2 {2, 0}, V2 {-1, 2}, V2 {2, -1} },
+        },
+        std::array {
+            std::array { V2 {1, 0}, V2 {-2, 0}, V2 {1, -2}, V2 {-2, 1} },
+            std::array { V2 {2, 0}, V2 {-1, 0}, V2 {2, 1}, V2 {-1, -2} },
+        },
+        std::array {
+            std::array { V2 {-2, 0}, V2 {1, 0}, V2 {-2, -1}, V2 {1, 2} },
+            std::array { V2 {1, 0}, V2 {-2, 0}, V2 {1, -2}, V2 {-2, 1} },
+        },
+    };
+
+    auto const i = static_cast<std::size_t>(rotation);
+    auto const j = static_cast<std::size_t>(dir);
+
     switch (type) {
         case Shape::Type::J:
         case Shape::Type::L:
         case Shape::Type::S:
         case Shape::Type::T:
         case Shape::Type::Z: {
-            switch (rotation) {
-                case Shape::Rotation::r0: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        return { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
-                    } else {
-                        return { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
-                    }
-                }
-                case Shape::Rotation::r90:
-                    // both directions check same positions
-                    return { V2 {1, 0}, {1, -1}, {0, 2}, {1, 2} };
-                case Shape::Rotation::r180: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        return { V2 {1, 0}, {1, 1}, {0, -2}, {1, -2} };
-                    } else {
-                        return { V2 {-1, 0}, {-1, 1}, {0, -2}, {-1, -2} };
-                    }
-                }
-                case Shape::Rotation::r270:
-                    // both directions check same positions
-                    return { V2 {-1, 0}, {-1, -1}, {0, 2}, {-1, 2} };
-            }
-        } break;
+            return JLSTZKicks[i][j];
+        }
         case Shape::Type::I: {
-            switch (rotation) {
-                case Shape::Rotation::r0: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        return { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
-                    } else {
-                        return { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
-                    }
-                }
-                case Shape::Rotation::r90: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        return { V2 {-1, 0}, {2, 0}, {-1, 2}, {2, -1} };
-                    } else {
-                        return { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
-                    }
-                }
-                case Shape::Rotation::r180: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        return { V2 {2, 0}, {-1, 0}, {2, 1}, {-1, -2} };
-                    } else {
-                        return { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
-                    }
-                }
-                case Shape::Rotation::r270: {
-                    if (dir == Shape::RotationDirection::RIGHT) {
-                        return { V2 {1, 0}, {-2, 0}, {1, -2}, {-2, 1} };
-                    } else {
-                        return { V2 {-2, 0}, {1, 0}, {-2, -1}, {1, 2} };
-                    }
-                }
-            }
-        } break;
+            return IKicks[i][j];
+        }
         case Shape::Type::O:
             return {};
     }
