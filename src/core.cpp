@@ -576,9 +576,9 @@ auto run() -> void
         for (auto y = 0; y < windim.h; ++y) {
             for (auto x = 0; x < windim.w; ++x) {
                 auto color = RGB {
-                    int(0xff * (float(x) / windim.w)),
-                    int(0xff * (1 - (float(x) / windim.w) * (float(y) / windim.h))),
-                    int(0xff * (float(y) / windim.h)),
+                    int(Color::maxChannelValue * (float(x) / windim.w)),
+                    int(Color::maxChannelValue * (1 - (float(x) / windim.w) * (float(y) / windim.h))),
+                    int(Color::maxChannelValue * (float(y) / windim.h)),
                 };
                 draw_solid_square(bb, {float(x), float(y), 1, 1}, color);
             }
@@ -623,8 +623,8 @@ auto run() -> void
                     }
                 };
 
-                draw_shape_in_play_area(gameState.currentShapeShadow, 0xff / 2);
-                draw_shape_in_play_area(gameState.currentShape, 0xff);
+                draw_shape_in_play_area(gameState.currentShapeShadow, Color::Alpha::opaque / 2);
+                draw_shape_in_play_area(gameState.currentShape, Color::Alpha::opaque);
 
                 // draw shape previews
                 auto previewArray = gameState.shapePool.get_preview_shapes_array();

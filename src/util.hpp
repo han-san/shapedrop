@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include "jint.h"
+
 template <typename T>
 struct V2Generic {
     union {
@@ -104,6 +106,30 @@ using V4f = V4Generic<float>;
 
 using RGB = V3;
 using RGBA = V4;
+
+struct Color {
+    RGB static constexpr red {0xFF, 0x00, 0x00};
+    RGB static constexpr green {0x00, 0xFF, 0x00};
+    RGB static constexpr blue {0x00, 0x00, 0xFF};
+    RGB static constexpr cyan {0x00, 0xFF, 0xFF};
+
+    u8 static constexpr maxChannelValue{0xFF};
+
+    struct Shape {
+        RGB static constexpr I {0x00, 0xF0, 0xF0};
+        RGB static constexpr O {0xF0, 0xF0, 0x00};
+        RGB static constexpr L {0xF0, 0xA0, 0x00};
+        RGB static constexpr J {0x00, 0x00, 0xF0};
+        RGB static constexpr S {0x00, 0xF0, 0x00};
+        RGB static constexpr Z {0xF0, 0x00, 0x00};
+        RGB static constexpr T {0xA0, 0x00, 0xF0};
+    };
+
+    struct Alpha {
+        u8 static constexpr opaque {0xFF};
+        u8 static constexpr transparent {0xFF};
+    };
+};
 
 using Square = V4;
 using Squaref = V4f;

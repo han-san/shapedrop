@@ -4,6 +4,7 @@
 
 #include "platform.hpp"
 #include "font.hpp"
+#include "util.hpp"
 
 auto inline to_screen_space(Squaref const square) -> Squaref {
     auto const dim = get_window_dimensions();
@@ -31,10 +32,10 @@ auto inline to_screen_space_width(float const width) -> float {
     return width * get_window_dimensions().w;
 }
 
-auto draw_solid_square(BackBuffer& buf, Squaref sqr, RGB color, int a = 0xff) -> void;
-auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, int a = 0xff) -> void;
-auto draw_hollow_square(BackBuffer& buf, Squaref sqr, RGB color, int a = 0xff, int borderSize = 1) -> void;
-auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, int a = 0xff, int borderSize = 1) -> void;
+auto draw_solid_square(BackBuffer& buf, Squaref sqr, RGB color, int a = Color::Alpha::opaque) -> void;
+auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, int a = Color::Alpha::opaque) -> void;
+auto draw_hollow_square(BackBuffer& buf, Squaref sqr, RGB color, int a = Color::Alpha::opaque, int borderSize = 1) -> void;
+auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, RGB color, int a = Color::Alpha::opaque, int borderSize = 1) -> void;
 auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int y) -> void;
 auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, float x, float y) -> void;
 auto draw_text(BackBuffer& buf, std::string_view text, int x, int y, float pixelHeight) -> void;

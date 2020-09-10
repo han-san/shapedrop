@@ -7,6 +7,7 @@
 #include "fmt/core.h"
 
 #include "board.hpp"
+#include "util.hpp"
 
 #include "shape.hpp"
 
@@ -18,31 +19,31 @@ Shape::Shape(Type const type) noexcept
 {
     switch (type) {
         case Type::I: {
-            color = RGB(0x00, 0xf0, 0xf0);
+            color = Color::Shape::I;
             rotationMap = &IRotationMap;
         } break;
         case Type::O: {
-            color = RGB(0xf0, 0xf0, 0x00);
+            color = Color::Shape::O;
             rotationMap = &ORotationMap;
         } break;
         case Type::L: {
-            color = RGB(0xf0, 0xa0, 0x00);
+            color = Color::Shape::L;
             rotationMap = &LRotationMap;
         } break;
         case Type::J: {
-            color = RGB(0x00, 0x00, 0xf0);
+            color = Color::Shape::J;
             rotationMap = &JRotationMap;
         } break;
         case Type::S: {
-            color = RGB(0x00, 0xf0, 0x00);
+            color = Color::Shape::S;
             rotationMap = &SRotationMap;
         } break;
         case Type::Z: {
-            color = RGB(0xf0, 0x00, 0x00);
+            color = Color::Shape::Z;
             rotationMap = &ZRotationMap;
         } break;
         case Type::T: {
-            color = RGB(0xa0, 0x00, 0xf0);
+            color = Color::Shape::T;
             rotationMap = &TRotationMap;
         } break;
     }
