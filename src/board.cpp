@@ -42,7 +42,7 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
             return Shape::RotationType::Wallkick;
         }
     }
-    return {};
+    return std::nullopt;
 }
 
 auto Board::is_valid_spot(Position const pos) const -> bool {

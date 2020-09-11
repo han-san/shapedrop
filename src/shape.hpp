@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include "util.hpp"
 
 class Shape {

@@ -305,7 +305,7 @@ auto run() -> void
                     auto droppedRows {0};
                     while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
                         gameState.lockClock = frameStartClock;
-                        gameState.currentRotationType = {};
+                        gameState.currentRotationType = std::nullopt;
                         ++droppedRows;
                     }
                     gameState.droppedRows = droppedRows;
@@ -322,7 +322,7 @@ auto run() -> void
                 } else if (message.type == Message::Type::Hold) {
                     if (!gameState.hasHeld) {
                         gameState.hasHeld = true;
-                        gameState.currentRotationType = {};
+                        gameState.currentRotationType = std::nullopt;
                         if (gameState.holdShape) {
                             auto tmp {gameState.holdShape};
 
@@ -368,7 +368,7 @@ auto run() -> void
                     gameState.dropClock = frameStartClock;
                     if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
                         gameState.lockClock = frameStartClock;
-                        gameState.currentRotationType = {};
+                        gameState.currentRotationType = std::nullopt;
 
                         if (gameState.isSoftDropping) {
                             ++gameState.softDropRowCount;
@@ -486,7 +486,7 @@ auto run() -> void
                                 }
                             } break;
                             default: {
-                                gameState.backToBackType = {};
+                                gameState.backToBackType = std::nullopt;
                             } break;
                         }
 
