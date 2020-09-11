@@ -14,8 +14,8 @@ struct Block {
 };
 
 enum class TspinType {
-    REGULAR,
-    MINI
+    Regular,
+    Mini
 };
 
 class Board {

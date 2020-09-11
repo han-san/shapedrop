@@ -81,41 +81,41 @@ auto handle_input() -> Message
     SDL_Event e;
     if (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) {
-            msg.type = Message::Type::QUIT;
+            msg.type = Message::Type::Quit;
         } else if (e.type == SDL_KEYDOWN) {
             switch (e.key.keysym.sym) {
             case SDLK_RIGHT: {
-                msg.type = Message::Type::MOVE_RIGHT;
+                msg.type = Message::Type::Move_right;
             } break;
             case SDLK_LEFT: {
-                msg.type = Message::Type::MOVE_LEFT;
+                msg.type = Message::Type::Move_left;
             } break;
             case SDLK_r: {
-                msg.type = Message::Type::RESET;
+                msg.type = Message::Type::Reset;
             } break;
             case SDLK_DOWN: {
-                msg.type = Message::Type::INCREASE_SPEED;
+                msg.type = Message::Type::Increase_speed;
             } break;
             case SDLK_UP: {
-                msg.type = Message::Type::DROP;
+                msg.type = Message::Type::Drop;
             } break;
             case SDLK_z: {
-                msg.type = Message::Type::ROTATE_LEFT;
+                msg.type = Message::Type::Rotate_left;
             } break;
             case SDLK_x: {
-                msg.type = Message::Type::ROTATE_RIGHT;
+                msg.type = Message::Type::Rotate_right;
             } break;
             case SDLK_2: {
-                msg.type = Message::Type::INCREASE_WINDOW_SIZE;
+                msg.type = Message::Type::Increase_window_size;
             } break;
             case SDLK_1: {
-                msg.type = Message::Type::DECREASE_WINDOW_SIZE;
+                msg.type = Message::Type::Decrease_window_size;
             } break;
             case SDLK_SPACE: {
-                msg.type = Message::Type::HOLD;
+                msg.type = Message::Type::Hold;
             } break;
             case SDLK_ESCAPE: {
-                msg.type = Message::Type::PAUSE;
+                msg.type = Message::Type::Pause;
             } break;
             default: {
             } break;
@@ -123,12 +123,12 @@ auto handle_input() -> Message
         } else if (e.type == SDL_KEYUP) {
             switch (e.key.keysym.sym) {
             case SDLK_DOWN: {
-                msg.type = Message::Type::RESET_SPEED;
+                msg.type = Message::Type::Reset_speed;
             } break;
             }
         } else if (e.type == SDL_MOUSEBUTTONDOWN) {
             if (e.button.button == SDL_BUTTON_LEFT) {
-                msg.type = Message::Type::MOUSEBUTTONDOWN;
+                msg.type = Message::Type::Mousebuttondown;
                 msg.x = e.button.x;
                 msg.y = e.button.y;
             }

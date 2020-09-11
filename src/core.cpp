@@ -55,19 +55,19 @@ using namespace std::string_view_literals;
 enum class ClearType {
     // Don't change order. clearTypeScores and get_clear_type() depends on the
     // specific order.
-    NONE,
-    SINGLE,
-    DOUBLE,
-    TRIPLE,
-    TETRIS,
+    None,
+    Single,
+    Double,
+    Triple,
+    Tetris,
 
-    TSPIN,
-    TSPIN_SINGLE,
-    TSPIN_DOUBLE,
-    TSPIN_TRIPLE,
-    TSPIN_MINI,
-    TSPIN_MINI_SINGLE,
-    TSPIN_MINI_DOUBLE,
+    Tspin,
+    Tspin_single,
+    Tspin_double,
+    Tspin_triple,
+    Tspin_mini,
+    Tspin_mini_single,
+    Tspin_mini_double,
 };
 
 std::array constexpr clearTypeScores {
@@ -95,16 +95,16 @@ auto get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin
     assert(rowsCleared <= 3); // A t-spin can't clear more than 3 rows.
     switch (rowsCleared) {
         case 0:
-            return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI : ClearType::TSPIN;
+            return *tspin == TspinType::Mini ? ClearType::Tspin_mini : ClearType::Tspin;
         case 1:
-            return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI_SINGLE : ClearType::TSPIN_SINGLE;
+            return *tspin == TspinType::Mini ? ClearType::Tspin_mini_single : ClearType::Tspin_single;
         case 2:
-            return *tspin == TspinType::MINI ? ClearType::TSPIN_MINI_DOUBLE : ClearType::TSPIN_DOUBLE;
+            return *tspin == TspinType::Mini ? ClearType::Tspin_mini_double : ClearType::Tspin_double;
         case 3:
             // T-spin triple requires a wallkick so there is no
             // distinction between regular and mini (although it's
             // going to be represented internally as a mini).
-            return ClearType::TSPIN_TRIPLE;
+            return ClearType::Tspin_triple;
         default: {
             // Getting here means rowsCleared was above 4 in a release build (BAD).
             auto const errMsg {fmt::format("The amount of rows cleared should be between 0 and 4, but is currently ({})", rowsCleared)};
@@ -126,11 +126,11 @@ auto calculate_score(int const rowsCleared, std::optional<TspinType> tspin, int 
 }
 
 enum class LevelType {
-    MENU,
-    GAME,
+    Menu,
+    Game,
 };
 
-LevelType levelType {LevelType::MENU};
+LevelType levelType {LevelType::Menu};
 std::size_t highScore {0};
 time_t constexpr static lockDelay {CLOCKS_PER_SEC / 2};
 auto constexpr static initialDropDelay {1.0};
@@ -148,8 +148,8 @@ std::array<Shape, ShapePool::SIZE> const initialShapes {
 };
 
 enum class BackToBackType {
-    TETRIS,
-    TSPIN
+    Tetris,
+    Tspin
 };
 
 auto constexpr gMinLevel {1};
@@ -220,19 +220,19 @@ auto run() -> void
 
         // input
         Message message;
-        while ((message = handle_input()).type != Message::Type::NONE) {
+        while ((message = handle_input()).type != Message::Type::None) {
             UI::update_state(message);
 
             // First check messages independent of whether in menu or game
-            if (message.type == Message::Type::QUIT) {
+            if (message.type == Message::Type::Quit) {
                 running = false;
-            } else if (message.type == Message::Type::RESET) {
+            } else if (message.type == Message::Type::Reset) {
                 gameState.reset();
-            } else if (message.type == Message::Type::INCREASE_WINDOW_SIZE) {
+            } else if (message.type == Message::Type::Increase_window_size) {
                 change_window_scale(get_window_scale() + 1);
-            } else if (message.type == Message::Type::DECREASE_WINDOW_SIZE) {
+            } else if (message.type == Message::Type::Decrease_window_size) {
                 change_window_scale(get_window_scale() - 1);
-            } else if (levelType == LevelType::GAME) {
+            } else if (levelType == LevelType::Game) {
                 auto update_shadow_and_clocks = [&](bool isGrounded) {
                     gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
                     gameState.lockClock = frameStartClock;
@@ -242,15 +242,15 @@ auto run() -> void
                 };
 
                 enum class HorDir {
-                    LEFT,
-                    RIGHT
+                    Left,
+                    Right
                 };
 
                 auto move_horizontal = [&] (HorDir const dir) {
                     // if currentShape is on top of a block before move,
                     // the drop clock needs to be reset
                     auto isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
-                    auto const dirVec {dir == HorDir::RIGHT ? V2{1, 0} : V2{-1, 0}};
+                    auto const dirVec {dir == HorDir::Right ? V2{1, 0} : V2{-1, 0}};
                     if (gameState.board.try_move(gameState.currentShape, dirVec)) {
                         update_shadow_and_clocks(isGrounded);
                         // if you move the piece you cancel the drop
@@ -270,17 +270,17 @@ auto run() -> void
                         gameState.currentRotationType = rotation;
                         // if you rotate the piece you cancel the drop
                         gameState.droppedRows = 0;
-                        if ((rotation == Shape::RotationType::WALLKICK) && isGrounded) {
+                        if ((rotation == Shape::RotationType::Wallkick) && isGrounded) {
                             gameState.softDropRowCount = 0;
                         }
                     }
                 };
 
-                if (message.type == Message::Type::MOVE_RIGHT) {
-                    move_horizontal(HorDir::RIGHT);
-                } else if (message.type == Message::Type::MOVE_LEFT) {
-                    move_horizontal(HorDir::LEFT);
-                } else if (message.type == Message::Type::INCREASE_SPEED) {
+                if (message.type == Message::Type::Move_right) {
+                    move_horizontal(HorDir::Right);
+                } else if (message.type == Message::Type::Move_left) {
+                    move_horizontal(HorDir::Left);
+                } else if (message.type == Message::Type::Increase_speed) {
                     // TODO: How does this work if you e.g. press
                     // left/right/rotate while holding button down?
                     // is isSoftDropping still true at that time?
@@ -294,14 +294,14 @@ auto run() -> void
                         gameState.softDropRowCount = 0;
                     }
                     gameState.isSoftDropping = true;
-                } else if (message.type == Message::Type::RESET_SPEED) {
+                } else if (message.type == Message::Type::Reset_speed) {
                     gameState.isSoftDropping = false;
 
                     // softdrops only get reset if the piece can currently fall
                     if (gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
                         gameState.softDropRowCount = 0;
                     }
-                } else if (message.type == Message::Type::DROP) {
+                } else if (message.type == Message::Type::Drop) {
                     auto droppedRows {0};
                     while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
                         gameState.lockClock = frameStartClock;
@@ -314,12 +314,12 @@ auto run() -> void
                     if (droppedRows) {
                         gameState.softDropRowCount = 0;
                     }
-                } else if (message.type == Message::Type::ROTATE_LEFT) {
-                    rotate_current_shape(Shape::RotationDirection::LEFT);
-                } else if (message.type == Message::Type::ROTATE_RIGHT) {
-                    rotate_current_shape(Shape::RotationDirection::RIGHT);
-                } else if (message.type == Message::Type::ROTATE_RIGHT) {
-                } else if (message.type == Message::Type::HOLD) {
+                } else if (message.type == Message::Type::Rotate_left) {
+                    rotate_current_shape(Shape::RotationDirection::Left);
+                } else if (message.type == Message::Type::Rotate_right) {
+                    rotate_current_shape(Shape::RotationDirection::Right);
+                } else if (message.type == Message::Type::Rotate_right) {
+                } else if (message.type == Message::Type::Hold) {
                     if (!gameState.hasHeld) {
                         gameState.hasHeld = true;
                         gameState.currentRotationType = {};
@@ -339,7 +339,7 @@ auto run() -> void
                         auto isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
                         update_shadow_and_clocks(isGrounded);
                     }
-                } else if (message.type == Message::Type::PAUSE) {
+                } else if (message.type == Message::Type::Pause) {
                     gameState.paused = !gameState.paused;
                     // TODO: maybe save the amount of clocks left when the game was paused and set them again here.
                     gameState.dropClock = frameStartClock;
@@ -349,7 +349,7 @@ auto run() -> void
         }
 
         // sim
-        if (levelType == LevelType::GAME) {
+        if (levelType == LevelType::Game) {
             auto const dropDelay = [&]() {
                 auto const levelDropDelay {gameState.drop_delay_for_level()};
                 if (gameState.isSoftDropping && (softDropDelay < levelDropDelay)) {
@@ -424,7 +424,7 @@ auto run() -> void
                         // only regular clears count, but if it's a t-spin then
                         // droppedRows should have been set to 0 from rotating the shape
                         // so it SHOULDN'T be necessary to check explicitly.
-                        if (clearType != ClearType::NONE) {
+                        if (clearType != ClearType::None) {
                             // you shouldn't be able to soft drop and hard drop at the same time.
                             assert(!gameState.droppedRows || !gameState.softDropRowCount);
                             gameState.score += 2 * gameState.droppedRows;
@@ -436,15 +436,15 @@ auto run() -> void
 
                         // handle combos
                         switch (clearType) {
-                            case ClearType::SINGLE:
-                            case ClearType::DOUBLE:
-                            case ClearType::TRIPLE:
-                            case ClearType::TETRIS:
-                            case ClearType::TSPIN_SINGLE:
-                            case ClearType::TSPIN_DOUBLE:
-                            case ClearType::TSPIN_TRIPLE:
-                            case ClearType::TSPIN_MINI_SINGLE:
-                            case ClearType::TSPIN_MINI_DOUBLE: {
+                            case ClearType::Single:
+                            case ClearType::Double:
+                            case ClearType::Triple:
+                            case ClearType::Tetris:
+                            case ClearType::Tspin_single:
+                            case ClearType::Tspin_double:
+                            case ClearType::Tspin_triple:
+                            case ClearType::Tspin_mini_single:
+                            case ClearType::Tspin_mini_double: {
                                 ++gameState.comboCounter;
                                 auto const comboScore {50 * gameState.comboCounter * gameState.level};
                                 gameState.score += comboScore;
@@ -453,9 +453,9 @@ auto run() -> void
                                 }
                             } break;
                             // These aren't technically clears and will reset your combo
-                            case ClearType::NONE:
-                            case ClearType::TSPIN:
-                            case ClearType::TSPIN_MINI: {
+                            case ClearType::None:
+                            case ClearType::Tspin:
+                            case ClearType::Tspin_mini: {
                                 gameState.comboCounter = -1;
                             } break;
                         }
@@ -463,26 +463,26 @@ auto run() -> void
                         // check for back to back tetris/t-spin
                         auto backToBackModifier {1.0};
                         switch (clearType) {
-                            case ClearType::TETRIS: {
-                                if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::TETRIS)) {
+                            case ClearType::Tetris: {
+                                if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::Tetris)) {
                                     std::cerr << "Back to back Tetris\n";
                                     backToBackModifier = 1.5;
                                 } else {
-                                    gameState.backToBackType = BackToBackType::TETRIS;
+                                    gameState.backToBackType = BackToBackType::Tetris;
                                 }
                             } break;
-                            case ClearType::TSPIN:
-                            case ClearType::TSPIN_MINI:
-                            case ClearType::TSPIN_SINGLE:
-                            case ClearType::TSPIN_MINI_SINGLE:
-                            case ClearType::TSPIN_DOUBLE:
-                            case ClearType::TSPIN_MINI_DOUBLE:
-                            case ClearType::TSPIN_TRIPLE: {
-                                if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::TSPIN)) {
+                            case ClearType::Tspin:
+                            case ClearType::Tspin_mini:
+                            case ClearType::Tspin_single:
+                            case ClearType::Tspin_mini_single:
+                            case ClearType::Tspin_double:
+                            case ClearType::Tspin_mini_double:
+                            case ClearType::Tspin_triple: {
+                                if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::Tspin)) {
                                     std::cerr << "Back to back T-Spin\n";
                                     backToBackModifier = 1.5;
                                 } else {
-                                    gameState.backToBackType = BackToBackType::TSPIN;
+                                    gameState.backToBackType = BackToBackType::Tspin;
                                 }
                             } break;
                             default: {
@@ -511,7 +511,7 @@ auto run() -> void
                         if (gameOver) {
                             std::cout << "Game Over!\n";
                             if (gameState.score > highScore) highScore = gameState.score;
-                            levelType = LevelType::MENU;
+                            levelType = LevelType::Menu;
                         }
 
                     }
@@ -521,51 +521,51 @@ auto run() -> void
 
             {
                 auto const fontSize {0.048};
-                UI::label(fmt::format("Score: {}", gameState.score), fontSize, UI::XAlignment::RIGHT);
+                UI::label(fmt::format("Score: {}", gameState.score), fontSize, UI::XAlignment::Right);
 
                 // Round up linesCleared to nearest 10
                 auto const linesRequired {(gameState.linesCleared / 10 + 1) * 10};
                 auto levelString {fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired)};
-                UI::label(std::move(levelString), fontSize, UI::XAlignment::RIGHT, fontSize);
+                UI::label(std::move(levelString), fontSize, UI::XAlignment::Right, fontSize);
             }
 
             if (gameState.paused) {
                 UI::begin_menu({0.2, 0.2, 0.6, 0.6}, Color::cyan);
-                UI::label("Paused", 0.06, UI::XAlignment::CENTER);
-                if (UI::button("Resume", 0.06, UI::XAlignment::CENTER)) {
+                UI::label("Paused", 0.06, UI::XAlignment::Center);
+                if (UI::button("Resume", 0.06, UI::XAlignment::Center)) {
                     gameState.paused = false;
 
                     // TODO: maybe save the amount of clocks left when the game was paused and set them again here.
                     gameState.dropClock = frameStartClock;
                     gameState.lockClock = frameStartClock;
                 }
-                if (UI::button("Main Menu", 0.06, UI::XAlignment::CENTER)) {
-                    levelType = LevelType::MENU;
+                if (UI::button("Main Menu", 0.06, UI::XAlignment::Center)) {
+                    levelType = LevelType::Menu;
                 }
-                if (UI::button("Quit", 0.06, UI::XAlignment::CENTER)) {
+                if (UI::button("Quit", 0.06, UI::XAlignment::Center)) {
                     running = false;
                 }
 
                 UI::end_menu();
             }
 
-        } else if (levelType == LevelType::MENU) {
+        } else if (levelType == LevelType::Menu) {
             auto const highScoreFontSize {0.048};
-            UI::label(fmt::format("High Score: {}", highScore), highScoreFontSize, UI::XAlignment::RIGHT);
+            UI::label(fmt::format("High Score: {}", highScore), highScoreFontSize, UI::XAlignment::Right);
 
             auto menuY {1. / 10.};
             auto menuFontSize {1. / 10.};
             UI::begin_menu({0., menuY, 1., 1. - menuY});
-            UI::label("ShapeDrop", menuFontSize, UI::XAlignment::CENTER);
-            if (UI::button("Play", menuFontSize, UI::XAlignment::CENTER)) {
+            UI::label("ShapeDrop", menuFontSize, UI::XAlignment::Center);
+            if (UI::button("Play", menuFontSize, UI::XAlignment::Center)) {
                 // FIXME: This will cause the game field to render this frame,
                 // but the UI being rendered this frame will be the main menu's
                 // instead of the game field's since that's the simulation
                 // branch we're currently on.
-                levelType = LevelType::GAME;
+                levelType = LevelType::Game;
                 gameState.reset();
             }
-            UI::spinbox("Level", menuFontSize / 2., UI::XAlignment::CENTER, 0., menuState.level, gMinLevel, gMaxLevel);
+            UI::spinbox("Level", menuFontSize / 2., UI::XAlignment::Center, 0., menuState.level, gMinLevel, gMaxLevel);
             UI::end_menu();
         }
 
@@ -585,9 +585,9 @@ auto run() -> void
         }
 
         switch (levelType) {
-            case LevelType::MENU: {
+            case LevelType::Menu: {
             } break;
-            case LevelType::GAME: {
+            case LevelType::Game: {
                 // draw playarea background
                 for (auto y {2}; y < Board::rows; ++y) {
                     for (auto x {0}; x < Board::columns; ++x) {

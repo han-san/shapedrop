@@ -81,11 +81,11 @@ namespace UI {
         auto const y {workingRegion.y + double(yOffset) * workingRegion.h};
         auto const x = [xAlign, workingRegion, width]() {
             switch (xAlign) {
-                case XAlignment::LEFT:
+                case XAlignment::Left:
                     return workingRegion.x;
-                case XAlignment::CENTER:
+                case XAlignment::Center:
                     return workingRegion.x + (workingRegion.w / 2.f) - (width / 2.f);
-                case XAlignment::RIGHT:
+                case XAlignment::Right:
                     return workingRegion.x + workingRegion.w - width;
             }
             // Gotta return something even though all valid
@@ -214,7 +214,7 @@ namespace UI {
     }
 
     auto update_state(Message const message) -> void {
-        if (message.type == Message::Type::MOUSEBUTTONDOWN) {
+        if (message.type == Message::Type::Mousebuttondown) {
             clicked = true;
             cursor.x = double(message.x);
             cursor.y = double(message.y);

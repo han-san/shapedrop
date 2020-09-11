@@ -91,9 +91,9 @@ namespace UI {
     using RelativeScaleRect = V4Generic<RelativeScale>;
 
     enum class XAlignment {
-        LEFT,
-        CENTER,
-        RIGHT
+        Left,
+        Center,
+        Right
     };
 
     auto label(std::string text, WindowScale fontHeight, RelativeScalePoint offset) -> void;

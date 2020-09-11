@@ -195,8 +195,8 @@ public:
     };
 
     enum class RotationType {
-        WALLKICK,
-        REGULAR,
+        Wallkick,
+        Regular,
     };
 
     // ShapeDims relies on the specific order of these.
@@ -208,8 +208,8 @@ public:
     std::array<V2, 7> static constexpr dimensions { V2 {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
 
     enum class RotationDirection {
-        LEFT,
-        RIGHT
+        Left,
+        Right
     };
 
     enum class Rotation {
@@ -221,13 +221,13 @@ public:
         auto constexpr maxRotationValue {static_cast<int>(Rotation::r270)};
         auto rotationInt {static_cast<int>(rotationEnum)};
         switch (direction) {
-            case RotationDirection::LEFT: {
+            case RotationDirection::Left: {
                 --rotationInt;
                 if (rotationInt < minRotationValue) {
                     rotationInt = maxRotationValue;
                 }
             } break;
-            case RotationDirection::RIGHT: {
+            case RotationDirection::Right: {
                 ++rotationInt;
                 if (rotationInt > maxRotationValue) {
                     rotationInt = minRotationValue;

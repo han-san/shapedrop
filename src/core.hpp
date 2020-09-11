@@ -12,21 +12,21 @@ struct BackBuffer {
 
 struct Message {
     enum class Type {
-        NONE,
-        QUIT,
-        RESET,
-        HOLD,
-        MOVE_RIGHT,
-        MOVE_LEFT,
-        INCREASE_SPEED,
-        RESET_SPEED,
-        DROP,
-        ROTATE_LEFT,
-        ROTATE_RIGHT,
-        INCREASE_WINDOW_SIZE,
-        DECREASE_WINDOW_SIZE,
-        MOUSEBUTTONDOWN,
-        PAUSE,
+        None,
+        Quit,
+        Reset,
+        Hold,
+        Move_right,
+        Move_left,
+        Increase_speed,
+        Reset_speed,
+        Drop,
+        Rotate_left,
+        Rotate_right,
+        Increase_window_size,
+        Decrease_window_size,
+        Mousebuttondown,
+        Pause,
     };
 
     Type type;

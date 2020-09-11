@@ -25,7 +25,7 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
     rotatingShape.rotation += dir;
     if (is_valid_shape(rotatingShape)) {
         shape.rotation = rotatingShape.rotation;
-        return Shape::RotationType::REGULAR;
+        return Shape::RotationType::Regular;
     }
 
     // Something is blocking the shape after just rotating it, so it has to be
@@ -39,7 +39,7 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
         rotatingShape.pos.y -= kickMove.y;
         if (is_valid_shape(rotatingShape)) {
             shape = rotatingShape;
-            return Shape::RotationType::WALLKICK;
+            return Shape::RotationType::Wallkick;
         }
     }
     return {};
@@ -79,7 +79,7 @@ auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotati
             cornersOccupied += !is_valid_spot(shape.pos + offset);
         }
         if (cornersOccupied >= 3) {
-            return (rotationType == Shape::RotationType::WALLKICK) ? TspinType::MINI : TspinType::REGULAR;
+            return (rotationType == Shape::RotationType::Wallkick) ? TspinType::Mini : TspinType::Regular;
         }
     }
     return {};
