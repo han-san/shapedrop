@@ -51,5 +51,4 @@ private:
     FontString(std::string_view string, double pixelHeight);
 };
 
-auto get_codepoint_kern_advance(char codepoint, char nextCodepoint, double scale) -> double;
 auto init_font(std::string const& filePath) -> bool;

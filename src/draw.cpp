@@ -5,7 +5,7 @@
 
 #include "draw.hpp"
 
-auto alpha_blend_channel(int const bg, int const fg, int const alpha) -> double
+auto static alpha_blend_channel(int const bg, int const fg, int const alpha) -> double
 {
     assert(bg >= 0 && bg <= 255);
     assert(fg >= 0 && fg <= 255);
@@ -15,7 +15,7 @@ auto alpha_blend_channel(int const bg, int const fg, int const alpha) -> double
     return fg * alphaRatio + bg * (1 - alphaRatio);
 }
 
-auto draw_pixel(void* data, RGBA const color) -> void
+auto static draw_pixel(void* data, RGBA const color) -> void
 {
     auto byte {(u8*) data};
     *byte = u8(alpha_blend_channel(*byte, color.b, color.a));
@@ -25,7 +25,7 @@ auto draw_pixel(void* data, RGBA const color) -> void
     *byte = u8(alpha_blend_channel(*byte, color.r, color.a));
 }
 
-auto draw_font_character(BackBuffer& buf, FontCharacter const& fontCharacter, int const realX, int const realY) -> void
+auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharacter, int const realX, int const realY) -> void
 {
     for (auto y {0}; y < fontCharacter.h; ++y) {
         auto const currY {realY + y + fontCharacter.yoff + (int)(fontCharacter.ascent * fontCharacter.scale)};

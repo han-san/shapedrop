@@ -70,7 +70,7 @@ enum class ClearType {
     Tspin_mini_double,
 };
 
-std::array constexpr clearTypeScores {
+std::array static constexpr clearTypeScores {
     0,    // None
     100,  // Single
     300,  // Double
@@ -86,7 +86,7 @@ std::array constexpr clearTypeScores {
     1200  // T-Spin Mini Double
 };
 
-auto get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin) {
+auto static get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin) {
     assert(rowsCleared <= 4);
     if (!tspin) {
         return static_cast<ClearType>(rowsCleared);
@@ -114,13 +114,13 @@ auto get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin
     }
 }
 
-auto calculate_score(ClearType const clearType, int const level) {
+auto static calculate_score(ClearType const clearType, int const level) {
     auto const index {static_cast<std::size_t>(clearType)};
     assert(index < clearTypeScores.size());
     return clearTypeScores[index] * level;
 }
 
-auto calculate_score(int const rowsCleared, std::optional<TspinType> tspin, int const level) {
+auto static calculate_score(int const rowsCleared, std::optional<TspinType> tspin, int const level) {
     auto const clearType {get_clear_type(rowsCleared, tspin)};
     return calculate_score(clearType, level);
 }
@@ -130,14 +130,14 @@ enum class LevelType {
     Game,
 };
 
-LevelType levelType {LevelType::Menu};
-std::size_t highScore {0};
-time_t constexpr static lockDelay {CLOCKS_PER_SEC / 2};
-auto constexpr static initialDropDelay {1.0};
-auto constexpr static softDropDelay {0.1};
-bool running {true};
+LevelType static levelType {LevelType::Menu};
+std::size_t static highScore {0};
+time_t static constexpr lockDelay {CLOCKS_PER_SEC / 2};
+auto static constexpr initialDropDelay {1.0};
+auto static constexpr softDropDelay {0.1};
+bool static running {true};
 
-std::array<Shape, ShapePool::SIZE> const initialShapes {
+std::array<Shape, ShapePool::SIZE> static const initialShapes {
     Shape::Type::I,
     Shape::Type::L,
     Shape::Type::J,
@@ -152,13 +152,13 @@ enum class BackToBackType {
     Tspin
 };
 
-auto constexpr gMinLevel {1};
-auto constexpr gMaxLevel {99};
+auto static constexpr gMinLevel {1};
+auto static constexpr gMaxLevel {99};
 
 struct MenuState {
     std::size_t level {gMinLevel};
 };
-MenuState menuState {};
+MenuState static menuState {};
 
 // For variables which are unique to their instance of a game
 // i.e. should be reset when starting a new one

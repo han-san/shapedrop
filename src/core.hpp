@@ -46,7 +46,7 @@ Square constexpr gSidebarDim {
     4, (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)
 };
 
-auto constexpr constexpr_round(double const val) -> int {
+auto inline constexpr constexpr_round(double const val) -> int {
     return int(val + 0.5);
 }
 

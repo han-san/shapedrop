@@ -41,7 +41,7 @@ auto get_window_dimensions() -> V2
     return {window.surface->w, window.surface->h};
 }
 
-auto resize_window(V2 const dimensions) {
+auto static resize_window(V2 const dimensions) {
     SDL_SetWindowSize(window.handle, dimensions.w, dimensions.h);
     window.surface = SDL_GetWindowSurface(window.handle);
     assert(window.surface);
@@ -68,7 +68,7 @@ auto swap_buffer() -> void
     SDL_UpdateWindowSurface(window.handle);
 }
 
-auto window_fits_on_screen(V2 windowDimensions) -> bool {
+auto static window_fits_on_screen(V2 windowDimensions) -> bool {
     SDL_Rect displayBounds {};
     SDL_GetDisplayUsableBounds(0, &displayBounds);
 
@@ -139,7 +139,7 @@ auto handle_input() -> Message
 }
 
 
-auto init_window() {
+auto static init_window() {
     SDL_Init(SDL_INIT_EVERYTHING);
 
     auto newScale {windowScale};

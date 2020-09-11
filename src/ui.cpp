@@ -104,7 +104,7 @@ namespace UI {
         }
     }
 
-    auto get_text_window_scale_width(std::string_view const text, WindowScale const fontHeight) -> WindowScale {
+    auto static get_text_window_scale_width(std::string_view const text, WindowScale const fontHeight) -> WindowScale {
         return to_normalized_width(FontString::get_text_width_normalized(text, double(fontHeight)));
     }
 
@@ -178,7 +178,7 @@ namespace UI {
     };
 
     // base spinbox function
-    auto spinbox(SpinBox spinBox) -> void {
+    auto static spinbox(SpinBox spinBox) -> void {
         auto const buttonWidth {get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) / 2.};
         WindowScaleRect const decreaseButtonRegion {spinBox.region.x, spinBox.region.y, buttonWidth, spinBox.region.h};
         WindowScaleRect const increaseButtonRegion {spinBox.region.x + buttonWidth, spinBox.region.y, buttonWidth, spinBox.region.h};

@@ -13,7 +13,7 @@ stbtt_fontinfo font;
 
 // FIXME: Temporary implementation. Should probably use std::path or something.
 //        Also the path shouldn't be relative to the current working directory.
-auto get_font_path() -> std::string
+auto static get_font_path() -> std::string
 {
     return "./";
 }
@@ -28,7 +28,7 @@ auto init_font(std::string const& fontName) -> bool
     return true;
 }
 
-auto get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, double const scale) -> double
+auto static get_codepoint_kern_advance(char const codepoint, char const nextCodepoint, double const scale) -> double
 {
     int advance;
     int lsb;
