@@ -73,15 +73,16 @@ auto Board::is_valid_shape(Shape const& shape) const -> bool {
 auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotationType) const -> std::optional<TspinType> {
     if (shape.type == Shape::Type::T) {
         std::array<V2, 4> static constexpr cornerOffsets {V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
-        auto cornersOccupied {0};
-        for (auto const offset : cornerOffsets) {
-            cornersOccupied += !is_valid_spot(shape.pos + offset);
-        }
+        auto const cornersOccupied {
+            std::count_if(std::cbegin(cornerOffsets), std::cend(cornerOffsets), [this, &shape](auto const& offset) {
+                          return !is_valid_spot(shape.pos + offset);
+                          })
+        };
         if (cornersOccupied >= 3) {
             return (rotationType == Shape::RotationType::Wallkick) ? TspinType::Mini : TspinType::Regular;
         }
     }
-    return {};
+    return std::nullopt;
 }
 
 auto Board::remove_full_rows() -> int {
