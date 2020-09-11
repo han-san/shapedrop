@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <optional>
@@ -60,12 +61,10 @@ auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
 }
 
 auto Board::is_valid_shape(Shape const& shape) const -> bool {
-    for (auto const position : shape.get_absolute_block_positions()) {
-        if (!is_valid_spot(position)) {
-            return false;
-        }
-    }
-    return true;
+    auto const ShapePositions {shape.get_absolute_block_positions()};
+    return std::all_of(std::cbegin(ShapePositions), std::cend(ShapePositions), [this](auto const& position) {
+                       return is_valid_spot(position);
+                       });
 }
 
 // If the shape is a T, its last movement was a rotation, and 3 or more of its
