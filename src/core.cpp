@@ -249,7 +249,7 @@ auto run() -> void
                 auto move_horizontal = [&] (HorDir const dir) {
                     // if currentShape is on top of a block before move,
                     // the drop clock needs to be reset
-                    auto isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
+                    auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
                     auto const dirVec {dir == HorDir::Right ? V2{1, 0} : V2{-1, 0}};
                     if (gameState.board.try_move(gameState.currentShape, dirVec)) {
                         update_shadow_and_clocks(isGrounded);
@@ -264,7 +264,7 @@ auto run() -> void
                 auto rotate_current_shape = [&] (Shape::RotationDirection rot) {
                     // if currentShape is on top of a block before rotation,
                     // the drop clock needs to be reset
-                    auto isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
+                    auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
                     if (auto const rotation {gameState.board.rotate_shape(gameState.currentShape, rot)}; rotation) {
                         update_shadow_and_clocks(isGrounded);
                         gameState.currentRotationType = rotation;
@@ -336,7 +336,7 @@ auto run() -> void
                         gameState.softDropRowCount = 0;
                         gameState.droppedRows = 0;
 
-                        auto isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
+                        auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
                         update_shadow_and_clocks(isGrounded);
                     }
                 } else if (message.type == Message::Type::Pause) {
@@ -363,7 +363,7 @@ auto run() -> void
                 // TODO: make it possible for shapes to drop more than one block
                 // (e.g. at max drop speed it should drop all the way to the bottom
                 // instantly)
-                auto nextdropClock {gameState.dropClock + dropDelay * CLOCKS_PER_SEC};
+                auto const nextdropClock {gameState.dropClock + dropDelay * CLOCKS_PER_SEC};
                 if (frameStartClock > nextdropClock) {
                     gameState.dropClock = frameStartClock;
                     if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
@@ -391,15 +391,15 @@ auto run() -> void
                         }
 
                         // fix currentBlocks position on board
-                        for (auto position : gameState.currentShape.get_absolute_block_positions()) {
+                        for (auto const position : gameState.currentShape.get_absolute_block_positions()) {
                             assert(gameState.board.is_valid_spot(position));
-                            auto boardIndex {position.y * gameState.board.columns + position.x};
+                            auto const boardIndex {position.y * gameState.board.columns + position.x};
                             gameState.board.data[boardIndex] = {gameState.currentShape.color, true};
                         }
 
                         auto const tspin {gameState.currentRotationType ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType) : std::nullopt};
 
-                        auto rowsCleared {gameState.board.remove_full_rows()};
+                        auto const rowsCleared {gameState.board.remove_full_rows()};
                         gameState.linesCleared += rowsCleared;
                         auto clearType {get_clear_type(rowsCleared, tspin)};
                         std::array static constexpr clearTypeToName {
@@ -525,7 +525,7 @@ auto run() -> void
 
                 // Round up linesCleared to nearest 10
                 auto const linesRequired {(gameState.linesCleared / 10 + 1) * 10};
-                auto levelString {fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired)};
+                auto const levelString {fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired)};
                 UI::label(std::move(levelString), fontSize, UI::XAlignment::Right, fontSize);
             }
 
@@ -553,8 +553,8 @@ auto run() -> void
             auto const highScoreFontSize {0.048};
             UI::label(fmt::format("High Score: {}", highScore), highScoreFontSize, UI::XAlignment::Right);
 
-            auto menuY {1. / 10.};
-            auto menuFontSize {1. / 10.};
+            auto const menuY {1. / 10.};
+            auto const menuFontSize {1. / 10.};
             UI::begin_menu({0., menuY, 1., 1. - menuY});
             UI::label("ShapeDrop", menuFontSize, UI::XAlignment::Center);
             if (UI::button("Play", menuFontSize, UI::XAlignment::Center)) {
@@ -570,9 +570,9 @@ auto run() -> void
         }
 
         // draw border
-        auto windim {get_window_dimensions()};
+        auto const windim {get_window_dimensions()};
         auto bb {get_back_buffer()};
-        auto scale {get_window_scale()};
+        auto const scale {get_window_scale()};
         for (auto y {0}; y < windim.h; ++y) {
             for (auto x {0}; x < windim.w; ++x) {
                 RGB const color {
@@ -608,7 +608,7 @@ auto run() -> void
                     for (auto& position : shape.get_absolute_block_positions()) {
                         // since the top 2 rows shouldn't be visible, the y
                         // position for drawing is 2 less than the shape's
-                        auto actualYPosition {position.y - 2};
+                        auto const actualYPosition {position.y - 2};
 
                         // don't draw if square is above the playarea
                         if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) continue;
@@ -627,9 +627,9 @@ auto run() -> void
                 draw_shape_in_play_area(gameState.currentShape, Color::Alpha::opaque);
 
                 // draw shape previews
-                auto previewArray {gameState.shapePool.get_preview_shapes_array()};
+                auto const previewArray {gameState.shapePool.get_preview_shapes_array()};
                 auto i {0};
-                for (auto shapePointer : previewArray) {
+                for (auto const* shapePointer : previewArray) {
                     auto shape {*shapePointer};
                     shape.pos.x = gSidebarDim.x;
                     auto const ySpacing {3}; // max height of a shape is 2 + 1 for a block of space
@@ -658,11 +658,11 @@ auto run() -> void
                     shape.pos.x = 0;
                     shape.pos.y = 0;
 
-                    auto is_even = [](auto n) { return (n % 2) == 0; };
+                    auto is_even = [](auto const n) { return (n % 2) == 0; };
                     // offset to center shape inside hold square
-                    auto shapeDimensions {Shape::dimensions[int(shape.type)]};
-                    auto xOffset {is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5};
-                    auto yOffset {is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5};
+                    auto const shapeDimensions {Shape::dimensions[int(shape.type)]};
+                    auto const xOffset {is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5};
+                    auto const yOffset {is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5};
 
                     for (auto& position : shape.get_absolute_block_positions()) {
                         Squaref square {
