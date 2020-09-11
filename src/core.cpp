@@ -526,7 +526,8 @@ auto run() -> void
 
                 // Round up linesCleared to nearest 10
                 auto const linesRequired {(gameState.linesCleared / 10 + 1) * 10};
-                auto const levelString {fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired)};
+                // Not const since it's later moved
+                auto levelString {fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired)};
                 UI::label(std::move(levelString), fontSize, UI::XAlignment::Right, fontSize);
             }
 
