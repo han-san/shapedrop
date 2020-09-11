@@ -324,10 +324,10 @@ auto run() -> void
                         gameState.hasHeld = true;
                         gameState.currentRotationType = std::nullopt;
                         if (gameState.holdShape) {
-                            auto tmp {gameState.holdShape};
+                            auto const holdType {gameState.holdShape->type};
 
                             gameState.holdShape = Shape(gameState.currentShape.type);
-                            gameState.currentShape = Shape(tmp->type);
+                            gameState.currentShape = Shape(holdType);
                         } else {
                             gameState.holdShape = Shape(gameState.currentShape.type);
                             gameState.currentShape = gameState.shapePool.next_shape();
