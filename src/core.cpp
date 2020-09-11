@@ -402,7 +402,7 @@ auto run() -> void
 
                         auto const rowsCleared {gameState.board.remove_full_rows()};
                         gameState.linesCleared += rowsCleared;
-                        auto clearType {get_clear_type(rowsCleared, tspin)};
+                        auto const clearType {get_clear_type(rowsCleared, tspin)};
                         std::array static constexpr clearTypeToName {
                             ""sv,
                                 "Single"sv,
