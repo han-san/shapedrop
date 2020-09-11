@@ -1,4 +1,5 @@
 #include <array>
+#include <algorithm>
 #include <cassert>
 #include <ctime>
 #include <iostream>
@@ -383,12 +384,12 @@ auto run() -> void
                     if (!gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
                         // game over if entire piece is above visible portion
                         // of board
-                        auto gameOver {true};
-                        for (auto pos : gameState.currentShape.get_absolute_block_positions()) {
-                            if (pos.y > 1) {
-                                gameOver = false;
-                            }
-                        }
+                        auto const shapePositions {gameState.currentShape.get_absolute_block_positions()};
+                        auto gameOver {
+                            std::all_of(std::cbegin(shapePositions), std::cend(shapePositions), [](auto const& pos) {
+                                        return pos.y < (Board::rows - Board::visibleRows);
+                                        })
+                        };
 
                         // fix currentBlocks position on board
                         for (auto const position : gameState.currentShape.get_absolute_block_positions()) {
