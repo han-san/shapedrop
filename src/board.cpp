@@ -143,13 +143,11 @@ auto Board::remove_full_rows() -> int {
 
         auto emptyRowsPassed {0};
         for (auto y {botRow}; y != topRow; --y) {
-            auto found {false};
-            for (auto const row : rowsCleared) {
-                if (row == y) {
-                    found = true;
-                    break;
-                }
-            }
+            auto const found {
+                std::any_of(std::cbegin(rowsCleared), std::cend(rowsCleared), [y](auto const& row) {
+                        return row == y;
+                        })
+            };
             if (!found) {
                 // a non-full row between full rows
                 // move down the amount of empty rows that have been passed
