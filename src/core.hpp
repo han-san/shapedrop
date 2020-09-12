@@ -24,12 +24,8 @@ Square constexpr gSidebarDim {
     4, (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)
 };
 
-auto inline constexpr constexpr_round(double const val) -> int {
-    return int(val + 0.5);
-}
-
-auto constexpr gBaseWindowWidth {constexpr_round(double(gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize))};
-auto constexpr gBaseWindowHeight {constexpr_round(double(gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize))};
+auto constexpr gBaseWindowWidth {gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize};
+auto constexpr gBaseWindowHeight {gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize};
 
 std::array<Shape, ShapePool::SIZE> static const initialShapes {
     Shape::Type::I,
