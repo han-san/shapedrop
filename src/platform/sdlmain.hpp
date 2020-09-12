@@ -6,6 +6,7 @@
 #include "../jint.h"
 
 #include "../core.hpp"
+#include "../input.hpp"
 
 namespace platform::SDL {
 

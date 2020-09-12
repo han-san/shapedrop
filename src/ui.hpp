@@ -4,6 +4,7 @@
 #include <string_view>
 
 #include "core.hpp"
+#include "input.hpp"
 #include "util.hpp"
 
 namespace UI {

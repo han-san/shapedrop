@@ -12,30 +12,6 @@ struct BackBuffer {
     int bpp;
 };
 
-struct Event {
-    enum class Type {
-        None,
-        Quit,
-        Reset,
-        Hold,
-        Move_right,
-        Move_left,
-        Increase_speed,
-        Reset_speed,
-        Drop,
-        Rotate_left,
-        Rotate_right,
-        Increase_window_size,
-        Decrease_window_size,
-        Mousebuttondown,
-        Pause,
-    };
-
-    Type type;
-    int x;
-    int y;
-};
-
 auto constexpr gBorderSize {1};
 
 Square constexpr gHoldShapeDim {gBorderSize, gBorderSize, 5, 3};

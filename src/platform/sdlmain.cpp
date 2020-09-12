@@ -5,6 +5,7 @@
 #include "../jint.h"
 
 #include "../core.hpp"
+#include "../input.hpp"
 #include "../font.hpp"
 
 #include "sdlmain.hpp"
