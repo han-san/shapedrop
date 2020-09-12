@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.10)
 
 project(ShapeDrop)
 
-add_executable(ShapeDrop src/platform/sdlmain.cpp src/font.cpp src/board.cpp src/core.cpp src/draw.cpp src/shape.cpp src/tests.cpp src/ui.cpp src/input.cpp)
+add_executable(ShapeDrop src/platform/sdlmain.cpp src/font.cpp src/board.cpp src/core.cpp src/draw.cpp src/shape.cpp src/tests.cpp src/ui.cpp src/input.cpp src/simulate.cpp)
 
 add_subdirectory("deps/SDL2-2.0.12")
 add_subdirectory("deps/fmt-7.0.3")

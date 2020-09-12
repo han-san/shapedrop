@@ -5,6 +5,7 @@
 #include "platform.hpp"
 #include "font.hpp"
 #include "util.hpp"
+#include "core.hpp"
 
 auto inline to_screen_space(Squaref const square) -> Squaref {
     auto const dim {get_window_dimensions()};
@@ -40,3 +41,4 @@ auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int 
 auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, double x, double y) -> void;
 auto draw_text(BackBuffer& buf, std::string_view text, int x, int y, double pixelHeight) -> void;
 auto draw_text_normalized(BackBuffer& buf, std::string_view text, double x, double y, double pixelHeight) -> void;
+auto draw(ProgramState& programState, GameState& gameState) -> void;

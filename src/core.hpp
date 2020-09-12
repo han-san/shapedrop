@@ -73,6 +73,10 @@ enum class BackToBackType {
 auto constexpr gMinLevel {1};
 auto constexpr gMaxLevel {99};
 
+struct MenuState {
+    std::size_t level {gMinLevel};
+};
+
 struct ProgramState {
     enum class LevelType {
         Menu,

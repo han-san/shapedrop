@@ -2,6 +2,7 @@
 #include <string_view>
 
 #include "core.hpp"
+#include "ui.hpp"
 
 #include "draw.hpp"
 
@@ -169,4 +170,117 @@ auto draw_image(BackBuffer& backBuf, Position const dest, BackBuffer& img) -> vo
             draw_pixel(currBBbyte, {r, g, b, a});
         }
     }
+}
+
+auto draw(ProgramState& programState, GameState& gameState) -> void {
+    auto const windim {get_window_dimensions()};
+    auto bb {get_back_buffer()};
+    auto const scale {get_window_scale()};
+    for (auto y {0}; y < windim.h; ++y) {
+        for (auto x {0}; x < windim.w; ++x) {
+            RGB const color {
+                int(Color::maxChannelValue * (double(x) / windim.w)),
+                    int(Color::maxChannelValue * (1 - (double(x) / windim.w) * (double(y) / windim.h))),
+                    int(Color::maxChannelValue * (double(y) / windim.h)),
+            };
+            draw_solid_square(bb, {double(x), double(y), 1, 1}, color);
+        }
+    }
+
+    switch (programState.levelType) {
+        case ProgramState::LevelType::Menu: {
+        } break;
+        case ProgramState::LevelType::Game: {
+            // draw playarea background
+            for (auto y {2}; y < Board::rows; ++y) {
+                for (auto x {0}; x < Board::columns; ++x) {
+                    auto currindex {y * Board::columns + x};
+                    auto& block {gameState.board.data[currindex]};
+                    auto color {block.isActive ? block.color : RGB { 0, 0, 0 }};
+                    Squaref square {
+                        double((x + gPlayAreaDim.x) * scale),
+                            double((y - 2 + gPlayAreaDim.y) * scale),
+                            double(scale),
+                            double(scale)
+                    };
+                    draw_solid_square(bb, square, color);
+                }
+            }
+
+            auto draw_shape_in_play_area = [&](Shape& shape, int transparency) {
+                for (auto& position : shape.get_absolute_block_positions()) {
+                    // since the top 2 rows shouldn't be visible, the y
+                    // position for drawing is 2 less than the shape's
+                    auto const actualYPosition {position.y - 2};
+
+                    // don't draw if square is above the playarea
+                    if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) continue;
+                    Squaref square {
+                        double((position.x + gPlayAreaDim.x) * scale),
+                            double((actualYPosition + gPlayAreaDim.y) * scale),
+                            double(scale),
+                            double(scale)
+                    };
+
+                    draw_solid_square(bb, square, shape.color, transparency);
+                }
+            };
+
+            draw_shape_in_play_area(gameState.currentShapeShadow, Color::Alpha::opaque / 2);
+            draw_shape_in_play_area(gameState.currentShape, Color::Alpha::opaque);
+
+            // draw shape previews
+            auto const previewArray {gameState.shapePool.get_preview_shapes_array()};
+            auto i {0};
+            for (auto const* shapePointer : previewArray) {
+                auto shape {*shapePointer};
+                shape.pos.x = gSidebarDim.x;
+                auto const ySpacing {3}; // max height of a shape is 2 + 1 for a block of space
+                shape.pos.y = gSidebarDim.y + ySpacing * i;
+                for (auto& position : shape.get_absolute_block_positions()) {
+                    Squaref square {
+                        double((position.x) * scale),
+                            double((position.y) * scale),
+                            double(scale),
+                            double(scale)
+                    };
+                    draw_solid_square(bb, square, shape.color);
+                }
+                ++i;
+            }
+
+            // draw held shape
+            Squaref holdShapeDim{};
+            holdShapeDim.x = gHoldShapeDim.x * double(scale);
+            holdShapeDim.y = gHoldShapeDim.y * double(scale);
+            holdShapeDim.w = gHoldShapeDim.w * double(scale);
+            holdShapeDim.h = gHoldShapeDim.h * double(scale);
+            draw_solid_square(bb, holdShapeDim, {0, 0, 0});
+            if (gameState.holdShape) {
+                auto shape {*gameState.holdShape};
+                shape.pos.x = 0;
+                shape.pos.y = 0;
+
+                auto is_even = [](auto const n) { return (n % 2) == 0; };
+                // offset to center shape inside hold square
+                auto const shapeDimensions {Shape::dimensions[int(shape.type)]};
+                auto const xOffset {is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5};
+                auto const yOffset {is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5};
+
+                for (auto& position : shape.get_absolute_block_positions()) {
+                    Squaref square {
+                        double((position.x + gHoldShapeDim.x + xOffset) * scale),
+                            double((position.y + gHoldShapeDim.y + yOffset) * scale),
+                            double(scale),
+                            double(scale)
+                    };
+                    draw_solid_square(bb, square, shape.color);
+                }
+            }
+        } break;
+    }
+
+    UI::draw(bb);
+
+    swap_buffer();
 }
