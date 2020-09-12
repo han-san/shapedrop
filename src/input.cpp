@@ -104,7 +104,6 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
                 rotate_current_shape(Shape::RotationDirection::Left);
             } else if (event.type == Event::Type::Rotate_right) {
                 rotate_current_shape(Shape::RotationDirection::Right);
-            } else if (event.type == Event::Type::Rotate_right) {
             } else if (event.type == Event::Type::Hold) {
                 if (!gameState.hasHeld) {
                     gameState.hasHeld = true;
