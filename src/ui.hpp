@@ -106,5 +106,5 @@ namespace UI {
     auto begin_menu(RelativeScaleRect region, RGB color, u8 alpha = Color::Alpha::opaque) -> void;
     auto end_menu() -> void;
     auto draw(BackBuffer bb) -> void;
-    auto update_state(Message message) -> void;
+    auto update_state(Event event) -> void;
 }

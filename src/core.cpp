@@ -21,6 +21,7 @@
 #include "tests.hpp"
 #include "ui.hpp"
 #include "util.hpp"
+#include "input.hpp"
 
 #include "core.hpp"
 
@@ -126,93 +127,25 @@ auto static calculate_score(int const rowsCleared, std::optional<TspinType> tspi
     return calculate_score(clearType, level);
 }
 
-enum class LevelType {
-    Menu,
-    Game,
-};
-
-LevelType static levelType {LevelType::Menu};
-std::size_t static highScore {0};
-time_t static constexpr lockDelay {CLOCKS_PER_SEC / 2};
-auto static constexpr initialDropDelay {1.0};
-auto static constexpr softDropDelay {0.1};
-bool static running {true};
-
-std::array<Shape, ShapePool::SIZE> static const initialShapes {
-    Shape::Type::I,
-    Shape::Type::L,
-    Shape::Type::J,
-    Shape::Type::O,
-    Shape::Type::S,
-    Shape::Type::Z,
-    Shape::Type::T,
-};
-
-enum class BackToBackType {
-    Tetris,
-    Tspin
-};
-
-auto static constexpr gMinLevel {1};
-auto static constexpr gMaxLevel {99};
-
 struct MenuState {
     std::size_t level {gMinLevel};
-};
-MenuState static menuState {};
-
-// For variables which are unique to their instance of a game
-// i.e. should be reset when starting a new one
-struct GameState {
-
-    // unique to current shape
-    time_t dropClock {clock()};
-    time_t lockClock {dropClock};
-    std::size_t droppedRows {0};
-    std::size_t softDropRowCount {0};
-
-    // shared for all shapes
-    bool isSoftDropping {false};
-    std::size_t linesCleared {0};
-    std::size_t startingLevel {menuState.level};
-    std::size_t level {startingLevel};
-    std::size_t score {0};
-    bool hasHeld {false};
-    std::optional<BackToBackType> backToBackType {};
-    // Starts at -1 since the first clear advances the counter, but only the
-    // second clear in a row counts as a combo.
-    int comboCounter {-1};
-    Board board {};
-    ShapePool shapePool {initialShapes};
-    Shape currentShape {shapePool.current_shape()};
-    Shape currentShapeShadow {board.get_shadow(currentShape)};
-    std::optional<Shape::RotationType> currentRotationType {};
-    std::optional<Shape> holdShape {};
-    bool paused {false};
-
-    auto reset() {
-        *this = GameState {};
-    }
-
-    auto drop_delay_for_level() const {
-        auto const dropDelay {initialDropDelay - this->level * 0.1};
-        // dropDelay can't be negative
-        return dropDelay > 0. ? dropDelay : 0.;
-    }
 };
 
 auto run() -> void
 {
     tests::run();
 
-    GameState gameState {};
+    ProgramState programState {};
+    MenuState menuState {};
+    GameState gameState {menuState.level};
 
-    time_t frameStartClock {clock()};
 
-    while (running) {
+    programState.frameStartClock = clock();
+
+    while (programState.running) {
         auto newclock {clock()};
-        auto frameclocktime {newclock - frameStartClock};
-        frameStartClock = newclock;
+        auto frameclocktime {newclock - programState.frameStartClock};
+        programState.frameStartClock = newclock;
 
         // delta = (double)frameclocktime / CLOCKS_PER_SEC;
         /* auto framemstime = 1000.0 * delta; */
@@ -220,141 +153,13 @@ auto run() -> void
         // TODO: sleep so cpu doesn't melt
 
         // input
-        Message message;
-        while ((message = handle_input()).type != Message::Type::None) {
-            UI::update_state(message);
-
-            // First check messages independent of whether in menu or game
-            if (message.type == Message::Type::Quit) {
-                running = false;
-            } else if (message.type == Message::Type::Reset) {
-                gameState.reset();
-            } else if (message.type == Message::Type::Increase_window_size) {
-                change_window_scale(get_window_scale() + 1);
-            } else if (message.type == Message::Type::Decrease_window_size) {
-                change_window_scale(get_window_scale() - 1);
-            } else if (levelType == LevelType::Game) {
-                auto update_shadow_and_clocks = [&](bool isGrounded) {
-                    gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
-                    gameState.lockClock = frameStartClock;
-                    if (isGrounded) {
-                        gameState.dropClock = frameStartClock;
-                    }
-                };
-
-                enum class HorDir {
-                    Left,
-                    Right
-                };
-
-                auto move_horizontal = [&] (HorDir const dir) {
-                    // if currentShape is on top of a block before move,
-                    // the drop clock needs to be reset
-                    auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
-                    auto const dirVec {dir == HorDir::Right ? V2{1, 0} : V2{-1, 0}};
-                    if (gameState.board.try_move(gameState.currentShape, dirVec)) {
-                        update_shadow_and_clocks(isGrounded);
-                        // if you move the piece you cancel the drop
-                        gameState.droppedRows = 0;
-                        if (isGrounded) {
-                            gameState.softDropRowCount = 0;
-                        }
-                    }
-                };
-
-                auto rotate_current_shape = [&] (Shape::RotationDirection rot) {
-                    // if currentShape is on top of a block before rotation,
-                    // the drop clock needs to be reset
-                    auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
-                    if (auto const rotation {gameState.board.rotate_shape(gameState.currentShape, rot)}; rotation) {
-                        update_shadow_and_clocks(isGrounded);
-                        gameState.currentRotationType = rotation;
-                        // if you rotate the piece you cancel the drop
-                        gameState.droppedRows = 0;
-                        if ((rotation == Shape::RotationType::Wallkick) && isGrounded) {
-                            gameState.softDropRowCount = 0;
-                        }
-                    }
-                };
-
-                if (message.type == Message::Type::Move_right) {
-                    move_horizontal(HorDir::Right);
-                } else if (message.type == Message::Type::Move_left) {
-                    move_horizontal(HorDir::Left);
-                } else if (message.type == Message::Type::Increase_speed) {
-                    // TODO: How does this work if you e.g. press
-                    // left/right/rotate while holding button down?
-                    // is isSoftDropping still true at that time?
-
-                    // This message currently gets spammed when you hold down
-                    // the button, so resetting the soft drop count directly
-                    // will continue resetting it while the button is pressed.
-                    // In order to avoid that we check if isSoftDropping has
-                    // been set, which only happens during spam.
-                    if (!gameState.isSoftDropping) {
-                        gameState.softDropRowCount = 0;
-                    }
-                    gameState.isSoftDropping = true;
-                } else if (message.type == Message::Type::Reset_speed) {
-                    gameState.isSoftDropping = false;
-
-                    // softdrops only get reset if the piece can currently fall
-                    if (gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
-                        gameState.softDropRowCount = 0;
-                    }
-                } else if (message.type == Message::Type::Drop) {
-                    auto droppedRows {0};
-                    while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
-                        gameState.lockClock = frameStartClock;
-                        gameState.currentRotationType = std::nullopt;
-                        ++droppedRows;
-                    }
-                    gameState.droppedRows = droppedRows;
-
-                    // hard drop overrides soft drop
-                    if (droppedRows) {
-                        gameState.softDropRowCount = 0;
-                    }
-                } else if (message.type == Message::Type::Rotate_left) {
-                    rotate_current_shape(Shape::RotationDirection::Left);
-                } else if (message.type == Message::Type::Rotate_right) {
-                    rotate_current_shape(Shape::RotationDirection::Right);
-                } else if (message.type == Message::Type::Rotate_right) {
-                } else if (message.type == Message::Type::Hold) {
-                    if (!gameState.hasHeld) {
-                        gameState.hasHeld = true;
-                        gameState.currentRotationType = std::nullopt;
-                        if (gameState.holdShape) {
-                            auto const holdType {gameState.holdShape->type};
-
-                            gameState.holdShape = Shape(gameState.currentShape.type);
-                            gameState.currentShape = Shape(holdType);
-                        } else {
-                            gameState.holdShape = Shape(gameState.currentShape.type);
-                            gameState.currentShape = gameState.shapePool.next_shape();
-                        }
-
-                        gameState.softDropRowCount = 0;
-                        gameState.droppedRows = 0;
-
-                        auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
-                        update_shadow_and_clocks(isGrounded);
-                    }
-                } else if (message.type == Message::Type::Pause) {
-                    gameState.paused = !gameState.paused;
-                    // TODO: maybe save the amount of clocks left when the game was paused and set them again here.
-                    gameState.dropClock = frameStartClock;
-                    gameState.lockClock = frameStartClock;
-                }
-            }
-        }
-
+        handle_input(programState, gameState);
         // sim
-        if (levelType == LevelType::Game) {
+        if (programState.levelType == ProgramState::LevelType::Game) {
             auto const dropDelay = [&]() {
                 auto const levelDropDelay {gameState.drop_delay_for_level()};
-                if (gameState.isSoftDropping && (softDropDelay < levelDropDelay)) {
-                    return softDropDelay;
+                if (gameState.isSoftDropping && (GameState::softDropDelay < levelDropDelay)) {
+                    return GameState::softDropDelay;
                 } else {
                     return levelDropDelay;
                 }
@@ -365,10 +170,10 @@ auto run() -> void
                 // (e.g. at max drop speed it should drop all the way to the bottom
                 // instantly)
                 auto const nextdropClock {gameState.dropClock + dropDelay * CLOCKS_PER_SEC};
-                if (frameStartClock > nextdropClock) {
-                    gameState.dropClock = frameStartClock;
+                if (programState.frameStartClock > nextdropClock) {
+                    gameState.dropClock = programState.frameStartClock;
                     if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
-                        gameState.lockClock = frameStartClock;
+                        gameState.lockClock = programState.frameStartClock;
                         gameState.currentRotationType = std::nullopt;
 
                         if (gameState.isSoftDropping) {
@@ -379,7 +184,7 @@ auto run() -> void
                     }
                 }
 
-                if (frameStartClock > gameState.lockClock + lockDelay) {
+                if (programState.frameStartClock > gameState.lockClock + GameState::lockDelay) {
                     // only care about locking if currentShape is on top of a block
                     if (!gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
                         // game over if entire piece is above visible portion
@@ -500,7 +305,7 @@ auto run() -> void
                         // update shape shadow
                         gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
 
-                        gameState.lockClock = frameStartClock;
+                        gameState.lockClock = programState.frameStartClock;
 
                         gameState.hasHeld = false;
 
@@ -511,8 +316,8 @@ auto run() -> void
 
                         if (gameOver) {
                             std::cout << "Game Over!\n";
-                            if (gameState.score > highScore) highScore = gameState.score;
-                            levelType = LevelType::Menu;
+                            if (gameState.score > programState.highScore) programState.highScore = gameState.score;
+                            programState.levelType = ProgramState::LevelType::Menu;
                         }
 
                     }
@@ -538,22 +343,22 @@ auto run() -> void
                     gameState.paused = false;
 
                     // TODO: maybe save the amount of clocks left when the game was paused and set them again here.
-                    gameState.dropClock = frameStartClock;
-                    gameState.lockClock = frameStartClock;
+                    gameState.dropClock = programState.frameStartClock;
+                    gameState.lockClock = programState.frameStartClock;
                 }
                 if (UI::button("Main Menu", 0.06, UI::XAlignment::Center)) {
-                    levelType = LevelType::Menu;
+                    programState.levelType = ProgramState::LevelType::Menu;
                 }
                 if (UI::button("Quit", 0.06, UI::XAlignment::Center)) {
-                    running = false;
+                    programState.running = false;
                 }
 
                 UI::end_menu();
             }
 
-        } else if (levelType == LevelType::Menu) {
+        } else if (programState.levelType == ProgramState::LevelType::Menu) {
             auto const highScoreFontSize {0.048};
-            UI::label(fmt::format("High Score: {}", highScore), highScoreFontSize, UI::XAlignment::Right);
+            UI::label(fmt::format("High Score: {}", programState.highScore), highScoreFontSize, UI::XAlignment::Right);
 
             auto const menuY {1. / 10.};
             auto const menuFontSize {1. / 10.};
@@ -564,8 +369,8 @@ auto run() -> void
                 // but the UI being rendered this frame will be the main menu's
                 // instead of the game field's since that's the simulation
                 // branch we're currently on.
-                levelType = LevelType::Game;
-                gameState.reset();
+                programState.levelType = ProgramState::LevelType::Game;
+                gameState = GameState{menuState.level};
             }
             UI::spinbox("Level", menuFontSize / 2., UI::XAlignment::Center, 0., menuState.level, gMinLevel, gMaxLevel);
             UI::end_menu();
@@ -586,10 +391,10 @@ auto run() -> void
             }
         }
 
-        switch (levelType) {
-            case LevelType::Menu: {
+        switch (programState.levelType) {
+            case ProgramState::LevelType::Menu: {
             } break;
-            case LevelType::Game: {
+            case ProgramState::LevelType::Game: {
                 // draw playarea background
                 for (auto y {2}; y < Board::rows; ++y) {
                     for (auto x {0}; x < Board::columns; ++x) {

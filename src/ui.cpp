@@ -213,11 +213,11 @@ namespace UI {
         spinbox(std::move(spinBox));
     }
 
-    auto update_state(Message const message) -> void {
-        if (message.type == Message::Type::Mousebuttondown) {
+    auto update_state(Event const event) -> void {
+        if (event.type == Event::Type::Mousebuttondown) {
             clicked = true;
-            cursor.x = double(message.x);
-            cursor.y = double(message.y);
+            cursor.x = double(event.x);
+            cursor.y = double(event.y);
         }
     }
 
