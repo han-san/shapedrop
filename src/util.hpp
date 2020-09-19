@@ -104,32 +104,44 @@ using V2f = V2Generic<double>;
 using V3f = V3Generic<double>;
 using V4f = V4Generic<double>;
 
-using RGB = V3;
-using RGBA = V4;
+namespace Color {
+    struct RGBA {
+        u8 static constexpr maxChannelValue{0xFF};
+        struct Alpha {
+            u8 static constexpr opaque {maxChannelValue};
+            u8 static constexpr transparent {0};
+        };
 
-struct Color {
-    RGB static constexpr red {0xFF, 0x00, 0x00};
-    RGB static constexpr green {0x00, 0xFF, 0x00};
-    RGB static constexpr blue {0x00, 0x00, 0xFF};
-    RGB static constexpr cyan {0x00, 0xFF, 0xFF};
+        constexpr RGBA() = default;
+        constexpr RGBA(int const rr, int const gg, int const bb)
+            : r{rr}, g{gg}, b{bb}
+        {}
+        constexpr RGBA(int const rr, int const gg, int const bb, int const aa)
+            : r{rr}, g{gg}, b{bb}, a{aa}
+        {}
 
-    u8 static constexpr maxChannelValue{0xFF};
+        int r {0};
+        int g {0};
+        int b {0};
+        int a {Alpha::opaque};
+    };
+
+    RGBA static constexpr red {0xFF, 0, 0};
+    RGBA static constexpr green {0, 0xFF, 0};
+    RGBA static constexpr blue {0, 0, 0xFF};
+    RGBA static constexpr cyan {0, 0xFF, 0xFF};
+    RGBA static constexpr transparent {0, 0, 0, RGBA::Alpha::transparent};
 
     struct Shape {
-        RGB static constexpr I {0x00, 0xF0, 0xF0};
-        RGB static constexpr O {0xF0, 0xF0, 0x00};
-        RGB static constexpr L {0xF0, 0xA0, 0x00};
-        RGB static constexpr J {0x00, 0x00, 0xF0};
-        RGB static constexpr S {0x00, 0xF0, 0x00};
-        RGB static constexpr Z {0xF0, 0x00, 0x00};
-        RGB static constexpr T {0xA0, 0x00, 0xF0};
+        RGBA static constexpr I {0, 0xF0, 0xF0};
+        RGBA static constexpr O {0xF0, 0xF0, 0};
+        RGBA static constexpr L {0xF0, 0xA0, 0};
+        RGBA static constexpr J {0, 0, 0xF0};
+        RGBA static constexpr S {0, 0xF0, 0};
+        RGBA static constexpr Z {0xF0, 0, 0};
+        RGBA static constexpr T {0xA0, 0, 0xF0};
     };
-
-    struct Alpha {
-        u8 static constexpr opaque {0xFF};
-        u8 static constexpr transparent {0xFF};
-    };
-};
+}
 
 using Square = V4;
 using Squaref = V4f;

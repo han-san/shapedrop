@@ -16,7 +16,7 @@ auto static alpha_blend_channel(int const bg, int const fg, int const alpha) -> 
     return fg * alphaRatio + bg * (1 - alphaRatio);
 }
 
-auto static draw_pixel(void* data, RGBA const color) -> void
+auto static draw_pixel(void* data, Color::RGBA const color) -> void
 {
     auto byte {(u8*) data};
     *byte = u8(alpha_blend_channel(*byte, color.b, color.a));
@@ -55,8 +55,7 @@ auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int 
 }
 
 auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, double const x, double const y) -> void
-{
-    draw_font_string(buf, fontString, int(x * buf.w), int(y * buf.h));
+{ draw_font_string(buf, fontString, int(x * buf.w), int(y * buf.h));
 }
 
 auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int const y, double const pixelHeight) -> void
@@ -70,7 +69,7 @@ auto draw_text_normalized(BackBuffer& buf, std::string_view const text, double c
     draw_text(buf, text, int(x * buf.w), int(y * buf.h), pixelHeight * buf.h);
 }
 
-auto draw_solid_square(BackBuffer& buf, Squaref const sqr, RGB const color, int const a) -> void
+auto draw_solid_square(BackBuffer& buf, Squaref const sqr, Color::RGBA const color) -> void
 {
     for (auto y {0}; y < sqr.h; ++y) {
         auto const pixely {(int)sqr.y + y};
@@ -86,22 +85,22 @@ auto draw_solid_square(BackBuffer& buf, Squaref const sqr, RGB const color, int 
             auto const currbyteindex {pixely * buf.w + pixelx};
             auto currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
 
-            draw_pixel(currbyte, {color.r, color.g, color.b, a});
+            draw_pixel(currbyte, color);
         }
     }
 }
 
-auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, RGB const color, int const a) -> void
+auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, Color::RGBA const color) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
     sqr.w *= buf.w;
     sqr.h *= buf.h;
 
-    draw_solid_square(buf, sqr, color, a);
+    draw_solid_square(buf, sqr, color);
 }
 
-auto draw_hollow_square(BackBuffer& buf, Squaref const sqr, RGB const color, int const a, int const borderSize) -> void
+auto draw_hollow_square(BackBuffer& buf, Squaref const sqr, Color::RGBA const color, int const borderSize) -> void
 {
     for (auto y {0}; y < sqr.h; ++y) {
         auto const pixely {(int)sqr.y + y};
@@ -124,19 +123,19 @@ auto draw_hollow_square(BackBuffer& buf, Squaref const sqr, RGB const color, int
             auto const currbyteindex {pixely * buf.w + pixelx};
             auto currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
 
-            draw_pixel(currbyte, {color.r, color.g, color.b, a});
+            draw_pixel(currbyte, color);
         }
     }
 }
 
-auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, RGB const color, int const a, int const borderSize) -> void
+auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, Color::RGBA const color, int const borderSize) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
     sqr.w *= buf.w;
     sqr.h *= buf.h;
 
-    draw_hollow_square(buf, sqr, color, a, borderSize);
+    draw_hollow_square(buf, sqr, color, borderSize);
 }
 
 auto draw_image(BackBuffer& backBuf, Position const dest, BackBuffer& img) -> void
@@ -178,10 +177,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     auto const scale {get_window_scale()};
     for (auto y {0}; y < windim.h; ++y) {
         for (auto x {0}; x < windim.w; ++x) {
-            RGB const color {
-                int(Color::maxChannelValue * (double(x) / windim.w)),
-                    int(Color::maxChannelValue * (1 - (double(x) / windim.w) * (double(y) / windim.h))),
-                    int(Color::maxChannelValue * (double(y) / windim.h)),
+            Color::RGBA const color {
+                int(Color::RGBA::maxChannelValue * (double(x) / windim.w)),
+                    int(Color::RGBA::maxChannelValue * (1 - (double(x) / windim.w) * (double(y) / windim.h))),
+                    int(Color::RGBA::maxChannelValue * (double(y) / windim.h)),
             };
             draw_solid_square(bb, {double(x), double(y), 1, 1}, color);
         }
@@ -196,7 +195,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                 for (auto x {0}; x < Board::columns; ++x) {
                     auto currindex {y * Board::columns + x};
                     auto& block {gameState.board.data[currindex]};
-                    auto color {block.isActive ? block.color : RGB { 0, 0, 0 }};
+                    auto color {block.isActive ? block.color : Color::RGBA {}};
                     Squaref square {
                         double((x + gPlayAreaDim.x) * scale),
                             double((y - 2 + gPlayAreaDim.y) * scale),
@@ -207,7 +206,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                 }
             }
 
-            auto draw_shape_in_play_area = [&](Shape& shape, int transparency) {
+            auto draw_shape_in_play_area = [&](Shape& shape) {
                 for (auto& position : shape.get_absolute_block_positions()) {
                     // since the top 2 rows shouldn't be visible, the y
                     // position for drawing is 2 less than the shape's
@@ -222,12 +221,12 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                             double(scale)
                     };
 
-                    draw_solid_square(bb, square, shape.color, transparency);
+                    draw_solid_square(bb, square, shape.color);
                 }
             };
 
-            draw_shape_in_play_area(gameState.currentShapeShadow, Color::Alpha::opaque / 2);
-            draw_shape_in_play_area(gameState.currentShape, Color::Alpha::opaque);
+            draw_shape_in_play_area(gameState.currentShapeShadow);
+            draw_shape_in_play_area(gameState.currentShape);
 
             // draw shape previews
             auto const previewArray {gameState.shapePool.get_preview_shapes_array()};

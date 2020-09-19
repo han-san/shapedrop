@@ -35,7 +35,7 @@ namespace UI {
 
     struct Background {
         WindowScaleRect region;
-        RGBA color;
+        Color::RGBA color;
     };
     std::vector<Background> static backgrounds {};
 
@@ -225,7 +225,7 @@ namespace UI {
         assert(menus.empty());
 
         for (auto const& bg : backgrounds) {
-            draw_solid_square_normalized(bb, to_squaref(bg.region), {bg.color.r, bg.color.g, bg.color.b}, bg.color.a);
+            draw_solid_square_normalized(bb, to_squaref(bg.region), bg.color);
         }
         backgrounds.clear();
 
@@ -238,7 +238,7 @@ namespace UI {
         clicked = false;
     }
 
-    auto begin_menu(RelativeScaleRect const region, RGBA const bgColor) -> void {
+    auto begin_menu(RelativeScaleRect const region, Color::RGBA const bgColor) -> void {
         auto const regionRelativeToWindow {to_window_scale(region)};
         add_region_as_child_of_current_menu(regionRelativeToWindow);
         menus.push_back({regionRelativeToWindow, {}});
@@ -247,10 +247,6 @@ namespace UI {
         if (bgColor.a) {
             backgrounds.push_back({regionRelativeToWindow, bgColor});
         }
-    }
-
-    auto begin_menu(RelativeScaleRect const region, RGB const bgColor, u8 const alpha) -> void {
-        begin_menu(region, {bgColor.r, bgColor.g, bgColor.b, alpha});
     }
 
     auto end_menu() -> void {

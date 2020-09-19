@@ -239,7 +239,7 @@ public:
     Type type;
     RotationMap const* rotationMap {nullptr};
     Rotation rotation {Rotation::r0};
-    RGB color;
+    Color::RGBA color;
     Position pos;
 
     Shape(Type type) noexcept;
