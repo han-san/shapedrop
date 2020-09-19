@@ -178,9 +178,9 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     for (auto y {0}; y < windim.h; ++y) {
         for (auto x {0}; x < windim.w; ++x) {
             Color::RGBA const color {
-                int(Color::RGBA::maxChannelValue * (double(x) / windim.w)),
-                    int(Color::RGBA::maxChannelValue * (1 - (double(x) / windim.w) * (double(y) / windim.h))),
-                    int(Color::RGBA::maxChannelValue * (double(y) / windim.h)),
+                static_cast<u8>(Color::RGBA::maxChannelValue * (double(x) / windim.w)),
+                    static_cast<u8>(Color::RGBA::maxChannelValue * (1 - (double(x) / windim.w) * (double(y) / windim.h))),
+                    static_cast<u8>(Color::RGBA::maxChannelValue * (double(y) / windim.h)),
             };
             draw_solid_square(bb, {double(x), double(y), 1, 1}, color);
         }

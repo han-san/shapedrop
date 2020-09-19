@@ -113,17 +113,17 @@ namespace Color {
         };
 
         constexpr RGBA() = default;
-        constexpr RGBA(int const rr, int const gg, int const bb)
+        constexpr RGBA(u8 const rr, u8 const gg, u8 const bb)
             : r{rr}, g{gg}, b{bb}
         {}
-        constexpr RGBA(int const rr, int const gg, int const bb, int const aa)
+        constexpr RGBA(u8 const rr, u8 const gg, u8 const bb, u8 const aa)
             : r{rr}, g{gg}, b{bb}, a{aa}
         {}
 
-        int r {0};
-        int g {0};
-        int b {0};
-        int a {Alpha::opaque};
+        u8 r {0};
+        u8 g {0};
+        u8 b {0};
+        u8 a {Alpha::opaque};
     };
 
     RGBA static constexpr red {0xFF, 0, 0};
