@@ -24,7 +24,7 @@ public:
     int static constexpr columns {10};
     int static constexpr visibleRows {rows - 2};
 
-    std::array<Block, rows * columns> data;
+    std::array<Block, rows * columns> data {make_filled_array<Block, rows * columns>({Color::black, false})};
 
     auto rotate_shape(Shape& shape, Shape::RotationDirection dir) const -> std::optional<Shape::RotationType>;
     auto try_move(Shape& shape, V2 move) const -> bool;

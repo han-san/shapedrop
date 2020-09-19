@@ -203,3 +203,13 @@ auto inline point_is_in_rect(Position const point, Square const rect) {
         (point.y >= rect.y) &&
         (point.y <= rect.y + rect.h);
 }
+
+// This won't work if T doesn't have a default constructor. If it does have
+// one, there's a potential performance hit from default constructing every
+// element and then immediately reassigning all of them.
+template <typename T, std::size_t N>
+auto constexpr make_filled_array(T const val) {
+    std::array<T, N> arr;
+    arr.fill(val);
+    return arr;
+}
