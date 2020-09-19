@@ -111,16 +111,6 @@ auto Board::remove_full_rows() -> int {
         return 0;
     }
 
-    // FIXME: this doesn't really do anything I think. The rows above get moved onto them anyway.
-    // remove rows
-    for (auto const y : rowsCleared) {
-        for (auto x {0}; x < columns; ++x) {
-            auto const index {y * columns + x};
-            data[index].isActive = false;
-            data[index].color = Color::black;
-        }
-    }
-
     auto move_row_down = [this](int const rowNumber, int const distance) {
         assert(distance > 0);
         for (auto x {0}; x < columns; ++x) {
