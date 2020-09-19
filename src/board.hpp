@@ -9,7 +9,7 @@
 #include "util.hpp"
 
 struct Block {
-    Color::RGBA color;
+    Color::RGBA color {Color::invalid};
     bool isActive {false};
 };
 

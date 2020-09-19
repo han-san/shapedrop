@@ -195,7 +195,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                 for (auto x {0}; x < Board::columns; ++x) {
                     auto currindex {y * Board::columns + x};
                     auto& block {gameState.board.data[currindex]};
-                    auto color {block.isActive ? block.color : Color::RGBA {}};
+                    auto color {block.isActive ? block.color : Color::black};
                     Squaref square {
                         double((x + gPlayAreaDim.x) * scale),
                             double((y - 2 + gPlayAreaDim.y) * scale),

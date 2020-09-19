@@ -112,7 +112,6 @@ namespace Color {
             u8 static constexpr transparent {0};
         };
 
-        constexpr RGBA() = default;
         constexpr RGBA(u8 const rr, u8 const gg, u8 const bb)
             : r{rr}, g{gg}, b{bb}
         {}
@@ -130,7 +129,14 @@ namespace Color {
     RGBA static constexpr green {0, 0xFF, 0};
     RGBA static constexpr blue {0, 0, 0xFF};
     RGBA static constexpr cyan {0, 0xFF, 0xFF};
+    RGBA static constexpr white {0xFF, 0xFF, 0xFF};
+    RGBA static constexpr black {0, 0, 0};
     RGBA static constexpr transparent {0, 0, 0, RGBA::Alpha::transparent};
+
+    // An invalid color to give some visual feedback when a color hasn't been
+    // properly initialized. White isn't really used otherwise in the game, so
+    // hopefully it will be obvious that something is wrong.
+    RGBA static constexpr invalid {white};
 
     struct Shape {
         RGBA static constexpr I {0, 0xF0, 0xF0};

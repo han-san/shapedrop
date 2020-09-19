@@ -6,8 +6,8 @@
 
 namespace tests {
     auto remove_full_rows() -> void {
-        Block const y { {}, true };
-        Block const n { {}, false };
+        Block const y { Color::invalid, true };
+        Block const n { Color::invalid, false };
         Board boardStart;
         boardStart.data = {
             n, n, n, n, n, n, n, n, n, n,

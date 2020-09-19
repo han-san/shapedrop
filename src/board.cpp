@@ -111,11 +111,13 @@ auto Board::remove_full_rows() -> int {
         return 0;
     }
 
+    // FIXME: this doesn't really do anything I think. The rows above get moved onto them anyway.
     // remove rows
     for (auto const y : rowsCleared) {
         for (auto x {0}; x < columns; ++x) {
             auto const index {y * columns + x};
             data[index].isActive = false;
+            data[index].color = Color::black;
         }
     }
 
@@ -129,6 +131,7 @@ auto Board::remove_full_rows() -> int {
             auto& newBlock {this->data[newIndex]};
             newBlock = oldBlock;
             oldBlock.isActive = false;
+            oldBlock.color = Color::black;
         }
     };
 
