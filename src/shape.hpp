@@ -203,7 +203,7 @@ public:
         I, O, L, J, S, Z, T
     };
 
-    std::array<V2, 7> static constexpr dimensions { V2 {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
+    std::array<Rect<int>::Size, 7> static constexpr dimensions { Rect<int>::Size {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
 
     enum class RotationDirection {
         Left,

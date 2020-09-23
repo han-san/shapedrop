@@ -7,6 +7,7 @@
 #include "../core.hpp"
 #include "../input.hpp"
 #include "../font.hpp"
+#include "../util.hpp"
 
 #include "sdlmain.hpp"
 
@@ -37,12 +38,12 @@ auto get_back_buffer() -> BackBuffer
     return bbuf;
 }
 
-auto get_window_dimensions() -> V2
+auto get_window_dimensions() -> Rect<int>::Size
 {
     return {window.surface->w, window.surface->h};
 }
 
-auto static resize_window(V2 const dimensions) {
+auto static resize_window(Rect<int>::Size const dimensions) {
     SDL_SetWindowSize(window.handle, dimensions.w, dimensions.h);
     window.surface = SDL_GetWindowSurface(window.handle);
     assert(window.surface);
@@ -69,7 +70,7 @@ auto swap_buffer() -> void
     SDL_UpdateWindowSurface(window.handle);
 }
 
-auto static window_fits_on_screen(V2 windowDimensions) -> bool {
+auto static window_fits_on_screen(Rect<int>::Size windowDimensions) -> bool {
     SDL_Rect displayBounds {};
     SDL_GetDisplayUsableBounds(0, &displayBounds);
 
@@ -145,10 +146,10 @@ auto static init_window() {
 
     auto newScale {windowScale};
     {
-        V2 dim {};
+        Rect<int>::Size dim {};
         do {
             ++newScale;
-            dim = V2 {gBaseWindowWidth * newScale, gBaseWindowHeight * newScale};
+            dim = {gBaseWindowWidth * newScale, gBaseWindowHeight * newScale};
         } while (window_fits_on_screen(dim));
     }
     --newScale;

@@ -6,14 +6,8 @@
 
 template <typename T>
 struct V2Generic {
-    union {
-        T w {0};
-        T x;
-    };
-    union {
-        T h {0};
-        T y;
-    };
+    T x {0};
+    T y {0};
 
     constexpr V2Generic() = default;
     constexpr V2Generic(T const a, T const b): x{a}, y{b} {}
@@ -32,18 +26,9 @@ struct V2Generic {
 
 template <typename T>
 struct V3Generic {
-    union {
-        T x {0};
-        T r;
-    };
-    union {
-        T y {0};
-        T g;
-    };
-    union {
-        T z {0};
-        T b;
-    };
+    T x {0};
+    T y {0};
+    T z {0};
 
     constexpr V3Generic() = default;
     constexpr V3Generic(T const a, T const b, T const c): x{a}, y{b}, z{c} {}
@@ -61,48 +46,10 @@ struct V3Generic {
     }
 };
 
-template <typename T>
-struct V4Generic {
-    union {
-        T x {0};
-        T r;
-    };
-    union {
-        T y {0};
-        T g;
-    };
-    union {
-        T w {0};
-        T b;
-    };
-    union {
-        T h {0};
-        T a;
-    };
-
-    constexpr V4Generic() = default;
-    constexpr V4Generic(T const a, T const b, T const c, T const d): x{a}, y{b}, w{c}, h{d} {}
-
-    using ThisType = V4Generic<T>;
-
-    auto constexpr operator +=(ThisType const& rhs) -> ThisType& {
-        x += rhs.x;
-        y += rhs.y;
-        w += rhs.w;
-        h += rhs.h;
-        return *this;
-    }
-    auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
-        return lhs += rhs;
-    }
-};
-
 using V2 = V2Generic<int>;
 using V3 = V3Generic<int>;
-using V4 = V4Generic<int>;
 using V2f = V2Generic<double>;
 using V3f = V3Generic<double>;
-using V4f = V4Generic<double>;
 
 namespace Color {
     struct RGBA {
@@ -152,6 +99,10 @@ namespace Color {
 template <typename T>
 struct Rect {
     T x, y, w, h;
+
+    struct Size {
+        T w, h;
+    };
 };
 
 template <typename T>

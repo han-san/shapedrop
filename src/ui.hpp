@@ -86,10 +86,10 @@ namespace UI {
         }
     };
 
-    using WindowScalePoint = V2Generic<WindowScale>;
-    using WindowScaleRect = V4Generic<WindowScale>;
-    using RelativeScalePoint = V2Generic<RelativeScale>;
-    using RelativeScaleRect = V4Generic<RelativeScale>;
+    using WindowScalePoint = Point<WindowScale>;
+    using WindowScaleRect = Rect<WindowScale>;
+    using RelativeScalePoint = Point<RelativeScale>;
+    using RelativeScaleRect = Rect<RelativeScale>;
 
     enum class XAlignment {
         Left,
