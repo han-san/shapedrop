@@ -21,7 +21,7 @@ auto static get_font_path() -> std::string
 auto init_font(std::string const& fontName) -> bool
 {
     auto const filePath {get_font_path() + fontName};
-    auto file {fopen(filePath.data(), "rb")};
+    auto* file {fopen(filePath.data(), "rb")};
     if (!file) return false;
     fread(ttf_buffer, 1, 1<<25, file);
     stbtt_InitFont(&font, ttf_buffer, stbtt_GetFontOffsetForIndex(&(*ttf_buffer), 0));

@@ -18,7 +18,7 @@ auto static alpha_blend_channel(int const bg, int const fg, int const alpha) -> 
 
 auto static draw_pixel(void* data, Color::RGBA const color) -> void
 {
-    auto byte {(u8*) data};
+    auto* byte {(u8*) data};
     *byte = u8(alpha_blend_channel(*byte, color.b, color.a));
     ++byte;
     *byte = u8(alpha_blend_channel(*byte, color.g, color.a));
@@ -36,7 +36,7 @@ auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharac
             if (currX < 0 || currX >= buf.w) continue;
 
             auto const currbyteindex {currY * buf.w + currX};
-            auto currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
+            auto* currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
 
             auto const relativeIndex {y * fontCharacter.w + x};
             auto const a {fontCharacter.bitmap[relativeIndex]};
@@ -83,7 +83,7 @@ auto draw_solid_square(BackBuffer& buf, Rect<double> const sqr, Color::RGBA cons
             }
 
             auto const currbyteindex {pixely * buf.w + pixelx};
-            auto currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
+            auto* currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
 
             draw_pixel(currbyte, color);
         }
@@ -121,7 +121,7 @@ auto draw_hollow_square(BackBuffer& buf, Rect<double> const sqr, Color::RGBA con
             }
 
             auto const currbyteindex {pixely * buf.w + pixelx};
-            auto currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
+            auto* currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
 
             draw_pixel(currbyte, color);
         }
@@ -152,9 +152,9 @@ auto draw_image(BackBuffer& backBuf, Point<int> const dest, BackBuffer& img) -> 
             }
 
             auto const currBBbyteindex {pixely * backBuf.w + pixelx};
-            auto currBBbyte {((u8*)backBuf.memory + currBBbyteindex * backBuf.bpp)};
+            auto* currBBbyte {((u8*)backBuf.memory + currBBbyteindex * backBuf.bpp)};
             auto const currimgbyteindex {y * img.w + x};
-            auto currimgbyte {((u8*)img.memory + currimgbyteindex * img.bpp)};
+            auto* currimgbyte {((u8*)img.memory + currimgbyteindex * img.bpp)};
 
             auto const r {*currimgbyte++};
             auto const g {*currimgbyte++};
