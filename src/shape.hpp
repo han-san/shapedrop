@@ -240,13 +240,13 @@ public:
     RotationMap const* rotationMap {nullptr};
     Rotation rotation {Rotation::r0};
     Color::RGBA color {Color::invalid};
-    Position pos;
+    Point<int> pos;
 
     Shape(Type type) noexcept;
 
     // All shapes are composed of 4 blocks.
     std::size_t static constexpr BLOCK_COUNT {4};
-    using BlockStack = ArrayStack<Position, BLOCK_COUNT>;
+    using BlockStack = ArrayStack<Point<int>, BLOCK_COUNT>;
 
     auto get_block_positions() const -> BlockStack;
     auto get_absolute_block_positions() const -> BlockStack;

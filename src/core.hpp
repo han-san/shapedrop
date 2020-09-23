@@ -14,12 +14,12 @@ struct BackBuffer {
 
 auto constexpr gBorderSize {1};
 
-Square constexpr gHoldShapeDim {gBorderSize, gBorderSize, 5, 3};
-Square constexpr gPlayAreaDim {
+Rect<int> constexpr gHoldShapeDim {gBorderSize, gBorderSize, 5, 3};
+Rect<int> constexpr gPlayAreaDim {
     gBorderSize, (gBorderSize + gHoldShapeDim.h + gBorderSize),
     Board::columns, Board::visibleRows
 };
-Square constexpr gSidebarDim {
+Rect<int> constexpr gSidebarDim {
     (gBorderSize + gPlayAreaDim.w + gBorderSize), gBorderSize,
     4, (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)
 };

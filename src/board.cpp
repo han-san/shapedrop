@@ -48,7 +48,7 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
     return std::nullopt;
 }
 
-auto Board::is_valid_spot(Position const pos) const -> bool {
+auto Board::is_valid_spot(Point<int> const pos) const -> bool {
     if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
         return false;
     } else {

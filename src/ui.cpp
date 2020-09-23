@@ -16,7 +16,7 @@ using namespace std::string_literals;
 
 namespace UI {
 
-    Positionf static cursor {};
+    Point<double> static cursor {};
     auto static clicked {false};
 
     struct TextInfo {
@@ -39,7 +39,7 @@ namespace UI {
     };
     std::vector<Background> static backgrounds {};
 
-    auto static to_squaref(WindowScaleRect const rect) -> Squaref {
+    auto static to_squaref(WindowScaleRect const rect) -> Rect<double> {
         return {double(rect.x), double(rect.y), double(rect.w), double(rect.h)};
     }
 

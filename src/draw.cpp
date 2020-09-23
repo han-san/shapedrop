@@ -69,7 +69,7 @@ auto draw_text_normalized(BackBuffer& buf, std::string_view const text, double c
     draw_text(buf, text, int(x * buf.w), int(y * buf.h), pixelHeight * buf.h);
 }
 
-auto draw_solid_square(BackBuffer& buf, Squaref const sqr, Color::RGBA const color) -> void
+auto draw_solid_square(BackBuffer& buf, Rect<double> const sqr, Color::RGBA const color) -> void
 {
     for (auto y {0}; y < sqr.h; ++y) {
         auto const pixely {(int)sqr.y + y};
@@ -90,7 +90,7 @@ auto draw_solid_square(BackBuffer& buf, Squaref const sqr, Color::RGBA const col
     }
 }
 
-auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, Color::RGBA const color) -> void
+auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA const color) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
@@ -100,7 +100,7 @@ auto draw_solid_square_normalized(BackBuffer& buf, Squaref sqr, Color::RGBA cons
     draw_solid_square(buf, sqr, color);
 }
 
-auto draw_hollow_square(BackBuffer& buf, Squaref const sqr, Color::RGBA const color, int const borderSize) -> void
+auto draw_hollow_square(BackBuffer& buf, Rect<double> const sqr, Color::RGBA const color, int const borderSize) -> void
 {
     for (auto y {0}; y < sqr.h; ++y) {
         auto const pixely {(int)sqr.y + y};
@@ -128,7 +128,7 @@ auto draw_hollow_square(BackBuffer& buf, Squaref const sqr, Color::RGBA const co
     }
 }
 
-auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, Color::RGBA const color, int const borderSize) -> void
+auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA const color, int const borderSize) -> void
 {
     sqr.x *= buf.w;
     sqr.y *= buf.h;
@@ -138,7 +138,7 @@ auto draw_hollow_square_normalized(BackBuffer& buf, Squaref sqr, Color::RGBA con
     draw_hollow_square(buf, sqr, color, borderSize);
 }
 
-auto draw_image(BackBuffer& backBuf, Position const dest, BackBuffer& img) -> void
+auto draw_image(BackBuffer& backBuf, Point<int> const dest, BackBuffer& img) -> void
 {
     for (auto y {0}; y < img.h; ++y) {
         auto const pixely {(int)dest.y + y};
@@ -196,7 +196,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                     auto currindex {y * Board::columns + x};
                     auto& block {gameState.board.data[currindex]};
                     auto color {block.isActive ? block.color : Color::black};
-                    Squaref square {
+                    Rect<double> square {
                         double((x + gPlayAreaDim.x) * scale),
                             double((y - 2 + gPlayAreaDim.y) * scale),
                             double(scale),
@@ -214,7 +214,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
                     // don't draw if square is above the playarea
                     if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) continue;
-                    Squaref square {
+                    Rect<double> square {
                         double((position.x + gPlayAreaDim.x) * scale),
                             double((actualYPosition + gPlayAreaDim.y) * scale),
                             double(scale),
@@ -237,7 +237,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                 auto const ySpacing {3}; // max height of a shape is 2 + 1 for a block of space
                 shape.pos.y = gSidebarDim.y + ySpacing * i;
                 for (auto& position : shape.get_absolute_block_positions()) {
-                    Squaref square {
+                    Rect<double> square {
                         double((position.x) * scale),
                             double((position.y) * scale),
                             double(scale),
@@ -249,7 +249,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             }
 
             // draw held shape
-            Squaref holdShapeDim{};
+            Rect<double> holdShapeDim{};
             holdShapeDim.x = gHoldShapeDim.x * double(scale);
             holdShapeDim.y = gHoldShapeDim.y * double(scale);
             holdShapeDim.w = gHoldShapeDim.w * double(scale);
@@ -267,7 +267,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                 auto const yOffset {is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5};
 
                 for (auto& position : shape.get_absolute_block_positions()) {
-                    Squaref square {
+                    Rect<double> square {
                         double((position.x + gHoldShapeDim.x + xOffset) * scale),
                             double((position.y + gHoldShapeDim.y + yOffset) * scale),
                             double(scale),

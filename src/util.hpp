@@ -149,10 +149,24 @@ namespace Color {
     };
 }
 
-using Square = V4;
-using Squaref = V4f;
-using Position = V2;
-using Positionf = V2f;
+template <typename T>
+struct Rect {
+    T x, y, w, h;
+};
+
+template <typename T>
+struct Point {
+    T x, y;
+
+    auto constexpr operator +=(V2Generic<T> const& rhs) {
+        x += rhs.x;
+        y += rhs.y;
+        return *this;
+    }
+    auto constexpr friend operator +(Point<T> lhs, V2Generic<T> const& rhs) {
+        return lhs += rhs;
+    }
+};
 
 template <typename T, std::size_t I>
 class ArrayStack {
@@ -190,14 +204,8 @@ private:
     size_type m_size {0};
 };
 
-auto inline point_is_in_rect(Positionf const point, Squaref const rect) {
-    return (point.x >= rect.x) &&
-        (point.x <= rect.x + rect.w) &&
-        (point.y >= rect.y) &&
-        (point.y <= rect.y + rect.h);
-}
-
-auto inline point_is_in_rect(Position const point, Square const rect) {
+template <typename T>
+auto point_is_in_rect(Point<T> const point, Rect<T> const rect) {
     return (point.x >= rect.x) &&
         (point.x <= rect.x + rect.w) &&
         (point.y >= rect.y) &&
