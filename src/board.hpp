@@ -28,11 +28,11 @@ public:
 
     auto rotate_shape(Shape& shape, Shape::RotationDirection dir) const -> std::optional<Shape::RotationType>;
     auto try_move(Shape& shape, V2 move) const -> bool;
-    auto get_shadow(Shape const& shape) const -> Shape;
-    auto check_for_tspin(Shape const& shape, Shape::RotationType rotationType) const -> std::optional<TspinType>;
-    auto is_valid_spot(Point<int> pos) const -> bool;
-    auto is_valid_move(Shape shape, V2 move) const -> bool;
-    auto is_valid_shape(Shape const& shape) const -> bool;
+    [[nodiscard]] auto get_shadow(Shape const& shape) const -> Shape;
+    [[nodiscard]] auto check_for_tspin(Shape const& shape, Shape::RotationType rotationType) const -> std::optional<TspinType>;
+    [[nodiscard]] auto is_valid_spot(Point<int> pos) const -> bool;
+    [[nodiscard]] auto is_valid_move(Shape shape, V2 move) const -> bool;
+    [[nodiscard]] auto is_valid_shape(Shape const& shape) const -> bool;
     auto remove_full_rows() -> int;
     auto print_board() const -> void;
 };

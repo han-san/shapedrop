@@ -102,7 +102,7 @@ struct GameState {
         *this = GameState {startingLevel};
     }
 
-    auto drop_delay_for_level() const {
+    [[nodiscard]] auto drop_delay_for_level() const {
         auto const dropDelay {initialDropDelay - this->level * 0.1};
         // dropDelay can't be negative
         return dropDelay > 0. ? dropDelay : 0.;

@@ -133,22 +133,22 @@ public:
     using size_type = typename ArrayType::size_type;
     using difference_type = typename ArrayType::difference_type;
 
-    auto constexpr begin() noexcept -> iterator { return m_data.begin(); }
-    auto constexpr begin() const noexcept -> const_iterator { return m_data.begin(); }
-    auto constexpr end() noexcept -> iterator { return begin() + m_size; }
-    auto constexpr end() const noexcept -> const_iterator { return begin() + m_size; }
-    auto constexpr cbegin() const noexcept -> const_iterator { return m_data.cbegin(); }
-    auto constexpr cend() const noexcept -> const_iterator { return cbegin() + m_size; }
-    auto constexpr front() -> reference { return m_data.front(); }
-    auto constexpr front() const -> const_reference { return m_data.front(); }
-    auto constexpr back() -> reference { return m_data[m_size - 1]; }
-    auto constexpr back() const -> const_reference { return m_data[m_size - 1]; }
-    auto constexpr size() const noexcept -> size_type { return m_size; }
-    auto constexpr max_size() const noexcept -> size_type { return I; }
+    [[nodiscard]] auto constexpr begin() noexcept -> iterator { return m_data.begin(); }
+    [[nodiscard]] auto constexpr begin() const noexcept -> const_iterator { return m_data.begin(); }
+    [[nodiscard]] auto constexpr end() noexcept -> iterator { return begin() + m_size; }
+    [[nodiscard]] auto constexpr end() const noexcept -> const_iterator { return begin() + m_size; }
+    [[nodiscard]] auto constexpr cbegin() const noexcept -> const_iterator { return m_data.cbegin(); }
+    [[nodiscard]] auto constexpr cend() const noexcept -> const_iterator { return cbegin() + m_size; }
+    [[nodiscard]] auto constexpr front() -> reference { return m_data.front(); }
+    [[nodiscard]] auto constexpr front() const -> const_reference { return m_data.front(); }
+    [[nodiscard]] auto constexpr back() -> reference { return m_data[m_size - 1]; }
+    [[nodiscard]] auto constexpr back() const -> const_reference { return m_data[m_size - 1]; }
+    [[nodiscard]] auto constexpr size() const noexcept -> size_type { return m_size; }
+    [[nodiscard]] auto constexpr max_size() const noexcept -> size_type { return I; }
     auto constexpr push_back(const_reference i) -> void { m_data[m_size++] = i; }
     auto constexpr push_back(value_type&& i) -> void { m_data[m_size++] = i; }
     auto constexpr pop_back() -> void { m_data[--m_size].~T(); }
-    auto constexpr empty() const noexcept -> bool { return !m_size; }
+    [[nodiscard]] auto constexpr empty() const noexcept -> bool { return !m_size; }
 
 private:
     ArrayType m_data;

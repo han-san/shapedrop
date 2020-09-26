@@ -248,9 +248,9 @@ public:
     std::size_t static constexpr BLOCK_COUNT {4};
     using BlockStack = ArrayStack<Point<int>, BLOCK_COUNT>;
 
-    auto get_block_positions() const -> BlockStack;
-    auto get_absolute_block_positions() const -> BlockStack;
-    auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
+    [[nodiscard]] auto get_block_positions() const -> BlockStack;
+    [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
+    [[nodiscard]] auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
 };
 
 class ShapePool {
@@ -272,6 +272,6 @@ public:
 
     auto reshuffle() -> void;
     auto next_shape() -> Shape;
-    auto current_shape() const -> Shape;
-    auto get_preview_shapes_array() const -> PreviewStack;
+    [[nodiscard]] auto current_shape() const -> Shape;
+    [[nodiscard]] auto get_preview_shapes_array() const -> PreviewStack;
 };
