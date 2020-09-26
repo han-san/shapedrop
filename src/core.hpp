@@ -46,7 +46,7 @@ auto constexpr gMinLevel {1};
 auto constexpr gMaxLevel {99};
 
 struct MenuState {
-    std::size_t level {gMinLevel};
+    int level {gMinLevel};
 };
 
 struct ProgramState {
@@ -58,22 +58,22 @@ struct ProgramState {
     LevelType levelType {LevelType::Menu};
     clock_t frameStartClock = clock();
     bool running {true};
-    std::size_t highScore {0};
+    int highScore {0};
 };
 
 // For variables which are unique to their instance of a game
 // i.e. should be reset when starting a new one
 struct GameState {
 
-    explicit GameState(std::size_t startingLevel)
+    explicit GameState(int startingLevel)
     : startingLevel{startingLevel}
     {}
 
     // unique to current shape
     time_t dropClock {clock()};
     time_t lockClock {dropClock};
-    std::size_t droppedRows {0};
-    std::size_t softDropRowCount {0};
+    int droppedRows {0};
+    int softDropRowCount {0};
 
     // shared for all shapes
     time_t static constexpr lockDelay {CLOCKS_PER_SEC / 2};
@@ -81,10 +81,10 @@ struct GameState {
     double static constexpr initialDropDelay {1.0};
 
     bool isSoftDropping {false};
-    std::size_t linesCleared {0};
-    std::size_t startingLevel {1};
-    std::size_t level {startingLevel};
-    std::size_t score {0};
+    int linesCleared {0};
+    int startingLevel {1};
+    int level {startingLevel};
+    int score {0};
     bool hasHeld {false};
     std::optional<BackToBackType> backToBackType {};
     // Starts at -1 since the first clear advances the counter, but only the

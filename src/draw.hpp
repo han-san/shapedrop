@@ -33,9 +33,9 @@ auto inline to_screen_space_width(double const width) -> double {
     return width * get_window_dimensions().w;
 }
 
-auto draw_solid_square(BackBuffer& buf, Rect<double> sqr, Color::RGBA color) -> void;
+auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void;
 auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA color) -> void;
-auto draw_hollow_square(BackBuffer& buf, Rect<double> sqr, Color::RGBA color, int borderSize = 1) -> void;
+auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color, int borderSize = 1) -> void;
 auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA color, int borderSize = 1) -> void;
 auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int y) -> void;
 auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, double x, double y) -> void;

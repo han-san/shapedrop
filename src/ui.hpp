@@ -16,8 +16,8 @@ namespace UI {
         double value;
     public:
         WindowScale() noexcept = default;
-        constexpr explicit operator double() const { return value; };
-        constexpr WindowScale(double const from) noexcept : value{from} {};
+        constexpr explicit operator double() const { return value; }
+        constexpr WindowScale(double const from) noexcept : value{from} {}
 
         auto constexpr operator +=(WindowScale const& rhs) -> WindowScale& {
             value += double(rhs);
@@ -53,8 +53,8 @@ namespace UI {
         double value;
     public:
         RelativeScale() noexcept = default;
-        constexpr explicit operator double() const { return value; };
-        constexpr RelativeScale(double const from) noexcept : value{from} {};
+        constexpr explicit operator double() const { return value; }
+        constexpr RelativeScale(double const from) noexcept : value{from} {}
 
         auto constexpr operator +=(RelativeScale const& rhs) -> RelativeScale& {
             value += double(rhs);
@@ -101,8 +101,8 @@ namespace UI {
     auto label(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> void;
     auto button(std::string text, WindowScale fontHeight, RelativeScalePoint pos) -> bool;
     auto button(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> bool;
-    auto spinbox(std::string_view text, WindowScale fontHeight, RelativeScalePoint offset, std::size_t& value, std::size_t minValue, std::size_t maxValue) -> void;
-    auto spinbox(std::string_view text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset, std::size_t& value, std::size_t minValue, std::size_t maxValue) -> void;
+    auto spinbox(std::string_view text, WindowScale fontHeight, RelativeScalePoint offset, int& value, int minValue, int maxValue) -> void;
+    auto spinbox(std::string_view text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset, int& value, int minValue, int maxValue) -> void;
     auto begin_menu(RelativeScaleRect region, Color::RGBA color = Color::transparent) -> void;
     auto end_menu() -> void;
     auto draw(BackBuffer bb) -> void;

@@ -52,7 +52,7 @@ auto Board::is_valid_spot(Point<int> const pos) const -> bool {
     if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
         return false;
     } else {
-        auto const index {pos.y * columns + pos.x};
+        auto const index {static_cast<std::size_t>(pos.y * columns + pos.x)};
         return !data[index].isActive;
     }
 }
@@ -95,7 +95,7 @@ auto Board::remove_full_rows() -> int {
     for (auto y {0}; y < rows; ++y) {
         auto rowIsFull {true};
         for (auto x {0}; x < columns; ++x) {
-            auto const boardIndex {y * columns + x};
+            auto const boardIndex {static_cast<std::size_t>(y * columns + x)};
             if (!data[boardIndex].isActive) {
                 rowIsFull = false;
                 break;
@@ -112,11 +112,12 @@ auto Board::remove_full_rows() -> int {
     }
 
     auto move_row_down = [this](int const rowNumber, int const distance) {
+        assert(rowNumber >= 0);
         assert(distance > 0);
+        assert((rowNumber + distance) < rows);
         for (auto x {0}; x < columns; ++x) {
-            auto const index {rowNumber * columns + x};
-            auto const newIndex {(rowNumber + distance) * columns + x};
-            assert((rowNumber + distance) < rows);
+            auto const index {static_cast<std::size_t>(rowNumber * columns + x)};
+            auto const newIndex {static_cast<std::size_t>((rowNumber + distance) * columns + x)};
             auto& oldBlock {this->data[index]};
             auto& newBlock {this->data[newIndex]};
             newBlock = oldBlock;
@@ -155,10 +156,10 @@ auto Board::remove_full_rows() -> int {
 
     // then move all rows above removed rows
     for (auto y {rowsCleared.front() - 1}; y >= 0; --y) {
-        move_row_down(y, rowsCleared.size());
+        move_row_down(y, static_cast<int>(rowsCleared.size()));
     }
 
-    return rowsCleared.size();
+    return static_cast<int>(rowsCleared.size());
 }
 
 auto Board::print_board() const -> void {
@@ -168,7 +169,7 @@ auto Board::print_board() const -> void {
     for (auto y {0}; y < rows; ++y) {
         std::cout << '|';
         for (auto x {0}; x < columns; ++x) {
-            auto const index {y * columns + x};
+            auto const index {static_cast<std::size_t>(y * columns + x)};
             auto const currBlock {data[index]};
 
             std::cout << (currBlock.isActive ? "O" : " ");

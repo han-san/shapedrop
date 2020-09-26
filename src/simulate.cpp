@@ -72,7 +72,8 @@ std::array static constexpr clearTypeScores {
     1200  // T-Spin Mini Double
 };
 
-auto static get_clear_type(uint const rowsCleared, std::optional<TspinType> const tspin) {
+auto static get_clear_type(int const rowsCleared, std::optional<TspinType> const tspin) {
+    assert(rowsCleared >= 0);
     assert(rowsCleared <= 4);
     if (!tspin) {
         return static_cast<ClearType>(rowsCleared);
@@ -156,14 +157,14 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                     // fix currentBlocks position on board
                     for (auto const position : shapePositions) {
                         assert(gameState.board.is_valid_spot(position));
-                        auto const boardIndex {position.y * gameState.board.columns + position.x};
+                        auto const boardIndex {static_cast<std::size_t>(position.y * gameState.board.columns + position.x)};
                         gameState.board.data[boardIndex] = {gameState.currentShape.color, true};
                     }
 
                     auto const tspin {gameState.currentRotationType ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType) : std::nullopt};
 
                     auto const rowsCleared {gameState.board.remove_full_rows()};
-                    gameState.linesCleared += rowsCleared;
+                    gameState.linesCleared += static_cast<std::size_t>(rowsCleared);
                     auto const clearType {get_clear_type(rowsCleared, tspin)};
                     std::array static constexpr clearTypeToName {
                         ""sv,
@@ -253,7 +254,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                         } break;
                     }
 
-                    auto clearScore {static_cast<std::size_t>(calculate_score(clearType, gameState.level) * backToBackModifier)};
+                    auto clearScore {static_cast<int>(calculate_score(clearType, gameState.level) * backToBackModifier)};
                     gameState.score += clearScore;
 
                     gameState.level = gameState.linesCleared / 10 + gameState.startingLevel;

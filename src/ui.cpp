@@ -156,14 +156,14 @@ namespace UI {
 
     struct SpinBox {
         std::string text;
-        std::size_t& value;
-        std::size_t maxValue;
-        std::size_t minValue;
+        int& value;
+        int maxValue;
+        int minValue;
         WindowScaleRect region;
 
         std::string_view static constexpr buttonsString {"<>"};
 
-        SpinBox(std::string_view const name, WindowScale const fontHeight, WindowScalePoint const offset, std::size_t& value, std::size_t const minValue, std::size_t const maxValue)
+        SpinBox(std::string_view const name, WindowScale const fontHeight, WindowScalePoint const offset, int& value, int const minValue, int const maxValue)
             : value{value},
             maxValue{maxValue},
             minValue{minValue},
@@ -197,11 +197,11 @@ namespace UI {
         label(std::move(spinBox.text), spinBox.region);
     }
 
-    auto spinbox(std::string_view const text, WindowScale const fontHeight, RelativeScalePoint const offset, std::size_t& value, std::size_t const minValue, std::size_t const maxValue) -> void {
+    auto spinbox(std::string_view const text, WindowScale const fontHeight, RelativeScalePoint const offset, int& value, int const minValue, int const maxValue) -> void {
         spinbox(SpinBox(text, fontHeight, to_window_scale(offset), value, minValue, maxValue));
     }
 
-    auto spinbox(std::string_view const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset, std::size_t& value, std::size_t const minValue, std::size_t const maxValue) -> void {
+    auto spinbox(std::string_view const text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset, int& value, int const minValue, int const maxValue) -> void {
         // A SpinBox's width and height aren't dependent on the region given,
         // so the correct region can be calculated after its creation.
         SpinBox spinBox(text, fontHeight, {}, value, minValue, maxValue);
