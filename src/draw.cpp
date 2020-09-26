@@ -30,10 +30,10 @@ auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharac
 {
     for (auto y {0}; y < fontCharacter.h; ++y) {
         auto const currY {realY + y + fontCharacter.yoff + static_cast<int>(fontCharacter.ascent * fontCharacter.scale)};
-        if (currY < 0 || currY >= buf.h) continue;
+        if (currY < 0 || currY >= buf.h) { continue; }
         for (auto x {0}; x < fontCharacter.w; ++x) {
             auto const currX {realX + x + fontCharacter.xoff};
-            if (currX < 0 || currX >= buf.w) continue;
+            if (currX < 0 || currX >= buf.w) { continue; }
 
             auto const currbyteindex {currY * buf.w + currX};
             auto* currbyte {((u8*)buf.memory + currbyteindex * buf.bpp)};
@@ -213,7 +213,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                     auto const actualYPosition {position.y - 2};
 
                     // don't draw if square is above the playarea
-                    if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) continue;
+                    if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) { continue; }
                     Rect<int> square {
                         (position.x + gPlayAreaDim.x) * scale,
                             (actualYPosition + gPlayAreaDim.y) * scale,

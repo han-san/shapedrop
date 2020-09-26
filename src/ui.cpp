@@ -187,9 +187,9 @@ namespace UI {
 
         if (clicked) {
             if (point_is_in_rect(cursor, decreaseButtonScreenSpaceRegion)) {
-                if (spinBox.value > spinBox.minValue) --spinBox.value;
+                if (spinBox.value > spinBox.minValue) { --spinBox.value; }
             } else if (point_is_in_rect(cursor, increaseButtonScreenSpaceRegion)) {
-                if (spinBox.value < spinBox.maxValue) ++spinBox.value;
+                if (spinBox.value < spinBox.maxValue) { ++spinBox.value; }
             }
         }
 

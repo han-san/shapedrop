@@ -58,8 +58,8 @@ auto static resize_window(Rect<int>::Size const dimensions) {
 }
 
 auto change_window_scale(int newScale) -> void {
-    if (newScale < 1) newScale = 1;
-    if (windowScale == newScale) return;
+    if (newScale < 1) { newScale = 1; }
+    if (windowScale == newScale) { return; }
     windowScale = newScale;
     resize_window({gBaseWindowWidth * windowScale, gBaseWindowHeight * windowScale});
 }

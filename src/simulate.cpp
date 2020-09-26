@@ -274,7 +274,9 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
 
                     if (gameOver) {
                         std::cout << "Game Over!\n";
-                        if (gameState.score > programState.highScore) programState.highScore = gameState.score;
+                        if (gameState.score > programState.highScore) {
+                            programState.highScore = gameState.score;
+                        }
                         programState.levelType = ProgramState::LevelType::Menu;
                     }
 

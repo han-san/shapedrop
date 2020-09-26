@@ -164,7 +164,7 @@ auto Board::remove_full_rows() -> int {
 
 auto Board::print_board() const -> void {
     std::cout << ' ';
-    for (auto i {0}; i < columns; ++i) std::cout << "_";
+    for (auto i {0}; i < columns; ++i) { std::cout << "_"; }
     std::cout << '\n';
     for (auto y {0}; y < rows; ++y) {
         std::cout << '|';
@@ -177,6 +177,6 @@ auto Board::print_board() const -> void {
         std::cout << "|\n";
     }
     std::cout << '|';
-    for (auto i {0}; i < columns; ++i) std::cout << "-";
+    for (auto i {0}; i < columns; ++i) { std::cout << "-"; }
     std::cout << "|\n";
 }
