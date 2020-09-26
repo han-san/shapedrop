@@ -66,7 +66,7 @@ auto change_window_scale(int newScale) -> void {
 
 auto swap_buffer() -> void
 {
-    SDL_BlitSurface(window.bbSurface, NULL, window.surface, NULL);
+    SDL_BlitSurface(window.bbSurface, nullptr, window.surface, nullptr);
     SDL_UpdateWindowSurface(window.handle);
 }
 

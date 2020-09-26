@@ -42,7 +42,7 @@ FontCharacter::FontCharacter(char const c, double const pixelHeight, char const 
     advance(get_codepoint_kern_advance(c, nextChar, scale))
 {
     bitmap = stbtt_GetCodepointBitmap(&font, 0, scale, c, &w, &h, &xoff, &yoff);
-    stbtt_GetFontVMetrics(&font, &ascent, 0, 0);
+    stbtt_GetFontVMetrics(&font, &ascent, nullptr, nullptr);
 }
 
 FontCharacter::~FontCharacter()
