@@ -154,7 +154,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                     };
 
                     // fix currentBlocks position on board
-                    for (auto const position : gameState.currentShape.get_absolute_block_positions()) {
+                    for (auto const position : shapePositions) {
                         assert(gameState.board.is_valid_spot(position));
                         auto const boardIndex {position.y * gameState.board.columns + position.x};
                         gameState.board.data[boardIndex] = {gameState.currentShape.color, true};
