@@ -245,8 +245,8 @@ public:
     Shape(Type type) noexcept;
 
     // All shapes are composed of 4 blocks.
-    std::size_t static constexpr BLOCK_COUNT {4};
-    using BlockStack = ArrayStack<Point<int>, BLOCK_COUNT>;
+    std::size_t static constexpr blockCount {4};
+    using BlockStack = ArrayStack<Point<int>, blockCount>;
 
     [[nodiscard]] auto get_block_positions() const -> BlockStack;
     [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
@@ -255,10 +255,10 @@ public:
 
 class ShapePool {
 public:
-    std::size_t static constexpr SIZE {7};
+    std::size_t static constexpr size {7};
 private:
-    using ShapePoolType = std::array<Shape const*, SIZE>;
-    using PreviewStack = ArrayStack<Shape const*, SIZE * 2>;
+    using ShapePoolType = std::array<Shape const*, size>;
+    using PreviewStack = ArrayStack<Shape const*, size * 2>;
 
     ShapePoolType shapePool;
 
@@ -266,7 +266,7 @@ private:
     ShapePoolType::iterator currentShapeIterator;
 
 public:
-    ShapePool(std::array<Shape, SIZE> const& shapes);
+    ShapePool(std::array<Shape, size> const& shapes);
     ShapePool(ShapePool const& other);
     ShapePool& operator=(ShapePool const& other);
 

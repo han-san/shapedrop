@@ -145,7 +145,7 @@ auto Shape::get_wallkicks(Shape::RotationDirection const dir) const -> std::arra
     }
 }
 
-ShapePool::ShapePool(std::array<Shape, ShapePool::SIZE> const& shapes)
+ShapePool::ShapePool(std::array<Shape, ShapePool::size> const& shapes)
 {
     shapePool = {
         &shapes[0], &shapes[1], &shapes[2],
