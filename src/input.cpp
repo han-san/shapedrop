@@ -88,7 +88,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
                     gameState.softDropRowCount = 0;
                 }
             } else if (event.type == Event::Type::Drop) {
-                std::size_t droppedRows {0};
+                auto droppedRows {0};
                 while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
                     gameState.lockClock = programState.frameStartClock;
                     gameState.currentRotationType = std::nullopt;
