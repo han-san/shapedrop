@@ -49,7 +49,7 @@ Shape::Shape(Type const ttype) noexcept
     }
 }
 
-auto Shape::get_block_positions() const -> BlockStack {
+auto Shape::get_local_block_positions() const -> BlockStack {
     BlockStack positions {};
     auto const rotationIndex {static_cast<RotationMap::size_type>(rotation)};
     auto const& layout {(*rotationMap)[rotationIndex]};
@@ -68,10 +68,10 @@ auto Shape::get_block_positions() const -> BlockStack {
 }
 
 auto Shape::get_absolute_block_positions() const -> BlockStack {
-    auto positions {get_block_positions()};
-    for (auto& position : positions) {
-        position.x += pos.x;
-        position.y += pos.y;
+    auto positions {get_local_block_positions()};
+    for (auto& localPosition : positions) {
+        localPosition.x += pos.x;
+        localPosition.y += pos.y;
     }
     return positions;
 }

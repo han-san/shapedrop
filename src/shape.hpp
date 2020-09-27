@@ -248,7 +248,9 @@ public:
     std::size_t static constexpr blockCount {4};
     using BlockStack = ArrayStack<Point<int>, blockCount>;
 
-    [[nodiscard]] auto get_block_positions() const -> BlockStack;
+    // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
+    [[nodiscard]] auto get_local_block_positions() const -> BlockStack;
+    // Returns the positions of the blocks relative to the top left corner of the play area
     [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
     [[nodiscard]] auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
 };
