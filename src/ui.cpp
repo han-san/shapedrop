@@ -40,7 +40,7 @@ namespace UI {
     std::vector<Background> static backgrounds {};
 
     auto static to_squaref(WindowScaleRect const rect) -> Rect<double> {
-        return {double(rect.x), double(rect.y), double(rect.w), double(rect.h)};
+        return {double{rect.x}, double{rect.y}, double{rect.w}, double{rect.h}};
     }
 
     auto static get_current_ui_region() -> WindowScaleRect {
@@ -62,23 +62,23 @@ namespace UI {
 
     auto static to_window_scale(RelativeScalePoint const offset) -> WindowScalePoint {
         auto const workingRegion {get_current_ui_region()};
-        auto const x {workingRegion.x + double(offset.x) * workingRegion.w};
-        auto const y {workingRegion.y + double(offset.y) * workingRegion.h};
+        auto const x {workingRegion.x + double{offset.x} * workingRegion.w};
+        auto const y {workingRegion.y + double{offset.y} * workingRegion.h};
         return {x, y};
     }
 
     auto static to_window_scale(RelativeScaleRect const region) -> WindowScaleRect {
         auto const workingRegion {get_current_ui_region()};
-        auto const x {workingRegion.x + double(region.x) * workingRegion.w};
-        auto const y {workingRegion.y + double(region.y) * workingRegion.h};
-        auto const w {double(region.w) * workingRegion.w};
-        auto const h {double(region.h) * workingRegion.h};
+        auto const x {workingRegion.x + double{region.x} * workingRegion.w};
+        auto const y {workingRegion.y + double{region.y} * workingRegion.h};
+        auto const w {double{region.w} * workingRegion.w};
+        auto const h {double{region.h} * workingRegion.h};
         return {x, y, w, h};
     }
 
     auto static to_window_scale(XAlignment const xAlign, RelativeScale const yOffset, WindowScale const width) -> WindowScalePoint {
         auto const workingRegion {get_current_ui_region()};
-        auto const y {workingRegion.y + double(yOffset) * workingRegion.h};
+        auto const y {workingRegion.y + double{yOffset} * workingRegion.h};
         auto const x = [xAlign, workingRegion, width]() {
             switch (xAlign) {
                 case XAlignment::Left:
@@ -105,7 +105,7 @@ namespace UI {
     }
 
     auto static get_text_window_scale_width(std::string_view const text, WindowScale const fontHeight) -> WindowScale {
-        return to_normalized_width(FontString::get_text_width_normalized(text, double(fontHeight)));
+        return to_normalized_width(FontString::get_text_width_normalized(text, double{fontHeight}));
     }
 
     // Assumes region.w and region.h are the correct sizes for the resulting FontString.
@@ -216,8 +216,8 @@ namespace UI {
     auto update_state(Event const event) -> void {
         if (event.type == Event::Type::Mousebuttondown) {
             clicked = true;
-            cursor.x = double(event.x);
-            cursor.y = double(event.y);
+            cursor.x = static_cast<double>(event.x);
+            cursor.y = static_cast<double>(event.y);
         }
     }
 
@@ -230,7 +230,7 @@ namespace UI {
         backgrounds.clear();
 
         for (auto const& text : textToDraw) {
-            draw_text_normalized(bb, text.text, double(text.x), double(text.y), double(text.textSize));
+            draw_text_normalized(bb, text.text, double{text.x}, double{text.y}, double{text.textSize});
         }
         textToDraw.clear();
 

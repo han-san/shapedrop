@@ -20,28 +20,28 @@ namespace UI {
         constexpr WindowScale(double const from) noexcept : value{from} {}
 
         auto constexpr operator +=(WindowScale const& rhs) -> WindowScale& {
-            value += double(rhs);
+            value += double{rhs};
             return *this;
         }
         auto constexpr friend operator +(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
             return lhs += rhs;
         }
         auto constexpr operator -=(WindowScale const& rhs) -> WindowScale& {
-            value -= double(rhs);
+            value -= double{rhs};
             return *this;
         }
         auto constexpr friend operator -(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
             return lhs -= rhs;
         }
         auto constexpr operator *=(WindowScale const& rhs) -> WindowScale& {
-            value *= double(rhs);
+            value *= double{rhs};
             return *this;
         }
         auto constexpr friend operator *(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
             return lhs *= rhs;
         }
         auto constexpr operator /=(WindowScale const& rhs) -> WindowScale& {
-            value /= double(rhs);
+            value /= double{rhs};
             return *this;
         }
         auto constexpr friend operator /(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
@@ -57,28 +57,28 @@ namespace UI {
         constexpr RelativeScale(double const from) noexcept : value{from} {}
 
         auto constexpr operator +=(RelativeScale const& rhs) -> RelativeScale& {
-            value += double(rhs);
+            value += double{rhs};
             return *this;
         }
         auto constexpr friend operator +(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
             return lhs += rhs;
         }
         auto constexpr operator -=(RelativeScale const& rhs) -> RelativeScale& {
-            value -= double(rhs);
+            value -= double{rhs};
             return *this;
         }
         auto constexpr friend operator -(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
             return lhs -= rhs;
         }
         auto constexpr operator *=(RelativeScale const& rhs) -> RelativeScale& {
-            value *= double(rhs);
+            value *= double{rhs};
             return *this;
         }
         auto constexpr friend operator *(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
             return lhs *= rhs;
         }
         auto constexpr operator /=(RelativeScale const& rhs) -> RelativeScale& {
-            value /= double(rhs);
+            value /= double{rhs};
             return *this;
         }
         auto constexpr friend operator /(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {

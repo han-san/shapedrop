@@ -57,7 +57,7 @@ auto Shape::get_block_positions() const -> BlockStack {
         for (std::size_t x {0}; x < layoutW; ++x) {
             std::size_t const index {y * layoutW + x};
             if (layout[index]) {
-                positions.push_back({int(x), int(y)});
+                positions.push_back({static_cast<int>(x), static_cast<int>(y)});
                 if (positions.size() == positions.max_size()) {
                     return positions;
                 }
