@@ -65,8 +65,8 @@ struct ProgramState {
 // i.e. should be reset when starting a new one
 struct GameState {
 
-    explicit GameState(int startingLevel)
-    : startingLevel{startingLevel}
+    explicit GameState(int sstartingLevel)
+    : startingLevel{sstartingLevel}
     {}
 
     // unique to current shape

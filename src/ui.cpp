@@ -155,18 +155,18 @@ namespace UI {
     }
 
     struct SpinBox {
-        std::string text;
         int& value;
-        int maxValue;
         int minValue;
+        int maxValue;
+        std::string text;
         WindowScaleRect region;
 
         std::string_view static constexpr buttonsString {"<>"};
 
-        SpinBox(std::string_view const name, WindowScale const fontHeight, WindowScalePoint const offset, int& value, int const minValue, int const maxValue)
-            : value{value},
-            maxValue{maxValue},
-            minValue{minValue},
+        SpinBox(std::string_view const name, WindowScale const fontHeight, WindowScalePoint const offset, int& vvalue, int const mminValue, int const mmaxValue)
+            : value{vvalue},
+            minValue{mminValue},
+            maxValue{mmaxValue},
             text{fmt::format("{} {}: ", buttonsString, name)}
         {
             auto const textWidth {get_text_window_scale_width(text, fontHeight)};
