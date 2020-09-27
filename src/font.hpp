@@ -24,9 +24,9 @@ public:
     ~FontCharacter();
 
     FontCharacter(FontCharacter&&) = default;
-    FontCharacter& operator=(FontCharacter&&) = default;
+    auto operator=(FontCharacter&&) -> FontCharacter& = default;
 
-    FontCharacter& operator=(FontCharacter const&) = delete;
+    auto operator=(FontCharacter const&) -> FontCharacter& = delete;
     FontCharacter(FontCharacter const&) = delete;
 };
 

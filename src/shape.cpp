@@ -165,7 +165,7 @@ ShapePool::ShapePool(ShapePool const& other)
     currentShapeIterator = shapePool.begin();
 }
 
-ShapePool& ShapePool::operator=(ShapePool const& other)
+auto ShapePool::operator=(ShapePool const& other) -> ShapePool&
 {
     this->shapePool = other.shapePool;
     this->previewPool = other.previewPool;

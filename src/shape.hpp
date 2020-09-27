@@ -270,7 +270,7 @@ private:
 public:
     ShapePool(std::array<Shape, size> const& shapes);
     ShapePool(ShapePool const& other);
-    ShapePool& operator=(ShapePool const& other);
+    auto operator=(ShapePool const& other) -> ShapePool&;
 
     auto reshuffle() -> void;
     auto next_shape() -> Shape;
