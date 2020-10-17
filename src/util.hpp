@@ -157,7 +157,7 @@ private:
 };
 
 template <typename T>
-auto point_is_in_rect(Point<T> const point, Rect<T> const rect) {
+auto point_is_in_rect(Point<T> const& point, Rect<T> const& rect) {
     return (point.x >= rect.x) &&
         (point.x <= rect.x + rect.w) &&
         (point.y >= rect.y) &&
@@ -168,7 +168,7 @@ auto point_is_in_rect(Point<T> const point, Rect<T> const rect) {
 // one, there's a potential performance hit from default constructing every
 // element and then immediately reassigning all of them.
 template <typename T, std::size_t N>
-auto constexpr make_filled_array(T const val) {
+auto constexpr make_filled_array(T const& val) {
     std::array<T, N> arr;
     arr.fill(val);
     return arr;
