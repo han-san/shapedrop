@@ -137,10 +137,19 @@ public:
     [[nodiscard]] auto constexpr back() const -> const_reference { return m_data[m_size - 1]; }
     [[nodiscard]] auto constexpr size() const noexcept -> size_type { return m_size; }
     [[nodiscard]] auto constexpr max_size() const noexcept -> size_type { return I; }
-    auto constexpr push_back(const_reference i) -> void { m_data[m_size++] = i; }
-    auto constexpr push_back(value_type&& i) -> void { m_data[m_size++] = i; }
-    auto constexpr pop_back() -> void { m_data[--m_size].~T(); }
     [[nodiscard]] auto constexpr empty() const noexcept -> bool { return !m_size; }
+    auto constexpr push_back(const_reference i) -> void {
+        assert(m_size < I);
+        m_data[m_size++] = i;
+    }
+    auto constexpr push_back(value_type&& i) -> void {
+        assert(m_size < I);
+        m_data[m_size++] = std::move(i);
+    }
+    auto constexpr pop_back() -> void {
+        assert(m_size > 0);
+        m_data[--m_size].~T();
+    }
 
 private:
     ArrayType m_data;
