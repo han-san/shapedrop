@@ -6,11 +6,8 @@
 
 template <typename T>
 struct V2Generic {
-    T x {0};
-    T y {0};
-
-    constexpr V2Generic() = default;
-    constexpr V2Generic(T const a, T const b): x{a}, y{b} {}
+    T x {};
+    T y {};
 
     using ThisType = V2Generic<T>;
 
@@ -26,12 +23,9 @@ struct V2Generic {
 
 template <typename T>
 struct V3Generic {
-    T x {0};
-    T y {0};
-    T z {0};
-
-    constexpr V3Generic() = default;
-    constexpr V3Generic(T const a, T const b, T const c): x{a}, y{b}, z{c} {}
+    T x {};
+    T y {};
+    T z {};
 
     using ThisType = V3Generic<T>;
 
@@ -58,13 +52,6 @@ namespace Color {
             u8 static constexpr opaque {maxChannelValue};
             u8 static constexpr transparent {0};
         };
-
-        constexpr RGBA(u8 const rr, u8 const gg, u8 const bb)
-            : r{rr}, g{gg}, b{bb}
-        {}
-        constexpr RGBA(u8 const rr, u8 const gg, u8 const bb, u8 const aa)
-            : r{rr}, g{gg}, b{bb}, a{aa}
-        {}
 
         u8 r {0};
         u8 g {0};
@@ -98,16 +85,21 @@ namespace Color {
 
 template <typename T>
 struct Rect {
-    T x, y, w, h;
+    T x {};
+    T y {};
+    T w {};
+    T h {};
 
     struct Size {
-        T w, h;
+        T w {};
+        T h {};
     };
 };
 
 template <typename T>
 struct Point {
-    T x, y;
+    T x {};
+    T y {};
 
     auto constexpr operator +=(V2Generic<T> const& rhs) {
         x += rhs.x;
