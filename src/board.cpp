@@ -49,12 +49,11 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
 }
 
 auto Board::is_valid_spot(Point<int> const pos) const -> bool {
-    if (pos.x < 0 || pos.x >= columns || pos.y < 0 || pos.y >= rows) {
-        return false;
-    } else {
+    if (point_is_in_rect(pos, {0, 0, columns, rows})) {
         auto const index {static_cast<std::size_t>(pos.y * columns + pos.x)};
         return !data[index].isActive;
     }
+    return false;
 }
 
 auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
