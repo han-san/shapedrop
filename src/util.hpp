@@ -159,9 +159,9 @@ private:
 template <typename T>
 auto point_is_in_rect(Point<T> const& point, Rect<T> const& rect) {
     return (point.x >= rect.x) &&
-        (point.x <= rect.x + rect.w) &&
+        (point.x < rect.x + rect.w) &&
         (point.y >= rect.y) &&
-        (point.y <= rect.y + rect.h);
+        (point.y < rect.y + rect.h);
 }
 
 // This won't work if T doesn't have a default constructor. If it does have
