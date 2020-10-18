@@ -3,27 +3,24 @@
 
 #include "core.hpp"
 #include "ui.hpp"
+#include "util.hpp"
 
 #include "draw.hpp"
 
-auto static alpha_blend_channel(int const bg, int const fg, int const alpha) -> u8
+auto static alpha_blend_channel(PositiveU8 const bg, PositiveU8 const fg, PositiveU8 const alpha) -> PositiveU8
 {
-    assert(bg >= 0 && bg <= 255);
-    assert(fg >= 0 && fg <= 255);
-    assert(alpha >= 0 && alpha <= 255);
-
-    auto const alphaRatio {alpha / 255.};
-    return static_cast<u8>(fg * alphaRatio + bg * (1 - alphaRatio));
+    auto const alphaRatio {u8 {alpha} / 255.};
+    return static_cast<PositiveU8>(u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio));
 }
 
 auto static draw_pixel(void* data, Color::RGBA const color) -> void
 {
     auto* byte {static_cast<u8*>(data)};
-    *byte = alpha_blend_channel(*byte, color.b, color.a);
+    *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.b, color.a)};
     ++byte;
-    *byte = alpha_blend_channel(*byte, color.g, color.a);
+    *byte = u8 {alpha_blend_channel(*byte, color.g, color.a)};
     ++byte;
-    *byte = alpha_blend_channel(*byte, color.r, color.a);
+    *byte = u8 {alpha_blend_channel(*byte, color.r, color.a)};
 }
 
 auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharacter, int const realX, int const realY) -> void

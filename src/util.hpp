@@ -155,33 +155,47 @@ namespace Color {
             u8 static constexpr transparent {0};
         };
 
-        u8 r {0};
-        u8 g {0};
-        u8 b {0};
-        u8 a {Alpha::opaque};
+        // This struct is meant to be used only for constexpr RGBA variables,
+        // since the compiler can then guarantee the members are initialized to
+        // valid values.
+        // The regular RGBA's members can't be constexpr since PositiveU8
+        // asserts that its members are valid in its constructors.
+        struct Unchecked {
+            u8 r {0};
+            u8 g {0};
+            u8 b {0};
+            u8 a {RGBA::Alpha::opaque};
+
+            operator RGBA() const { return {r, g, b, a}; }
+        };
+
+        PositiveU8 r {0};
+        PositiveU8 g {0};
+        PositiveU8 b {0};
+        PositiveU8 a {Alpha::opaque};
     };
 
-    RGBA static constexpr red {0xFF, 0, 0};
-    RGBA static constexpr green {0, 0xFF, 0};
-    RGBA static constexpr blue {0, 0, 0xFF};
-    RGBA static constexpr cyan {0, 0xFF, 0xFF};
-    RGBA static constexpr white {0xFF, 0xFF, 0xFF};
-    RGBA static constexpr black {0, 0, 0};
-    RGBA static constexpr transparent {0, 0, 0, RGBA::Alpha::transparent};
+    RGBA::Unchecked static constexpr red {0xFF, 0, 0};
+    RGBA::Unchecked static constexpr green {0, 0xFF, 0};
+    RGBA::Unchecked static constexpr blue {0, 0, 0xFF};
+    RGBA::Unchecked static constexpr cyan {0, 0xFF, 0xFF};
+    RGBA::Unchecked static constexpr white {0xFF, 0xFF, 0xFF};
+    RGBA::Unchecked static constexpr black {0, 0, 0};
+    RGBA::Unchecked static constexpr transparent {0, 0, 0, RGBA::Alpha::transparent};
 
     // An invalid color to give some visual feedback when a color hasn't been
     // properly initialized. White isn't really used otherwise in the game, so
     // hopefully it will be obvious that something is wrong.
-    RGBA static constexpr invalid {white};
+    RGBA::Unchecked static constexpr invalid {white};
 
     struct Shape {
-        RGBA static constexpr I {0, 0xF0, 0xF0};
-        RGBA static constexpr O {0xF0, 0xF0, 0};
-        RGBA static constexpr L {0xF0, 0xA0, 0};
-        RGBA static constexpr J {0, 0, 0xF0};
-        RGBA static constexpr S {0, 0xF0, 0};
-        RGBA static constexpr Z {0xF0, 0, 0};
-        RGBA static constexpr T {0xA0, 0, 0xF0};
+        RGBA::Unchecked static constexpr I {0, 0xF0, 0xF0};
+        RGBA::Unchecked static constexpr O {0xF0, 0xF0, 0};
+        RGBA::Unchecked static constexpr L {0xF0, 0xA0, 0};
+        RGBA::Unchecked static constexpr J {0, 0, 0xF0};
+        RGBA::Unchecked static constexpr S {0, 0xF0, 0};
+        RGBA::Unchecked static constexpr Z {0xF0, 0, 0};
+        RGBA::Unchecked static constexpr T {0xA0, 0, 0xF0};
     };
 }
 
