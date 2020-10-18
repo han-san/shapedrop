@@ -1,8 +1,110 @@
 #pragma once
 
 #include <array>
+#include <cassert>
 
 #include "jint.h"
+
+template <typename T>
+class PositiveGeneric {
+    using ThisType = PositiveGeneric<T>;
+public:
+    PositiveGeneric() = default;
+    PositiveGeneric(schar i)
+        : PositiveGeneric {sllong {i}}
+    {}
+    PositiveGeneric(sshort i)
+        : PositiveGeneric {sllong {i}}
+    {}
+    PositiveGeneric(sint i)
+        : PositiveGeneric {sllong {i}}
+    {}
+    PositiveGeneric(slong i)
+        : PositiveGeneric {sllong {i}}
+    {}
+    PositiveGeneric(sllong i)
+        : m_value {static_cast<T>(i)}
+    {
+        // make sure it fits the type's range
+        assert(i >= 0);
+        assert(static_cast<T>(-1) >= i);
+    }
+    PositiveGeneric(uchar i)
+        : PositiveGeneric {ullong {i}}
+    {}
+    PositiveGeneric(ushort i)
+        : PositiveGeneric {ullong {i}}
+    {}
+    PositiveGeneric(uint i)
+        : PositiveGeneric {ullong {i}}
+    {}
+    PositiveGeneric(ulong i)
+        : PositiveGeneric {ullong {i}}
+    {}
+    PositiveGeneric(ullong i)
+        : m_value{static_cast<T>(i)}
+    {
+        assert(static_cast<T>(-1) >= i);
+    }
+    explicit PositiveGeneric(double i)
+        : m_value {static_cast<T>(i)}
+    {
+        // make sure it fits the type's range
+        assert(i >= 0);
+        assert(static_cast<T>(-1) >= static_cast<ullong>(i));
+    }
+
+    explicit operator T() const noexcept { return m_value; }
+    operator bool() const noexcept { return m_value; }
+
+    auto constexpr operator -=(ThisType const& rhs) -> ThisType& {
+        auto const rhsVal = static_cast<T>(rhs);
+        assert(m_value >= rhsVal);
+        m_value -= rhsVal;
+        return *this;
+    }
+    auto constexpr friend operator -(ThisType lhs, ThisType const& rhs) -> ThisType {
+        return lhs -= rhs;
+    }
+    auto constexpr operator +=(ThisType const& rhs) -> ThisType& {
+        auto const rhsVal = static_cast<T>(rhs);
+        m_value += rhsVal;
+        return *this;
+    }
+    auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
+        return lhs += rhs;
+    }
+    auto constexpr operator *=(ThisType const& rhs) -> ThisType& {
+        auto const rhsVal = static_cast<T>(rhs);
+        m_value *= rhsVal;
+        return *this;
+    }
+    auto constexpr friend operator *(ThisType lhs, ThisType const& rhs) -> ThisType {
+        return lhs *= rhs;
+    }
+    auto constexpr operator /=(ThisType const& rhs) -> ThisType& {
+        auto const rhsVal = static_cast<T>(rhs);
+        m_value /= rhsVal;
+        return *this;
+    }
+    auto constexpr friend operator /(ThisType lhs, ThisType const& rhs) -> ThisType {
+        return lhs /= rhs;
+    }
+
+private:
+    T m_value {};
+};
+
+using PositiveUChar = PositiveGeneric<uchar>;
+using PositiveUShort = PositiveGeneric<ushort>;
+using PositiveUInt = PositiveGeneric<uint>;
+using PositiveULong = PositiveGeneric<ulong>;
+using PositiveULLong = PositiveGeneric<ullong>;
+using PositiveU8 = PositiveGeneric<u8>;
+using PositiveU16 = PositiveGeneric<u16>;
+using PositiveU32 = PositiveGeneric<u32>;
+using PositiveU64 = PositiveGeneric<u64>;
+using PositiveSize_t = PositiveGeneric<std::size_t>;
 
 template <typename T>
 struct V2Generic {
