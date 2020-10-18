@@ -55,7 +55,7 @@ public:
     }
 
     explicit operator T() const noexcept { return m_value; }
-    operator bool() const noexcept { return m_value; }
+    explicit operator bool() const noexcept { return m_value; }
 
     auto constexpr operator -=(ThisType const& rhs) -> ThisType& {
         auto const rhsVal = static_cast<T>(rhs);
