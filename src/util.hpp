@@ -76,7 +76,7 @@ public:
     explicit operator bool() const noexcept { return m_value; }
 
     auto constexpr operator -=(ThisType const& rhs) -> ThisType& {
-        auto const rhsVal = static_cast<T>(rhs);
+        auto const rhsVal = T {rhs};
         assert(m_value >= rhsVal);
         m_value -= rhsVal;
         return *this;
@@ -85,7 +85,7 @@ public:
         return lhs -= rhs;
     }
     auto constexpr operator +=(ThisType const& rhs) -> ThisType& {
-        auto const rhsVal = static_cast<T>(rhs);
+        auto const rhsVal = T {rhs};
         m_value += rhsVal;
         return *this;
     }
@@ -93,7 +93,7 @@ public:
         return lhs += rhs;
     }
     auto constexpr operator *=(ThisType const& rhs) -> ThisType& {
-        auto const rhsVal = static_cast<T>(rhs);
+        auto const rhsVal = T {rhs};
         m_value *= rhsVal;
         return *this;
     }
@@ -101,7 +101,7 @@ public:
         return lhs *= rhs;
     }
     auto constexpr operator /=(ThisType const& rhs) -> ThisType& {
-        auto const rhsVal = static_cast<T>(rhs);
+        auto const rhsVal = T {rhs};
         m_value /= rhsVal;
         return *this;
     }
