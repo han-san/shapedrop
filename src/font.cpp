@@ -33,15 +33,15 @@ auto static get_codepoint_kern_advance(char const codepoint, char const nextCode
     int advance;
     int lsb;
     stbtt_GetCodepointHMetrics(&font, codepoint, &advance, &lsb);
-    return scale * (advance + stbtt_GetCodepointKernAdvance(&font, codepoint, nextCodepoint));
+    return scale * static_cast<double>(advance + stbtt_GetCodepointKernAdvance(&font, codepoint, nextCodepoint));
 }
 
 FontCharacter::FontCharacter(char const c, double const pixelHeight, char const nextChar)
   : character(c),
-    scale(stbtt_ScaleForPixelHeight(&font, pixelHeight)),
+    scale(static_cast<double>(stbtt_ScaleForPixelHeight(&font, static_cast<float>(pixelHeight)))),
     advance(get_codepoint_kern_advance(c, nextChar, scale))
 {
-    bitmap = stbtt_GetCodepointBitmap(&font, 0, scale, c, &w, &h, &xoff, &yoff);
+    bitmap = stbtt_GetCodepointBitmap(&font, 0, static_cast<float>(scale), c, &w, &h, &xoff, &yoff);
     stbtt_GetFontVMetrics(&font, &ascent, nullptr, nullptr);
 }
 
@@ -70,7 +70,7 @@ FontString::FontString(std::string_view const string, double const pixelHeight)
 
 auto FontString::get_text_width(std::string_view const text, double const fontHeight) -> double {
     auto width {0.};
-    auto const scale {stbtt_ScaleForPixelHeight(&font, fontHeight)};
+    auto const scale {static_cast<double>(stbtt_ScaleForPixelHeight(&font, static_cast<float>(fontHeight)))};
     auto const size {text.size()};
     for (std::size_t i {0}; i < size; ++i) {
         auto const c {text[i]};
