@@ -10,43 +10,61 @@ class PositiveGeneric {
     using ThisType = PositiveGeneric<T>;
 public:
     PositiveGeneric() = default;
-    PositiveGeneric(schar i)
+    explicit PositiveGeneric(schar const i)
         : PositiveGeneric {sllong {i}}
     {}
-    PositiveGeneric(sshort i)
+    explicit PositiveGeneric(sshort const i)
         : PositiveGeneric {sllong {i}}
     {}
-    PositiveGeneric(sint i)
+    explicit PositiveGeneric(sint const i)
         : PositiveGeneric {sllong {i}}
     {}
-    PositiveGeneric(slong i)
+    explicit PositiveGeneric(slong const i)
         : PositiveGeneric {sllong {i}}
     {}
-    PositiveGeneric(sllong i)
+    explicit PositiveGeneric(sllong const i)
         : m_value {static_cast<T>(i)}
     {
         // make sure it fits the type's range
         assert(i >= 0);
         assert(static_cast<T>(-1) >= i);
     }
-    PositiveGeneric(uchar i)
-        : PositiveGeneric {ullong {i}}
-    {}
-    PositiveGeneric(ushort i)
-        : PositiveGeneric {ullong {i}}
-    {}
-    PositiveGeneric(uint i)
-        : PositiveGeneric {ullong {i}}
-    {}
-    PositiveGeneric(ulong i)
-        : PositiveGeneric {ullong {i}}
-    {}
-    PositiveGeneric(ullong i)
-        : m_value{static_cast<T>(i)}
+    constexpr PositiveGeneric(uchar const i)
+        : m_value {static_cast<T>(i)}
     {
-        assert(static_cast<T>(-1) >= i);
+        if constexpr (sizeof(i) > sizeof(T)) {
+            assert(static_cast<T>(-1) >= i);
+        }
     }
-    explicit PositiveGeneric(double i)
+    constexpr PositiveGeneric(ushort const i)
+        : m_value {static_cast<T>(i)}
+    {
+        if constexpr (sizeof(i) > sizeof(T)) {
+            assert(static_cast<T>(-1) >= i);
+        }
+    }
+    constexpr PositiveGeneric(uint const i)
+        : m_value {static_cast<T>(i)}
+    {
+        if constexpr (sizeof(i) > sizeof(T)) {
+            assert(static_cast<T>(-1) >= i);
+        }
+    }
+    constexpr PositiveGeneric(ulong const i)
+        : m_value {i}
+    {
+        if constexpr (sizeof(i) > sizeof(T)) {
+            assert(static_cast<T>(-1) >= i);
+        }
+    }
+    constexpr PositiveGeneric(ullong const i)
+        : m_value {i}
+    {
+        if constexpr (sizeof(i) > sizeof(T)) {
+            assert(static_cast<T>(-1) >= i);
+        }
+    }
+    explicit PositiveGeneric(double const i)
         : m_value {static_cast<T>(i)}
     {
         // make sure it fits the type's range
@@ -89,6 +107,25 @@ public:
     }
     auto constexpr friend operator /(ThisType lhs, ThisType const& rhs) -> ThisType {
         return lhs /= rhs;
+    }
+
+    auto constexpr friend operator ==(ThisType const& lhs, ThisType const& rhs) {
+        return lhs.m_value == rhs.m_value;
+    }
+    auto constexpr friend operator !=(ThisType const& lhs, ThisType const& rhs) {
+        return lhs.m_value != rhs.m_value;
+    }
+    auto constexpr friend operator <(ThisType const& lhs, ThisType const& rhs) {
+        return lhs.m_value < rhs.m_value;
+    }
+    auto constexpr friend operator >(ThisType const& lhs, ThisType const& rhs) {
+        return lhs.m_value > rhs.m_value;
+    }
+    auto constexpr friend operator <=(ThisType const& lhs, ThisType const& rhs) {
+        return lhs.m_value <= rhs.m_value;
+    }
+    auto constexpr friend operator >=(ThisType const& lhs, ThisType const& rhs) {
+        return lhs.m_value >= rhs.m_value;
     }
 
 private:
@@ -155,47 +192,33 @@ namespace Color {
             u8 static constexpr transparent {0};
         };
 
-        // This struct is meant to be used only for constexpr RGBA variables,
-        // since the compiler can then guarantee the members are initialized to
-        // valid values.
-        // The regular RGBA's members can't be constexpr since PositiveU8
-        // asserts that its members are valid in its constructors.
-        struct Unchecked {
-            u8 r {0};
-            u8 g {0};
-            u8 b {0};
-            u8 a {RGBA::Alpha::opaque};
-
-            operator RGBA() const { return {r, g, b, a}; }
-        };
-
-        PositiveU8 r {0};
-        PositiveU8 g {0};
-        PositiveU8 b {0};
+        PositiveU8 r {0U};
+        PositiveU8 g {0U};
+        PositiveU8 b {0U};
         PositiveU8 a {Alpha::opaque};
     };
 
-    RGBA::Unchecked static constexpr red {0xFF, 0, 0};
-    RGBA::Unchecked static constexpr green {0, 0xFF, 0};
-    RGBA::Unchecked static constexpr blue {0, 0, 0xFF};
-    RGBA::Unchecked static constexpr cyan {0, 0xFF, 0xFF};
-    RGBA::Unchecked static constexpr white {0xFF, 0xFF, 0xFF};
-    RGBA::Unchecked static constexpr black {0, 0, 0};
-    RGBA::Unchecked static constexpr transparent {0, 0, 0, RGBA::Alpha::transparent};
+    RGBA static constexpr red {RGBA::maxChannelValue, 0U, 0U};
+    RGBA static constexpr green {0U, RGBA::maxChannelValue, 0U};
+    RGBA static constexpr blue {0U, 0U, RGBA::maxChannelValue};
+    RGBA static constexpr cyan {0U, RGBA::maxChannelValue, RGBA::maxChannelValue};
+    RGBA static constexpr white {RGBA::maxChannelValue, RGBA::maxChannelValue, RGBA::maxChannelValue};
+    RGBA static constexpr black {0U, 0U, 0U};
+    RGBA static constexpr transparent {0U, 0U, 0U, RGBA::Alpha::transparent};
 
     // An invalid color to give some visual feedback when a color hasn't been
     // properly initialized. White isn't really used otherwise in the game, so
     // hopefully it will be obvious that something is wrong.
-    RGBA::Unchecked static constexpr invalid {white};
+    RGBA static constexpr invalid {white};
 
     struct Shape {
-        RGBA::Unchecked static constexpr I {0, 0xF0, 0xF0};
-        RGBA::Unchecked static constexpr O {0xF0, 0xF0, 0};
-        RGBA::Unchecked static constexpr L {0xF0, 0xA0, 0};
-        RGBA::Unchecked static constexpr J {0, 0, 0xF0};
-        RGBA::Unchecked static constexpr S {0, 0xF0, 0};
-        RGBA::Unchecked static constexpr Z {0xF0, 0, 0};
-        RGBA::Unchecked static constexpr T {0xA0, 0, 0xF0};
+        RGBA static constexpr I {0U, 0xF0U, 0xF0U};
+        RGBA static constexpr O {0xF0U, 0xF0U, 0U};
+        RGBA static constexpr L {0xF0U, 0xA0U, 0U};
+        RGBA static constexpr J {0U, 0U, 0xF0U};
+        RGBA static constexpr S {0U, 0xF0U, 0U};
+        RGBA static constexpr Z {0xF0U, 0U, 0U};
+        RGBA static constexpr T {0xA0U, 0U, 0xF0U};
     };
 }
 

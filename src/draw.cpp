@@ -18,27 +18,27 @@ auto static draw_pixel(void* data, Color::RGBA const color) -> void
     auto* byte {static_cast<u8*>(data)};
     *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.b, color.a)};
     ++byte;
-    *byte = u8 {alpha_blend_channel(*byte, color.g, color.a)};
+    *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.g, color.a)};
     ++byte;
-    *byte = u8 {alpha_blend_channel(*byte, color.r, color.a)};
+    *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.r, color.a)};
 }
 
 auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharacter, int const realX, int const realY) -> void
 {
     for (auto y {0}; y < fontCharacter.h; ++y) {
         auto const currY {realY + y + fontCharacter.yoff + static_cast<int>(fontCharacter.ascent * fontCharacter.scale)};
-        if (currY < 0 || currY >= buf.h) { continue; }
+        if (currY < 0 || static_cast<uint>(currY) >= uint {buf.h}) { continue; }
         for (auto x {0}; x < fontCharacter.w; ++x) {
             auto const currX {realX + x + fontCharacter.xoff};
-            if (currX < 0 || currX >= buf.w) { continue; }
+            if (currX < 0 || static_cast<uint>(currX) >= uint {buf.w}) { continue; }
 
-            auto const currbyteindex {currY * buf.w + currX};
-            auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * buf.bpp)};
+            auto const currbyteindex {static_cast<uint>(currY) * uint {buf.w} + static_cast<uint>(currX)};
+            auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
             auto const relativeIndex {static_cast<std::size_t>(y * fontCharacter.w + x)};
             auto const a {fontCharacter.bitmap[relativeIndex]};
 
-            draw_pixel(currbyte, {0, 0, 0, a});
+            draw_pixel(currbyte, Color::RGBA {0u, 0u, 0u, a});
         }
     }
 }
@@ -53,7 +53,9 @@ auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int 
 
 auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, double const x, double const y) -> void
 {
-    draw_font_string(buf, fontString, static_cast<int>(x * buf.w), static_cast<int>(y * buf.h));
+    auto const realX = static_cast<int>(x * uint {buf.w});
+    auto const realY = static_cast<int>(y * uint {buf.h});
+    draw_font_string(buf, fontString, realX, realY);
 }
 
 auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int const y, double const pixelHeight) -> void
@@ -64,24 +66,26 @@ auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int co
 
 auto draw_text_normalized(BackBuffer& buf, std::string_view const text, double const x, double const y, double const pixelHeight) -> void
 {
-    draw_text(buf, text, static_cast<int>(x * buf.w), static_cast<int>(y * buf.h), pixelHeight * buf.h);
+    auto const realX = static_cast<int>(x * uint {buf.w});
+    auto const realY = static_cast<int>(y * uint {buf.h});
+    draw_text(buf, text, realX, realY, pixelHeight * uint {buf.h});
 }
 
 auto draw_solid_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const color) -> void
 {
     for (auto y {0}; y < sqr.h; ++y) {
-        auto const pixely {sqr.y + y};
-        if (pixely < 0 || pixely >= buf.h) {
+        auto const pixely {static_cast<std::size_t>(sqr.y + y)};
+        if ((sqr.y + y) < 0 || pixely >= buf.h) {
             continue;
         }
         for (auto x {0}; x < sqr.w; ++x) {
-            auto const pixelx {sqr.x + x};
-            if (pixelx < 0 || pixelx >= buf.w) {
+            auto const pixelx {static_cast<std::size_t>(sqr.x + x)};
+            if ((sqr.x + x) < 0 || pixelx >= buf.w) {
                 continue;
             }
 
-            auto const currbyteindex {pixely * buf.w + pixelx};
-            auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * buf.bpp)};
+            auto const currbyteindex {pixely * uint {buf.w} + pixelx};
+            auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
             draw_pixel(currbyte, color);
         }
@@ -91,10 +95,10 @@ auto draw_solid_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const c
 auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA const color) -> void
 {
     Rect<int> newSqr {
-        static_cast<int>(sqr.x * buf.w),
-        static_cast<int>(sqr.y * buf.h),
-        static_cast<int>(sqr.w * buf.w),
-        static_cast<int>(sqr.h * buf.h)
+        static_cast<int>(sqr.x * uint {buf.w}),
+        static_cast<int>(sqr.y * uint {buf.h}),
+        static_cast<int>(sqr.w * uint {buf.w}),
+        static_cast<int>(sqr.h * uint {buf.h})
     };
 
     draw_solid_square(buf, newSqr, color);
@@ -102,26 +106,25 @@ auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA
 
 auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const color, int const borderSize) -> void
 {
-    for (auto y {0}; y < sqr.h; ++y) {
-        auto const pixely {sqr.y + y};
-        if (pixely < 0 || pixely >= buf.h) {
+    for (int y {0}; y < sqr.h; ++y) {
+        auto const pixely {static_cast<std::size_t>(sqr.y + y)};
+        if (sqr.y + y < 0 || pixely >= buf.h) {
             continue;
         }
-        for (auto x {0}; x < sqr.w; ++x) {
-            auto const pixelx {sqr.x + x};
-            if (pixelx < 0 || pixelx >= buf.w) {
+        for (int x {0}; x < sqr.w; ++x) {
+            auto const pixelx {static_cast<std::size_t>(sqr.x + x)};
+            if (sqr.x + x < 0 || pixelx >= buf.w) {
                 continue;
             }
 
             // check if pixel is part of border
-            if (((x < 0 || x >= borderSize) && (x >= sqr.w || x < sqr.w - borderSize)) &&
-                ((y < 0 || y >= borderSize) && (y >= sqr.h || y < sqr.h - borderSize)))
+            if (!point_is_in_rect(Point<int> {x, y}, {0, 0, sqr.w, sqr.h}) || point_is_in_rect(Point<int> {x, y}, {borderSize, borderSize, sqr.w - borderSize * 2, sqr.h - borderSize * 2}))
             {
                 continue;
             }
 
-            auto const currbyteindex {pixely * buf.w + pixelx};
-            auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * buf.bpp)};
+            auto const currbyteindex {pixely * uint {buf.w} + pixelx};
+            auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
             draw_pixel(currbyte, color);
         }
@@ -131,42 +134,42 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const 
 auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA const color, int const borderSize) -> void
 {
     Rect<int> newSqr {
-        static_cast<int>(sqr.x * buf.w),
-        static_cast<int>(sqr.y * buf.h),
-        static_cast<int>(sqr.w * buf.w),
-        static_cast<int>(sqr.h * buf.h)
+        static_cast<int>(sqr.x * uint {buf.w}),
+        static_cast<int>(sqr.y * uint {buf.h}),
+        static_cast<int>(sqr.w * uint {buf.w}),
+        static_cast<int>(sqr.h * uint {buf.h})
     };
 
     draw_hollow_square(buf, newSqr, color, borderSize);
 }
 
-auto draw_image(BackBuffer& backBuf, Point<int> const dest, BackBuffer& img) -> void
-{
-    for (auto y {0}; y < img.h; ++y) {
-        auto const pixely {dest.y + y};
-        if (pixely < 0 || pixely >= backBuf.h) {
-            continue;
-        }
-        for (auto x {0}; x < img.w; ++x) {
-            auto const pixelx {dest.x + x};
-            if (pixelx < 0 || pixelx >= backBuf.w) {
-                continue;
-            }
+/* auto draw_image(BackBuffer& backBuf, Point<int> const dest, BackBuffer& img) -> void */
+/* { */
+/*     for (auto y {0}; y < img.h; ++y) { */
+/*         auto const pixely {dest.y + y}; */
+/*         if (pixely < 0 || pixely >= backBuf.h) { */
+/*             continue; */
+/*         } */
+/*         for (auto x {0}; x < img.w; ++x) { */
+/*             auto const pixelx {dest.x + x}; */
+/*             if (pixelx < 0 || pixelx >= backBuf.w) { */
+/*                 continue; */
+/*             } */
 
-            auto const currBBbyteindex {pixely * backBuf.w + pixelx};
-            auto* currBBbyte {static_cast<u8*>(backBuf.memory) + (currBBbyteindex * backBuf.bpp)};
-            auto const currimgbyteindex {y * img.w + x};
-            auto* currimgbyte {static_cast<u8*>(img.memory) + (currimgbyteindex * img.bpp)};
+/*             auto const currBBbyteindex {pixely * backBuf.w + pixelx}; */
+/*             auto* currBBbyte {static_cast<u8*>(backBuf.memory) + (currBBbyteindex * backBuf.bpp)}; */
+/*             auto const currimgbyteindex {y * img.w + x}; */
+/*             auto* currimgbyte {static_cast<u8*>(img.memory) + (currimgbyteindex * img.bpp)}; */
 
-            auto const r {*currimgbyte++};
-            auto const g {*currimgbyte++};
-            auto const b {*currimgbyte++};
-            auto const a {*currimgbyte++};
+/*             auto const r {*currimgbyte++}; */
+/*             auto const g {*currimgbyte++}; */
+/*             auto const b {*currimgbyte++}; */
+/*             auto const a {*currimgbyte++}; */
 
-            draw_pixel(currBBbyte, {r, g, b, a});
-        }
-    }
-}
+/*             draw_pixel(currBBbyte, {r, g, b, a}); */
+/*         } */
+/*     } */
+/* } */
 
 auto draw(ProgramState& programState, GameState& gameState) -> void {
     auto const windim {get_window_dimensions()};
@@ -251,7 +254,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             holdShapeDim.y = gHoldShapeDim.y * scale;
             holdShapeDim.w = gHoldShapeDim.w * scale;
             holdShapeDim.h = gHoldShapeDim.h * scale;
-            draw_solid_square(bb, holdShapeDim, {0, 0, 0});
+            draw_solid_square(bb, holdShapeDim, Color::black);
             if (gameState.holdShape) {
                 auto shape {*gameState.holdShape};
                 shape.pos.x = 0;

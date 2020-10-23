@@ -5,11 +5,11 @@
 #include "board.hpp"
 
 struct BackBuffer {
-    void* memory;
-    int w;
-    int h;
-    int pitch;
-    int bpp;
+    void* memory {};
+    PositiveUInt w {};
+    PositiveUInt h {};
+    PositiveUInt pitch {};
+    PositiveU8 bpp {};
 };
 
 auto constexpr gBorderSize {1};

@@ -30,9 +30,9 @@ auto get_back_buffer() -> BackBuffer
 {
     auto bbuf = BackBuffer{};
     bbuf.memory = window.bbSurface->pixels;
-    bbuf.w = window.bbSurface->w;
-    bbuf.h = window.bbSurface->h;
-    bbuf.pitch = window.bbSurface->pitch;
+    bbuf.w = PositiveUInt {window.bbSurface->w};
+    bbuf.h = PositiveUInt {window.bbSurface->h};
+    bbuf.pitch = PositiveUInt {window.bbSurface->pitch};
     bbuf.bpp = window.bbSurface->format->BytesPerPixel;
 
     return bbuf;
