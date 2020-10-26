@@ -73,6 +73,10 @@ public:
     }
 
     explicit operator T() const noexcept { return m_value; }
+    template <typename U>
+    operator PositiveGeneric<U>() const noexcept {
+        return m_value;
+    }
     explicit operator bool() const noexcept { return m_value; }
 
     auto constexpr operator -=(ThisType const& rhs) -> ThisType& {
