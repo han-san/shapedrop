@@ -1,5 +1,6 @@
 #include <cassert>
 #include <string_view>
+#include <thread>
 
 #include "core.hpp"
 #include "ui.hpp"
@@ -171,41 +172,78 @@ auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGB
 /*     } */
 /* } */
 
+auto static draw_background_rows(BackBuffer bb, PositiveSize_t const startRow, PositiveSize_t const endRow) {
+    for (std::size_t y {startRow}; y < endRow; ++y) {
+        for (std::size_t x {0}; x < uint {bb.w}; ++x) {
+            Color::RGBA const color {
+                static_cast<u8>(Color::RGBA::maxChannelValue * (static_cast<double>(x) / static_cast<double>(uint {bb.w}))),
+                    static_cast<u8>(Color::RGBA::maxChannelValue * (1 - (static_cast<double>(x) / static_cast<double>(uint {bb.w})) * (static_cast<double>(y) / static_cast<double>(uint {bb.h})))),
+                    static_cast<u8>(Color::RGBA::maxChannelValue * (static_cast<double>(y) / static_cast<double>(uint {bb.h}))),
+            };
+            draw_solid_square(bb, {static_cast<int>(x), static_cast<int>(y), 1, 1}, color);
+        }
+    }
+}
+
+auto static draw_playarea_rows(BackBuffer bb, PositiveSize_t const startRow, PositiveSize_t const endRow, Board const& board, PositiveUInt const positiveScale) {
+    uint const scale {positiveScale};
+    for (std::size_t y {startRow}; y < endRow; ++y) {
+        for (std::size_t x {0}; x < Board::columns; ++x) {
+            auto currindex {y * Board::columns + x};
+            auto const& block {board.data[currindex]};
+            auto color {block.isActive ? block.color : Color::black};
+            Rect<int> square {
+                static_cast<int>((x + gPlayAreaDim.x) * scale),
+                    static_cast<int>((y - 2 + gPlayAreaDim.y) * scale),
+                    static_cast<int>(scale),
+                    static_cast<int>(scale)
+            };
+            draw_solid_square(bb, square, color);
+        }
+    }
+}
+
 auto draw(ProgramState& programState, GameState& gameState) -> void {
-    auto const windim {get_window_dimensions()};
     auto bb {get_back_buffer()};
     auto const scale {get_window_scale()};
-    for (auto y {0}; y < windim.h; ++y) {
-        for (auto x {0}; x < windim.w; ++x) {
-            Color::RGBA const color {
-                static_cast<u8>(Color::RGBA::maxChannelValue * (static_cast<double>(x) / static_cast<double>(windim.w))),
-                    static_cast<u8>(Color::RGBA::maxChannelValue * (1 - (static_cast<double>(x) / static_cast<double>(windim.w)) * (static_cast<double>(y) / static_cast<double>(windim.h)))),
-                    static_cast<u8>(Color::RGBA::maxChannelValue * (static_cast<double>(y) / static_cast<double>(windim.h))),
-            };
-            draw_solid_square(bb, {x, y, 1, 1}, color);
+    auto const threadCount {std::thread::hardware_concurrency()};
+    std::vector<std::thread> threads {};
+    threads.reserve(threadCount);
+
+    // draw window background
+    {
+        auto const rowsPerThread {uint {bb.h} / threadCount};
+        for (std::size_t i {0}; i < threadCount - 1; ++i) {
+            threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * i}, PositiveSize_t {rowsPerThread * (i + 1)});
         }
+        threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * (threadCount - 1)}, bb.h);
+
+        for (auto& thread : threads) {
+            thread.join();
+        }
+        threads.clear();
     }
 
     switch (programState.levelType) {
         case ProgramState::LevelType::Menu: {
         } break;
         case ProgramState::LevelType::Game: {
-            // draw playarea background
-            for (auto y {2}; y < Board::rows; ++y) {
-                for (auto x {0}; x < Board::columns; ++x) {
-                    auto currindex {static_cast<std::size_t>(y * Board::columns + x)};
-                    auto& block {gameState.board.data[currindex]};
-                    auto color {block.isActive ? block.color : Color::black};
-                    Rect<int> square {
-                        (x + gPlayAreaDim.x) * scale,
-                            (y - 2 + gPlayAreaDim.y) * scale,
-                            scale,
-                            scale
-                    };
-                    draw_solid_square(bb, square, color);
+            // draw playarea
+            {
+                auto const positiveScale {PositiveUInt {scale}};
+                auto const rowsPerThread {(Board::rows - 2) / threadCount};
+                for (std::size_t i {0}; i < threadCount - 1; ++i) {
+                    threads.emplace_back(&draw_playarea_rows, bb, PositiveSize_t {2 + (rowsPerThread * i)}, PositiveSize_t {2 + rowsPerThread * (i + 1)}, gameState.board, positiveScale);
                 }
+                threads.emplace_back(&draw_playarea_rows, bb, PositiveSize_t {2 + rowsPerThread * (threadCount - 1)}, PositiveSize_t {Board::rows}, gameState.board, positiveScale);
+
+                for (auto& thread : threads) {
+                    thread.join();
+                }
+                threads.clear();
             }
 
+            // draw currentShape and its shadow
             auto draw_shape_in_play_area = [&](Shape& shape) {
                 for (auto& position : shape.get_absolute_block_positions()) {
                     // since the top 2 rows shouldn't be visible, the y
