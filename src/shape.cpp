@@ -146,14 +146,12 @@ auto Shape::get_wallkicks(Shape::RotationDirection const dir) const -> std::arra
 }
 
 ShapePool::ShapePool(std::array<Shape, ShapePool::size> const& shapes)
-{
-    shapePool = {
+    : shapePool {
         &shapes[0], &shapes[1], &shapes[2],
         &shapes[3], &shapes[4], &shapes[5],
         &shapes[6],
-    };
-    previewPool = shapePool;
-
+    }, previewPool {shapePool}
+{
     reshuffle();
     currentShapeIterator = shapePool.begin();
 }
