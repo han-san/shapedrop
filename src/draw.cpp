@@ -293,8 +293,8 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             holdShapeDim.w = gHoldShapeDim.w * scale;
             holdShapeDim.h = gHoldShapeDim.h * scale;
             draw_solid_square(bb, holdShapeDim, Color::black);
-            if (gameState.holdShape) {
-                auto shape {*gameState.holdShape};
+            if (gameState.holdShapeType) {
+                Shape shape {*gameState.holdShapeType};
                 shape.pos.x = 0;
                 shape.pos.y = 0;
 

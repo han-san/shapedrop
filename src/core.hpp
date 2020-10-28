@@ -104,7 +104,7 @@ struct GameState {
     Shape currentShape {shapePool.current_shape()};
     Shape currentShapeShadow {board.get_shadow(currentShape)};
     std::optional<Shape::RotationType> currentRotationType {};
-    std::optional<Shape> holdShape {};
+    std::optional<Shape::Type> holdShapeType {};
     bool paused {false};
 
     auto reset() {

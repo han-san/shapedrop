@@ -108,13 +108,13 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
                 if (!gameState.hasHeld) {
                     gameState.hasHeld = true;
                     gameState.currentRotationType = std::nullopt;
-                    if (gameState.holdShape) {
-                        auto const holdType {gameState.holdShape->type};
+                    if (gameState.holdShapeType) {
+                        auto const holdType {*gameState.holdShapeType};
 
-                        gameState.holdShape = Shape(gameState.currentShape.type);
-                        gameState.currentShape = Shape(holdType);
+                        gameState.holdShapeType = gameState.currentShape.type;
+                        gameState.currentShape = Shape {holdType};
                     } else {
-                        gameState.holdShape = Shape(gameState.currentShape.type);
+                        gameState.holdShapeType = gameState.currentShape.type;
                         gameState.currentShape = gameState.shapePool.next_shape();
                     }
 
