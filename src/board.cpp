@@ -7,7 +7,7 @@
 
 auto Board::get_shadow(Shape const& shape) const -> Shape {
     auto shapeShadow {shape};
-    while (try_move(shapeShadow, {0, 1})) {
+    while (try_move(shapeShadow, V2::down())) {
         // Intentionally empty body.
     }
     shapeShadow.color.a = Color::RGBA::Alpha::opaque / 2U;

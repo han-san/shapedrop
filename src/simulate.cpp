@@ -130,7 +130,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
             auto const nextdropClock {gameState.dropClock + dropDelay};
             if (programState.frameStartClock > nextdropClock) {
                 gameState.dropClock = programState.frameStartClock;
-                if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
+                if (gameState.board.try_move(gameState.currentShape, V2::down())) {
                     gameState.lockClock = programState.frameStartClock;
                     gameState.currentRotationType = std::nullopt;
 
@@ -144,7 +144,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
 
             if (programState.frameStartClock > gameState.lockClock + GameState::lockDelay) {
                 // only care about locking if currentShape is on top of a block
-                if (!gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
+                if (!gameState.board.is_valid_move(gameState.currentShape, V2::down())) {
                     // game over if entire piece is above visible portion
                     // of board
                     auto const shapePositions {gameState.currentShape.get_absolute_block_positions()};

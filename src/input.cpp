@@ -35,8 +35,8 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
             auto move_horizontal = [&] (HorDir const dir) {
                 // if currentShape is on top of a block before move,
                 // the drop clock needs to be reset
-                auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
-                auto const dirVec {dir == HorDir::Right ? V2{1, 0} : V2{-1, 0}};
+                auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, V2::down())};
+                auto const dirVec {dir == HorDir::Right ? V2::right() : V2::left()};
                 if (gameState.board.try_move(gameState.currentShape, dirVec)) {
                     update_shadow_and_clocks(isGrounded);
                     // if you move the piece you cancel the drop
@@ -50,7 +50,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
             auto rotate_current_shape = [&] (Shape::RotationDirection rot) {
                 // if currentShape is on top of a block before rotation,
                 // the drop clock needs to be reset
-                auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
+                auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, V2::down())};
                 if (auto const rotation {gameState.board.rotate_shape(gameState.currentShape, rot)}; rotation) {
                     update_shadow_and_clocks(isGrounded);
                     gameState.currentRotationType = rotation;
@@ -84,12 +84,12 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
                 gameState.isSoftDropping = false;
 
                 // softdrops only get reset if the piece can currently fall
-                if (gameState.board.is_valid_move(gameState.currentShape, {0, 1})) {
+                if (gameState.board.is_valid_move(gameState.currentShape, V2::down())) {
                     gameState.softDropRowCount = 0;
                 }
             } else if (event.type == Event::Type::Drop) {
                 auto droppedRows {0};
-                while (gameState.board.try_move(gameState.currentShape, {0, 1})) {
+                while (gameState.board.try_move(gameState.currentShape, V2::down())) {
                     gameState.lockClock = programState.frameStartClock;
                     gameState.currentRotationType = std::nullopt;
                     ++droppedRows;
@@ -121,7 +121,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
                     gameState.softDropRowCount = 0;
                     gameState.droppedRows = 0;
 
-                    auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, {0, 1})};
+                    auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, V2::down())};
                     update_shadow_and_clocks(isGrounded);
                 }
             } else if (event.type == Event::Type::Pause) {

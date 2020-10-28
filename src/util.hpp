@@ -162,6 +162,11 @@ struct V2Generic {
     auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
         return lhs += rhs;
     }
+
+    auto static constexpr right() -> ThisType { return {1, 0}; }
+    auto static constexpr left() -> ThisType { return {-1, 0}; }
+    auto static constexpr up() -> ThisType { return {0, -1}; }
+    auto static constexpr down() -> ThisType { return {0, 1}; }
 };
 
 template <typename T>
