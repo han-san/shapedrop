@@ -1,30 +1,10 @@
-#include <array>
-#include <algorithm>
-#include <cassert>
 #include <chrono>
-#include <ctime>
-#include <iostream>
-#include <numeric>
-#include <optional>
-#include <random>
-#include <string>
-#include <string_view>
 #include <thread>
-#include <vector>
 
-#include "fmt/core.h"
-
-#include "jint.h"
-
-#include "board.hpp"
-#include "simulate.hpp"
 #include "draw.hpp"
-#include "platform.hpp"
-#include "shape.hpp"
-#include "tests.hpp"
-#include "ui.hpp"
-#include "util.hpp"
 #include "input.hpp"
+#include "simulate.hpp"
+#include "tests.hpp"
 
 #include "core.hpp"
 

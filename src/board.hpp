@@ -3,8 +3,6 @@
 #include <array>
 #include <optional>
 
-#include "jint.h"
-
 #include "shape.hpp"
 #include "util.hpp"
 

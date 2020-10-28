@@ -8,7 +8,6 @@
 
 #include "platform.hpp"
 
-
 class FontCharacter {
 public:
     uchar* bitmap;
