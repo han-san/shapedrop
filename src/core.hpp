@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ctime>
+#include <chrono>
 
 #include "board.hpp"
 
@@ -55,8 +56,15 @@ struct ProgramState {
         Game,
     };
 
+    using HiResClock = std::chrono::high_resolution_clock;
+    HiResClock::time_point frameStartClock {HiResClock::now()};
+    HiResClock::duration frameTime {0};
+    uint static constexpr targetFPS {60};
+    HiResClock::duration static constexpr targetFrameTime {
+        std::chrono::duration_cast<HiResClock::duration>(std::chrono::duration<double> {1. / targetFPS})
+    };
+
     LevelType levelType {LevelType::Menu};
-    clock_t frameStartClock = clock();
     bool running {true};
     int highScore {0};
 };
@@ -70,15 +78,16 @@ struct GameState {
     {}
 
     // unique to current shape
-    time_t dropClock {clock()};
-    time_t lockClock {dropClock};
+    using HiResClock = std::chrono::high_resolution_clock;
+    HiResClock::time_point dropClock {HiResClock::now()};
+    HiResClock::time_point lockClock {dropClock};
     int droppedRows {0};
     int softDropRowCount {0};
 
     // shared for all shapes
-    time_t static constexpr lockDelay {CLOCKS_PER_SEC / 2};
-    double static constexpr softDropDelay {0.1};
-    double static constexpr initialDropDelay {1.0};
+    std::chrono::milliseconds static constexpr lockDelay {500};
+    std::chrono::milliseconds static constexpr softDropDelay {100};
+    std::chrono::seconds static constexpr initialDropDelay {1};
 
     bool isSoftDropping {false};
     int linesCleared {0};
@@ -103,9 +112,10 @@ struct GameState {
     }
 
     [[nodiscard]] auto drop_delay_for_level() const {
-        auto const dropDelay {initialDropDelay - this->level * 0.1};
+        using namespace std::chrono_literals;
+        auto const dropDelay {initialDropDelay - (this->level * 100ms)};
         // dropDelay can't be negative
-        return dropDelay > 0. ? dropDelay : 0.;
+        return dropDelay > 0s ? dropDelay : 0s;
     }
 };
 

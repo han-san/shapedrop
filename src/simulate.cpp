@@ -127,7 +127,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
             // TODO: make it possible for shapes to drop more than one block
             // (e.g. at max drop speed it should drop all the way to the bottom
             // instantly)
-            auto const nextdropClock {gameState.dropClock + dropDelay * CLOCKS_PER_SEC};
+            auto const nextdropClock {gameState.dropClock + dropDelay};
             if (programState.frameStartClock > nextdropClock) {
                 gameState.dropClock = programState.frameStartClock;
                 if (gameState.board.try_move(gameState.currentShape, {0, 1})) {
