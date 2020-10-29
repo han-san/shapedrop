@@ -75,12 +75,12 @@ auto draw_solid_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const c
 {
     for (auto y {0}; y < sqr.h; ++y) {
         auto const pixely {static_cast<std::size_t>(sqr.y + y)};
-        if ((sqr.y + y) < 0 || pixely >= buf.h) {
+        if ((sqr.y + y) < 0 || pixely >= uint {buf.h}) {
             continue;
         }
         for (auto x {0}; x < sqr.w; ++x) {
             auto const pixelx {static_cast<std::size_t>(sqr.x + x)};
-            if ((sqr.x + x) < 0 || pixelx >= buf.w) {
+            if ((sqr.x + x) < 0 || pixelx >= uint {buf.w}) {
                 continue;
             }
 
@@ -108,12 +108,12 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const 
 {
     for (int y {0}; y < sqr.h; ++y) {
         auto const pixely {static_cast<std::size_t>(sqr.y + y)};
-        if (sqr.y + y < 0 || pixely >= buf.h) {
+        if (sqr.y + y < 0 || pixely >= uint {buf.h}) {
             continue;
         }
         for (int x {0}; x < sqr.w; ++x) {
             auto const pixelx {static_cast<std::size_t>(sqr.x + x)};
-            if (sqr.x + x < 0 || pixelx >= buf.w) {
+            if (sqr.x + x < 0 || pixelx >= uint {buf.w}) {
                 continue;
             }
 
