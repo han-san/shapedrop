@@ -85,9 +85,8 @@ auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotati
     return std::nullopt;
 }
 
-auto Board::remove_full_rows() -> int {
-    // check if a row can be cleared
-    // a maximum of 4 rows can be cleared at once with default shapes
+auto Board::get_cleared_rows() const -> ArrayStack<int, 4> {
+    // a maximum of 4 rows can be cleared at once with default shapes.
     ArrayStack<int, 4> rowsCleared;
 
     for (auto y {0}; y < rows; ++y) {
@@ -102,7 +101,12 @@ auto Board::remove_full_rows() -> int {
             rowsCleared.push_back(y);
         }
     }
-    assert(rowsCleared.size() <= 4);
+
+    return rowsCleared;
+}
+
+auto Board::remove_full_rows() -> int {
+    auto rowsCleared {get_cleared_rows()};
 
     if (rowsCleared.empty()) {
         return 0;
