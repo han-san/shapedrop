@@ -209,6 +209,13 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     std::vector<std::thread> threads {};
     threads.reserve(threadCount);
 
+    auto const join_all = [](auto& threadContainer) {
+        for (auto& thread : threadContainer) {
+            thread.join();
+        }
+        threadContainer.clear();
+    };
+
     // draw window background
     {
         auto const rowsPerThread {uint {bb.h} / threadCount};
@@ -216,11 +223,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * i}, PositiveSize_t {rowsPerThread * (i + 1)});
         }
         threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * (threadCount - 1)}, bb.h);
-
-        for (auto& thread : threads) {
-            thread.join();
-        }
-        threads.clear();
+        join_all(threads);
     }
 
     switch (programState.levelType) {
@@ -229,17 +232,13 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         case ProgramState::LevelType::Game: {
             // draw playarea
             {
-                auto const positiveScale {PositiveUInt {scale}};
+                PositiveUInt const positiveScale {scale};
                 auto const rowsPerThread {(Board::rows - 2) / threadCount};
                 for (std::size_t i {0}; i < threadCount - 1; ++i) {
                     threads.emplace_back(&draw_playarea_rows, bb, PositiveSize_t {2 + (rowsPerThread * i)}, PositiveSize_t {2 + rowsPerThread * (i + 1)}, gameState.board, positiveScale);
                 }
                 threads.emplace_back(&draw_playarea_rows, bb, PositiveSize_t {2 + rowsPerThread * (threadCount - 1)}, PositiveSize_t {Board::rows}, gameState.board, positiveScale);
-
-                for (auto& thread : threads) {
-                    thread.join();
-                }
-                threads.clear();
+                join_all(threads);
             }
 
             // draw currentShape and its shadow
