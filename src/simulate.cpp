@@ -164,7 +164,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                     auto const tspin {gameState.currentRotationType ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType) : std::nullopt};
 
                     auto const rowsCleared {gameState.board.remove_full_rows()};
-                    gameState.linesCleared += static_cast<std::size_t>(rowsCleared);
+                    gameState.linesCleared += rowsCleared;
                     auto const clearType {get_clear_type(rowsCleared, tspin)};
                     std::array static constexpr clearTypeToName {
                         ""sv,

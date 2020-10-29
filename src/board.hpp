@@ -19,9 +19,9 @@ enum class TspinType {
 
 class Board {
 public:
-    int static constexpr rows {22};
-    int static constexpr columns {10};
-    int static constexpr visibleRows {rows - 2};
+    u8 static constexpr rows {22};
+    u8 static constexpr columns {10};
+    u8 static constexpr visibleRows {rows - 2};
 
     std::array<Block, rows * columns> data {make_filled_array<Block, rows * columns>({Color::black, false})};
 
@@ -32,7 +32,7 @@ public:
     [[nodiscard]] auto is_valid_spot(Point<int> pos) const -> bool;
     [[nodiscard]] auto is_valid_move(Shape shape, V2 move) const -> bool;
     [[nodiscard]] auto is_valid_shape(Shape const& shape) const -> bool;
-    auto remove_full_rows() -> int;
+    auto remove_full_rows() -> u8;
     auto print_board() const -> void;
 private:
     [[nodiscard]] auto get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight>;

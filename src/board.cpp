@@ -106,20 +106,19 @@ auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
     return rowsCleared;
 }
 
-auto Board::remove_full_rows() -> int {
+auto Board::remove_full_rows() -> u8 {
     auto const rowsCleared {get_cleared_rows()};
 
     if (rowsCleared.empty()) {
         return 0;
     }
 
-    auto move_row_down = [this](int const rowNumber, int const distance) {
-        assert(rowNumber >= 0);
-        assert(distance > 0);
-        assert((rowNumber + distance) < rows);
-        for (auto x {0}; x < columns; ++x) {
-            auto const index {static_cast<std::size_t>(rowNumber * columns + x)};
-            auto const newIndex {static_cast<std::size_t>((rowNumber + distance) * columns + x)};
+    auto move_row_down = [this](PositiveSize_t const rowNumber, PositiveSize_t const distance) {
+        assert(std::size_t {distance} != 0);
+        assert(std::size_t {rowNumber} + std::size_t {distance} < rows);
+        for (u8 x {0}; x < columns; ++x) {
+            std::size_t const index {rowNumber * columns + x};
+            std::size_t const newIndex {(rowNumber + distance) * columns + x};
             auto& oldBlock {this->data[index]};
             auto& newBlock {this->data[newIndex]};
             newBlock = oldBlock;
@@ -135,11 +134,11 @@ auto Board::remove_full_rows() -> int {
     if (rowsCleared.size() == 2 || rowsCleared.size() == 3) {
         auto const topRow {rowsCleared.front()};
         auto const botRow {rowsCleared.back()};
-        assert(topRow >= 0 && topRow < rows);
-        assert(botRow >= 0 && botRow < rows);
+        assert(topRow < rows);
+        assert(botRow < rows);
         assert(botRow >= topRow);
 
-        auto emptyRowsPassed {0};
+        u8 emptyRowsPassed {0};
         for (auto y {botRow}; y != topRow; --y) {
             auto const found {
                 std::any_of(std::cbegin(rowsCleared), std::cend(rowsCleared), [y](auto const& row) {
@@ -157,11 +156,12 @@ auto Board::remove_full_rows() -> int {
     }
 
     // then move all rows above removed rows
-    for (auto y {rowsCleared.front() - 1}; y >= 0; --y) {
-        move_row_down(y, static_cast<int>(rowsCleared.size()));
+    auto const rowAboveRemovedRows {PositiveSize_t {rowsCleared.front()} - 1U};
+    for (std::size_t y {0}; y <= rowAboveRemovedRows; ++y) {
+        move_row_down(rowAboveRemovedRows - y, rowsCleared.size());
     }
 
-    return static_cast<int>(rowsCleared.size());
+    return static_cast<u8>(rowsCleared.size());
 }
 
 auto Board::print_board() const -> void {
