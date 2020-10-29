@@ -107,7 +107,7 @@ auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
 }
 
 auto Board::remove_full_rows() -> int {
-    auto rowsCleared {get_cleared_rows()};
+    auto const rowsCleared {get_cleared_rows()};
 
     if (rowsCleared.empty()) {
         return 0;
