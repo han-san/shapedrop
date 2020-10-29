@@ -3,6 +3,8 @@
 #include <iostream>
 #include <optional>
 
+#include "jint.h"
+
 #include "board.hpp"
 
 auto Board::get_shadow(Shape const& shape) const -> Shape {
@@ -85,10 +87,10 @@ auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotati
     return std::nullopt;
 }
 
-auto Board::get_cleared_rows() const -> ArrayStack<int, Shape::maxHeight> {
-    ArrayStack<int, Shape::maxHeight> rowsCleared;
+auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
+    ArrayStack<u8, Shape::maxHeight> rowsCleared;
 
-    for (auto y {0}; y < rows; ++y) {
+    for (u8 y {0}; y < rows; ++y) {
         auto const rowStartIt {data.cbegin() + (y * columns)};
         auto const rowEndIt {data.cbegin() + ((y + 1) * columns)};
         auto const rowIsFull {

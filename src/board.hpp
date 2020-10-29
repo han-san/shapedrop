@@ -3,6 +3,7 @@
 #include <array>
 #include <optional>
 
+#include "jint.h"
 #include "shape.hpp"
 #include "util.hpp"
 
@@ -34,5 +35,5 @@ public:
     auto remove_full_rows() -> int;
     auto print_board() const -> void;
 private:
-    [[nodiscard]] auto get_cleared_rows() const -> ArrayStack<int, Shape::maxHeight>;
+    [[nodiscard]] auto get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight>;
 };
