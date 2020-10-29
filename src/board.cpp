@@ -91,14 +91,13 @@ auto Board::remove_full_rows() -> int {
     ArrayStack<int, 4> rowsCleared;
 
     for (auto y {0}; y < rows; ++y) {
-        auto rowIsFull {true};
-        for (auto x {0}; x < columns; ++x) {
-            auto const boardIndex {static_cast<std::size_t>(y * columns + x)};
-            if (!data[boardIndex].isActive) {
-                rowIsFull = false;
-                break;
-            }
-        }
+        auto const rowStartIt {data.cbegin() + (y * columns)};
+        auto const rowEndIt {data.cbegin() + ((y + 1) * columns)};
+        auto const rowIsFull {
+            std::all_of(rowStartIt, rowEndIt, [](auto const& block) {
+                        return block.isActive;
+                        })
+        };
         if (rowIsFull) {
             rowsCleared.push_back(y);
         }
