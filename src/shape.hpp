@@ -1,5 +1,6 @@
 #pragma once
 
+#include "jint.h"
 #include "util.hpp"
 
 class Shape {
@@ -197,13 +198,16 @@ public:
         Regular,
     };
 
-    // ShapeDims relies on the specific order of these.
+    // Shape::dimensions relies on the specific order of these.
     // Don't move them around!
     enum class Type {
         I, O, L, J, S, Z, T
     };
 
     std::array<Rect<int>::Size, 7> static constexpr dimensions { Rect<int>::Size {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
+
+    // The shape with the maximum height is the I shape (4 blocks tall).
+    u8 static constexpr maxHeight {4};
 
     enum class RotationDirection {
         Left,

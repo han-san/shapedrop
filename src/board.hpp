@@ -34,5 +34,5 @@ public:
     auto remove_full_rows() -> int;
     auto print_board() const -> void;
 private:
-    [[nodiscard]] auto get_cleared_rows() const -> ArrayStack<int, 4>;
+    [[nodiscard]] auto get_cleared_rows() const -> ArrayStack<int, Shape::maxHeight>;
 };

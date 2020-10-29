@@ -85,9 +85,8 @@ auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotati
     return std::nullopt;
 }
 
-auto Board::get_cleared_rows() const -> ArrayStack<int, 4> {
-    // a maximum of 4 rows can be cleared at once with default shapes.
-    ArrayStack<int, 4> rowsCleared;
+auto Board::get_cleared_rows() const -> ArrayStack<int, Shape::maxHeight> {
+    ArrayStack<int, Shape::maxHeight> rowsCleared;
 
     for (auto y {0}; y < rows; ++y) {
         auto const rowStartIt {data.cbegin() + (y * columns)};
