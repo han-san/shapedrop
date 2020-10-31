@@ -289,8 +289,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             draw_solid_square(bb, holdShapeDim, Color::black);
             if (gameState.holdShapeType) {
                 Shape shape {*gameState.holdShapeType};
-                shape.pos.x = 0;
-                shape.pos.y = 0;
+                shape.pos = {};
 
                 auto is_even = [](auto const n) { return (n % 2) == 0; };
                 // offset to center shape inside hold square
