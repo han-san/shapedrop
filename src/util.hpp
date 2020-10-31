@@ -242,6 +242,17 @@ struct Rect {
         T w {};
         T h {};
     };
+
+    auto constexpr operator *=(T const& rhs) {
+        x *= rhs;
+        y *= rhs;
+        w *= rhs;
+        h *= rhs;
+        return *this;
+    }
+    auto constexpr friend operator *(Rect<T> lhs, T const& rhs) {
+        return lhs *= rhs;
+    }
 };
 
 template <typename T>

@@ -285,11 +285,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             }
 
             // draw held shape
-            Rect<int> holdShapeDim {};
-            holdShapeDim.x = gHoldShapeDim.x * scale;
-            holdShapeDim.y = gHoldShapeDim.y * scale;
-            holdShapeDim.w = gHoldShapeDim.w * scale;
-            holdShapeDim.h = gHoldShapeDim.h * scale;
+            auto const holdShapeDim {gHoldShapeDim * scale};
             draw_solid_square(bb, holdShapeDim, Color::black);
             if (gameState.holdShapeType) {
                 Shape shape {*gameState.holdShapeType};
