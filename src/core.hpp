@@ -77,7 +77,7 @@ struct ProgramState {
 struct GameState {
 
     explicit GameState(int sstartingLevel)
-    : startingLevel{sstartingLevel}
+    : startingLevel {sstartingLevel}
     {}
 
     // unique to current shape

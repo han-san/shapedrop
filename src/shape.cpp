@@ -14,8 +14,8 @@
 using namespace std::string_literals;
 
 Shape::Shape(Type const ttype) noexcept
-    : type{ttype}
-    , pos{Board::columns / 2 - 2, 0} // spawn centrally
+    : type {ttype}
+    , pos {Board::columns / 2 - 2, 0} // spawn centrally
 {
     switch (ttype) {
         case Type::I: {

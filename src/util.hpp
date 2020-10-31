@@ -195,7 +195,7 @@ using V3f = V3Generic<double>;
 
 namespace Color {
     struct RGBA {
-        u8 static constexpr maxChannelValue{0xFF};
+        u8 static constexpr maxChannelValue {0xFF};
         struct Alpha {
             u8 static constexpr opaque {maxChannelValue};
             u8 static constexpr transparent {0};

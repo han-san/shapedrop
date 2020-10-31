@@ -285,7 +285,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             }
 
             // draw held shape
-            Rect<int> holdShapeDim{};
+            Rect<int> holdShapeDim {};
             holdShapeDim.x = gHoldShapeDim.x * scale;
             holdShapeDim.y = gHoldShapeDim.y * scale;
             holdShapeDim.w = gHoldShapeDim.w * scale;

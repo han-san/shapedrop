@@ -330,7 +330,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
             // instead of the game field's since that's the simulation
             // branch we're currently on.
             programState.levelType = ProgramState::LevelType::Game;
-            gameState = GameState{menuState.level};
+            gameState = GameState {menuState.level};
         }
         UI::spinbox("Level", menuFontSize / 2., UI::XAlignment::Center, 0., menuState.level, gMinLevel, gMaxLevel);
         UI::end_menu();

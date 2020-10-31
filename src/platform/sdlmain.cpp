@@ -28,7 +28,7 @@ auto get_window_scale() -> int
 
 auto get_back_buffer() -> BackBuffer
 {
-    auto bbuf = BackBuffer{};
+    auto bbuf = BackBuffer {};
     bbuf.memory = window.bbSurface->pixels;
     bbuf.w = PositiveUInt {window.bbSurface->w};
     bbuf.h = PositiveUInt {window.bbSurface->h};

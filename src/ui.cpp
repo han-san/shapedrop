@@ -40,7 +40,7 @@ namespace UI {
     std::vector<Background> static backgrounds {};
 
     auto static to_squaref(WindowScaleRect const rect) -> Rect<double> {
-        return {double{rect.x}, double{rect.y}, double{rect.w}, double{rect.h}};
+        return {double {rect.x}, double {rect.y}, double {rect.w}, double {rect.h}};
     }
 
     auto static get_current_ui_region() -> WindowScaleRect {
@@ -62,23 +62,23 @@ namespace UI {
 
     auto static to_window_scale(RelativeScalePoint const offset) -> WindowScalePoint {
         auto const workingRegion {get_current_ui_region()};
-        auto const x {workingRegion.x + double{offset.x} * workingRegion.w};
-        auto const y {workingRegion.y + double{offset.y} * workingRegion.h};
+        auto const x {workingRegion.x + double {offset.x} * workingRegion.w};
+        auto const y {workingRegion.y + double {offset.y} * workingRegion.h};
         return {x, y};
     }
 
     auto static to_window_scale(RelativeScaleRect const region) -> WindowScaleRect {
         auto const workingRegion {get_current_ui_region()};
-        auto const x {workingRegion.x + double{region.x} * workingRegion.w};
-        auto const y {workingRegion.y + double{region.y} * workingRegion.h};
-        auto const w {double{region.w} * workingRegion.w};
-        auto const h {double{region.h} * workingRegion.h};
+        auto const x {workingRegion.x + double {region.x} * workingRegion.w};
+        auto const y {workingRegion.y + double {region.y} * workingRegion.h};
+        auto const w {double {region.w} * workingRegion.w};
+        auto const h {double {region.h} * workingRegion.h};
         return {x, y, w, h};
     }
 
     auto static to_window_scale(XAlignment const xAlign, RelativeScale const yOffset, WindowScale const width) -> WindowScalePoint {
         auto const workingRegion {get_current_ui_region()};
-        auto const y {workingRegion.y + double{yOffset} * workingRegion.h};
+        auto const y {workingRegion.y + double {yOffset} * workingRegion.h};
         auto const x = [xAlign, workingRegion, width]() {
             switch (xAlign) {
                 case XAlignment::Left:
@@ -105,7 +105,7 @@ namespace UI {
     }
 
     auto static get_text_window_scale_width(std::string_view const text, WindowScale const fontHeight) -> WindowScale {
-        return to_normalized_width(FontString::get_text_width_normalized(text, double{fontHeight}));
+        return to_normalized_width(FontString::get_text_width_normalized(text, double {fontHeight}));
     }
 
     // Assumes region.w and region.h are the correct sizes for the resulting FontString.
@@ -117,7 +117,7 @@ namespace UI {
     auto label(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> void {
         auto const textWidth {get_text_window_scale_width(text, fontHeight)};
         auto const windowOffset {to_window_scale(xAlign, yOffset, textWidth)};
-        auto const region {WindowScaleRect{windowOffset.x, windowOffset.y, textWidth, fontHeight}};
+        auto const region {WindowScaleRect {windowOffset.x, windowOffset.y, textWidth, fontHeight}};
 
         label(std::move(text), region);
     }
@@ -125,7 +125,7 @@ namespace UI {
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
     auto label(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void {
         auto const windowOffset {to_window_scale(offset)};
-        auto const region {WindowScaleRect{windowOffset.x, windowOffset.y, 0, fontHeight}};
+        auto const region {WindowScaleRect {windowOffset.x, windowOffset.y, 0, fontHeight}};
 
         label(std::move(text), region);
     }
@@ -164,16 +164,16 @@ namespace UI {
         std::string_view static constexpr buttonsString {"<>"};
 
         SpinBox(std::string_view const name, WindowScale const fontHeight, WindowScalePoint const offset, int& vvalue, int const mminValue, int const mmaxValue)
-            : value{vvalue},
-            minValue{mminValue},
-            maxValue{mmaxValue},
-            text{fmt::format("{} {}: ", buttonsString, name)}
+            : value {vvalue},
+            minValue {mminValue},
+            maxValue {mmaxValue},
+            text {fmt::format("{} {}: ", buttonsString, name)}
         {
             auto const textWidth {get_text_window_scale_width(text, fontHeight)};
             auto const maxValueWidth {get_text_window_scale_width(std::to_string(maxValue), fontHeight)};
             auto const fullTextWidth {textWidth + maxValueWidth};
 
-            region = WindowScaleRect{offset.x, offset.y, fullTextWidth, fontHeight};
+            region = WindowScaleRect {offset.x, offset.y, fullTextWidth, fontHeight};
         }
     };
 
@@ -230,7 +230,7 @@ namespace UI {
         backgrounds.clear();
 
         for (auto const& text : textToDraw) {
-            draw_text_normalized(bb, text.text, double{text.x}, double{text.y}, double{text.textSize});
+            draw_text_normalized(bb, text.text, double {text.x}, double {text.y}, double {text.textSize});
         }
         textToDraw.clear();
 
