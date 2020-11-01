@@ -53,9 +53,9 @@ auto Shape::get_local_block_positions() const -> BlockStack {
     BlockStack positions {};
     auto const rotationIndex {static_cast<RotationMap::size_type>(rotation)};
     auto const& layout {(*rotationMap)[rotationIndex]};
-    for (std::size_t y {0}; y < layoutH; ++y) {
-        for (std::size_t x {0}; x < layoutW; ++x) {
-            std::size_t const index {y * layoutW + x};
+    for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
+        for (std::size_t x {0}; x < layoutDimensions.w; ++x) {
+            std::size_t const index {y * layoutDimensions.w + x};
             if (layout[index]) {
                 positions.push_back({static_cast<int>(x), static_cast<int>(y)});
                 if (positions.size() == positions.max_size()) {

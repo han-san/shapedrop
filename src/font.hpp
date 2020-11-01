@@ -11,7 +11,7 @@
 class FontCharacter {
 public:
     uchar* bitmap;
-    int w, h;
+    Rect<int>::Size dimensions;
     int xoff, yoff;
     int ascent;
     char character;
@@ -32,8 +32,7 @@ public:
 class FontString {
 public:
     std::vector<FontCharacter> data;
-    double normalizedW;
-    double normalizedH;
+    Rect<double>::Size normalizedDimensions;
 
     auto static from_width(std::string_view string, double desiredPixelWidth) -> FontString;
     auto static from_width_normalized(std::string_view string, double desiredWidth) -> FontString;

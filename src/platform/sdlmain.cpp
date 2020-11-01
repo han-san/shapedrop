@@ -30,8 +30,10 @@ auto get_back_buffer() -> BackBuffer
 {
     auto bbuf = BackBuffer {};
     bbuf.memory = window.bbSurface->pixels;
-    bbuf.w = PositiveUInt {window.bbSurface->w};
-    bbuf.h = PositiveUInt {window.bbSurface->h};
+    bbuf.dimensions = {
+        PositiveUInt {window.bbSurface->w},
+        PositiveUInt {window.bbSurface->h}
+    };
     bbuf.pitch = PositiveUInt {window.bbSurface->pitch};
     bbuf.bpp = window.bbSurface->format->BytesPerPixel;
 
@@ -131,8 +133,10 @@ auto get_event() -> Event
         } else if (e.type == SDL_MOUSEBUTTONDOWN) {
             if (e.button.button == SDL_BUTTON_LEFT) {
                 event.type = Event::Type::Mousebuttondown;
-                event.x = e.button.x;
-                event.y = e.button.y;
+                event.mouseCoords = {
+                    e.button.x,
+                    e.button.y
+                };
             }
         }
     }

@@ -5,9 +5,8 @@
 
 class Shape {
 public:
-    std::size_t static constexpr layoutW {4};
-    std::size_t static constexpr layoutH {4};
-    using ShapeLayout = std::array<bool, layoutW * layoutH>;
+    Rect<std::size_t>::Size static constexpr layoutDimensions {4, 4};
+    using ShapeLayout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
     using RotationMap = std::array<ShapeLayout, 4>;
 
     RotationMap static constexpr IRotationMap {

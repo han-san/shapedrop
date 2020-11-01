@@ -22,8 +22,7 @@ struct Event {
     };
 
     Type type;
-    int x;
-    int y;
+    Point<int> mouseCoords;
 };
 
 auto handle_input(ProgramState& programState, GameState& gameState) -> void;

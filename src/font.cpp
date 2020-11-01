@@ -41,7 +41,7 @@ FontCharacter::FontCharacter(char const c, double const pixelHeight, char const 
     scale(static_cast<double>(stbtt_ScaleForPixelHeight(&font, static_cast<float>(pixelHeight)))),
     advance(get_codepoint_kern_advance(c, nextChar, scale))
 {
-    bitmap = stbtt_GetCodepointBitmap(&font, 0, static_cast<float>(scale), c, &w, &h, &xoff, &yoff);
+    bitmap = stbtt_GetCodepointBitmap(&font, 0, static_cast<float>(scale), c, &dimensions.w, &dimensions.h, &xoff, &yoff);
     stbtt_GetFontVMetrics(&font, &ascent, nullptr, nullptr);
 }
 
@@ -64,8 +64,10 @@ FontString::FontString(std::string_view const string, double const pixelHeight)
     }
 
     auto const windim {get_window_dimensions()};
-    normalizedH = pixelHeight / windim.h;
-    normalizedW = w / windim.w;
+    normalizedDimensions = {
+        w / windim.w,
+        pixelHeight / windim.h,
+    };
 }
 
 auto FontString::get_text_width(std::string_view const text, double const fontHeight) -> double {

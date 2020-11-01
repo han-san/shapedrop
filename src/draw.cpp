@@ -23,19 +23,19 @@ auto static draw_pixel(void* data, Color::RGBA const color) -> void
     *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.r, color.a)};
 }
 
-auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharacter, int const realX, int const realY) -> void
+auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharacter, Point<int> const characterCoords) -> void
 {
-    for (auto y {0}; y < fontCharacter.h; ++y) {
-        auto const currY {realY + y + fontCharacter.yoff + static_cast<int>(fontCharacter.ascent * fontCharacter.scale)};
-        if (currY < 0 || static_cast<uint>(currY) >= uint {buf.h}) { continue; }
-        for (auto x {0}; x < fontCharacter.w; ++x) {
-            auto const currX {realX + x + fontCharacter.xoff};
-            if (currX < 0 || static_cast<uint>(currX) >= uint {buf.w}) { continue; }
+    for (auto y {0}; y < fontCharacter.dimensions.h; ++y) {
+        auto const currY {characterCoords.y + y + fontCharacter.yoff + static_cast<int>(fontCharacter.ascent * fontCharacter.scale)};
+        if (currY < 0 || static_cast<uint>(currY) >= uint {buf.dimensions.h}) { continue; }
+        for (auto x {0}; x < fontCharacter.dimensions.w; ++x) {
+            auto const currX {characterCoords.x + x + fontCharacter.xoff};
+            if (currX < 0 || static_cast<uint>(currX) >= uint {buf.dimensions.w}) { continue; }
 
-            auto const currbyteindex {static_cast<uint>(currY) * uint {buf.w} + static_cast<uint>(currX)};
+            auto const currbyteindex {static_cast<uint>(currY) * uint {buf.dimensions.w} + static_cast<uint>(currX)};
             auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
-            auto const relativeIndex {static_cast<std::size_t>(y * fontCharacter.w + x)};
+            auto const relativeIndex {static_cast<std::size_t>(y * fontCharacter.dimensions.w + x)};
             auto const a {fontCharacter.bitmap[relativeIndex]};
 
             draw_pixel(currbyte, Color::RGBA {0u, 0u, 0u, a});
@@ -43,48 +43,52 @@ auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharac
     }
 }
 
-auto draw_font_string(BackBuffer& buf, FontString const& fontString, int x, int const y) -> void
+auto draw_font_string(BackBuffer& buf, FontString const& fontString, Point<int> coords) -> void
 {
     for (auto const& fontCharacter : fontString.data) {
-        draw_font_character(buf, fontCharacter, x, y);
-        x += static_cast<int>(fontCharacter.advance);
+        draw_font_character(buf, fontCharacter, coords);
+        coords.x += static_cast<int>(fontCharacter.advance);
     }
 }
 
-auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, double const x, double const y) -> void
+auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, Point<double> const relativeCoords) -> void
 {
-    auto const realX = static_cast<int>(x * uint {buf.w});
-    auto const realY = static_cast<int>(y * uint {buf.h});
-    draw_font_string(buf, fontString, realX, realY);
+    Point<int> const realCoords {
+        static_cast<int>(relativeCoords.x * uint {buf.dimensions.w}),
+        static_cast<int>(relativeCoords.y * uint {buf.dimensions.h}),
+    };
+    draw_font_string(buf, fontString, realCoords);
 }
 
-auto draw_text(BackBuffer& buf, std::string_view const text, int const x, int const y, double const pixelHeight) -> void
+auto draw_text(BackBuffer& buf, std::string_view const text, Point<int> const coords, double const pixelHeight) -> void
 {
     auto const fontString {FontString::from_height(text, pixelHeight)};
-    draw_font_string(buf, fontString, x, y);
+    draw_font_string(buf, fontString, coords);
 }
 
-auto draw_text_normalized(BackBuffer& buf, std::string_view const text, double const x, double const y, double const pixelHeight) -> void
+auto draw_text_normalized(BackBuffer& buf, std::string_view const text, Point<double> const relativeCoords, double const pixelHeight) -> void
 {
-    auto const realX = static_cast<int>(x * uint {buf.w});
-    auto const realY = static_cast<int>(y * uint {buf.h});
-    draw_text(buf, text, realX, realY, pixelHeight * uint {buf.h});
+    Point<int> const realCoords {
+        static_cast<int>(relativeCoords.x * uint {buf.dimensions.w}),
+        static_cast<int>(relativeCoords.y * uint {buf.dimensions.h}),
+    };
+    draw_text(buf, text, realCoords, pixelHeight * uint {buf.dimensions.h});
 }
 
 auto draw_solid_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const color) -> void
 {
     for (auto y {0}; y < sqr.h; ++y) {
         auto const pixely {static_cast<std::size_t>(sqr.y + y)};
-        if ((sqr.y + y) < 0 || pixely >= uint {buf.h}) {
+        if ((sqr.y + y) < 0 || pixely >= uint {buf.dimensions.h}) {
             continue;
         }
         for (auto x {0}; x < sqr.w; ++x) {
             auto const pixelx {static_cast<std::size_t>(sqr.x + x)};
-            if ((sqr.x + x) < 0 || pixelx >= uint {buf.w}) {
+            if ((sqr.x + x) < 0 || pixelx >= uint {buf.dimensions.w}) {
                 continue;
             }
 
-            auto const currbyteindex {pixely * uint {buf.w} + pixelx};
+            auto const currbyteindex {pixely * uint {buf.dimensions.w} + pixelx};
             auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
             draw_pixel(currbyte, color);
@@ -95,10 +99,10 @@ auto draw_solid_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const c
 auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA const color) -> void
 {
     Rect<int> newSqr {
-        static_cast<int>(sqr.x * uint {buf.w}),
-        static_cast<int>(sqr.y * uint {buf.h}),
-        static_cast<int>(sqr.w * uint {buf.w}),
-        static_cast<int>(sqr.h * uint {buf.h})
+        static_cast<int>(sqr.x * uint {buf.dimensions.w}),
+        static_cast<int>(sqr.y * uint {buf.dimensions.h}),
+        static_cast<int>(sqr.w * uint {buf.dimensions.w}),
+        static_cast<int>(sqr.h * uint {buf.dimensions.h})
     };
 
     draw_solid_square(buf, newSqr, color);
@@ -108,12 +112,12 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const 
 {
     for (int y {0}; y < sqr.h; ++y) {
         auto const pixely {static_cast<std::size_t>(sqr.y + y)};
-        if (sqr.y + y < 0 || pixely >= uint {buf.h}) {
+        if (sqr.y + y < 0 || pixely >= uint {buf.dimensions.h}) {
             continue;
         }
         for (int x {0}; x < sqr.w; ++x) {
             auto const pixelx {static_cast<std::size_t>(sqr.x + x)};
-            if (sqr.x + x < 0 || pixelx >= uint {buf.w}) {
+            if (sqr.x + x < 0 || pixelx >= uint {buf.dimensions.w}) {
                 continue;
             }
 
@@ -123,7 +127,7 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const 
                 continue;
             }
 
-            auto const currbyteindex {pixely * uint {buf.w} + pixelx};
+            auto const currbyteindex {pixely * uint {buf.dimensions.w} + pixelx};
             auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
             draw_pixel(currbyte, color);
@@ -134,10 +138,10 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const 
 auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA const color, int const borderSize) -> void
 {
     Rect<int> newSqr {
-        static_cast<int>(sqr.x * uint {buf.w}),
-        static_cast<int>(sqr.y * uint {buf.h}),
-        static_cast<int>(sqr.w * uint {buf.w}),
-        static_cast<int>(sqr.h * uint {buf.h})
+        static_cast<int>(sqr.x * uint {buf.dimensions.w}),
+        static_cast<int>(sqr.y * uint {buf.dimensions.h}),
+        static_cast<int>(sqr.w * uint {buf.dimensions.w}),
+        static_cast<int>(sqr.h * uint {buf.dimensions.h})
     };
 
     draw_hollow_square(buf, newSqr, color, borderSize);
@@ -173,11 +177,11 @@ auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGB
 
 auto static draw_background_rows(BackBuffer bb, PositiveSize_t const startRow, PositiveSize_t const endRow) {
     for (std::size_t y {startRow}; y < endRow; ++y) {
-        for (std::size_t x {0}; x < uint {bb.w}; ++x) {
+        for (std::size_t x {0}; x < uint {bb.dimensions.w}; ++x) {
             Color::RGBA const color {
-                static_cast<u8>(Color::RGBA::maxChannelValue * (static_cast<double>(x) / static_cast<double>(uint {bb.w}))),
-                    static_cast<u8>(Color::RGBA::maxChannelValue * (1 - (static_cast<double>(x) / static_cast<double>(uint {bb.w})) * (static_cast<double>(y) / static_cast<double>(uint {bb.h})))),
-                    static_cast<u8>(Color::RGBA::maxChannelValue * (static_cast<double>(y) / static_cast<double>(uint {bb.h}))),
+                static_cast<u8>(Color::RGBA::maxChannelValue * (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w}))),
+                    static_cast<u8>(Color::RGBA::maxChannelValue * (1 - (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w})) * (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h})))),
+                    static_cast<u8>(Color::RGBA::maxChannelValue * (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h}))),
             };
             draw_solid_square(bb, {static_cast<int>(x), static_cast<int>(y), 1, 1}, color);
         }
@@ -218,11 +222,11 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     // draw window background
     {
-        auto const rowsPerThread {uint {bb.h} / threadCount};
+        auto const rowsPerThread {uint {bb.dimensions.h} / threadCount};
         for (std::size_t i {0}; i < threadCount - 1; ++i) {
             threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * i}, PositiveSize_t {rowsPerThread * (i + 1)});
         }
-        threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * (threadCount - 1)}, bb.h);
+        threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * (threadCount - 1)}, bb.dimensions.h);
         join_all(threads);
     }
 

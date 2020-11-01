@@ -10,8 +10,7 @@
 
 struct BackBuffer {
     void* memory {};
-    PositiveUInt w {};
-    PositiveUInt h {};
+    Rect<PositiveUInt>::Size dimensions;
     PositiveUInt pitch {};
     PositiveU8 bpp {};
 };

@@ -22,8 +22,7 @@ namespace UI {
     struct TextInfo {
         std::string text;
         WindowScale textSize;
-        WindowScale x;
-        WindowScale y;
+        Point<WindowScale> coords;
     };
     std::vector<TextInfo> static textToDraw {};
 
@@ -41,6 +40,10 @@ namespace UI {
 
     auto static to_squaref(WindowScaleRect const rect) -> Rect<double> {
         return {double {rect.x}, double {rect.y}, double {rect.w}, double {rect.h}};
+    }
+
+    auto static to_point_double(Point<WindowScale> const point) -> Point<double> {
+        return {double {point.x}, double {point.y}};
     }
 
     auto static get_current_ui_region() -> WindowScaleRect {
@@ -216,8 +219,8 @@ namespace UI {
     auto update_state(Event const event) -> void {
         if (event.type == Event::Type::Mousebuttondown) {
             clicked = true;
-            cursor.x = static_cast<double>(event.x);
-            cursor.y = static_cast<double>(event.y);
+            cursor.x = static_cast<double>(event.mouseCoords.x);
+            cursor.y = static_cast<double>(event.mouseCoords.y);
         }
     }
 
@@ -230,7 +233,7 @@ namespace UI {
         backgrounds.clear();
 
         for (auto const& text : textToDraw) {
-            draw_text_normalized(bb, text.text, double {text.x}, double {text.y}, double {text.textSize});
+            draw_text_normalized(bb, text.text, to_point_double(text.coords), double {text.textSize});
         }
         textToDraw.clear();
 
