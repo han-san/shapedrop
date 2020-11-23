@@ -51,7 +51,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
                 // if currentShape is on top of a block before rotation,
                 // the drop clock needs to be reset
                 auto const isGrounded {!gameState.board.is_valid_move(gameState.currentShape, V2::down())};
-                if (auto const rotation {gameState.board.rotate_shape(gameState.currentShape, rot)}; rotation) {
+                if (auto const rotation {gameState.board.rotate_shape(gameState.currentShape, rot)}) {
                     update_shadow_and_clocks(isGrounded);
                     gameState.currentRotationType = rotation;
                     // if you rotate the piece you cancel the drop
