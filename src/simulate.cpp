@@ -75,8 +75,24 @@ std::array static constexpr clearTypeScores {
 auto static get_clear_type(int const rowsCleared, std::optional<TspinType> const tspin) {
     assert(rowsCleared >= 0);
     assert(rowsCleared <= 4);
+
+    auto bad_row_count_msg = [rowsCleared] (std::size_t min, std::size_t max) {
+        return fmt::format("The amount of rows cleared should be between {} and {}, but is currently {}", min, max, rowsCleared);
+    };
+
     if (!tspin) {
-        return static_cast<ClearType>(rowsCleared);
+        switch (rowsCleared) {
+            case 0: return ClearType::None;
+            case 1: return ClearType::Single;
+            case 2: return ClearType::Double;
+            case 3: return ClearType::Triple;
+            case 4: return ClearType::Tetris;
+            default: {
+                auto errMsg {bad_row_count_msg(0, 4)};
+                std::cerr << errMsg << '\n';
+                throw std::logic_error(errMsg);
+            }
+        }
     }
 
     assert(rowsCleared <= 3); // A t-spin can't clear more than 3 rows.
@@ -93,9 +109,8 @@ auto static get_clear_type(int const rowsCleared, std::optional<TspinType> const
             // going to be represented internally as a mini).
             return ClearType::Tspin_triple;
         default: {
-            // Getting here means rowsCleared was above 4 in a release build (BAD).
-            auto const errMsg {fmt::format("The amount of rows cleared should be between 0 and 4, but is currently ({})", rowsCleared)};
-            std::cerr << errMsg; // TODO: Log instead of stderr
+            auto errMsg {bad_row_count_msg(0, 3)};
+            std::cerr << errMsg << '\n';
             throw std::logic_error(errMsg);
         }
     }
