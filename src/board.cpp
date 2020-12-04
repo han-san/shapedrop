@@ -63,8 +63,8 @@ auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
 }
 
 auto Board::is_valid_shape(Shape const& shape) const -> bool {
-    auto const ShapePositions {shape.get_absolute_block_positions()};
-    return std::all_of(std::cbegin(ShapePositions), std::cend(ShapePositions), [this](auto const& position) {
+    auto const blockPositions {shape.get_absolute_block_positions()};
+    return std::all_of(std::cbegin(blockPositions), std::cend(blockPositions), [this](auto const& position) {
                        return is_valid_spot(position);
                        });
 }
