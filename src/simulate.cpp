@@ -7,6 +7,7 @@
 
 #include "core.hpp"
 #include "ui.hpp"
+#include "rangealgorithms.hpp"
 
 #include "simulate.hpp"
 
@@ -164,9 +165,9 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                     // of board
                     auto const shapePositions {gameState.currentShape.get_absolute_block_positions()};
                     auto gameOver {
-                        std::all_of(std::cbegin(shapePositions), std::cend(shapePositions), [](auto const& pos) {
-                                    return pos.y < (Board::rows - Board::visibleRows);
-                                    })
+                        all_of(shapePositions, [](auto const& pos) {
+                               return pos.y < (Board::rows - Board::visibleRows);
+                               })
                     };
 
                     // fix currentBlocks position on board

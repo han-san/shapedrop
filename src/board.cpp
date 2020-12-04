@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "jint.h"
+#include "rangealgorithms.hpp"
 
 #include "board.hpp"
 
@@ -64,9 +65,9 @@ auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
 
 auto Board::is_valid_shape(Shape const& shape) const -> bool {
     auto const blockPositions {shape.get_absolute_block_positions()};
-    return std::all_of(std::cbegin(blockPositions), std::cend(blockPositions), [this](auto const& position) {
-                       return is_valid_spot(position);
-                       });
+    return all_of(blockPositions, [this](auto const& position) {
+                  return is_valid_spot(position);
+                  });
 }
 
 // If the shape is a T, its last movement was a rotation, and 3 or more of its
@@ -76,9 +77,9 @@ auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotati
     if (shape.type == Shape::Type::T) {
         std::array<V2, 4> static constexpr cornerOffsets {V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
         auto const cornersOccupied {
-            std::count_if(std::cbegin(cornerOffsets), std::cend(cornerOffsets), [this, &shape](auto const& offset) {
-                          return !is_valid_spot(shape.pos + offset);
-                          })
+            count_if(cornerOffsets, [this, &shape](auto const& offset) {
+                     return !is_valid_spot(shape.pos + offset);
+                     })
         };
         if (cornersOccupied >= 3) {
             return (rotationType == Shape::RotationType::Wallkick) ? TspinType::Mini : TspinType::Regular;
@@ -141,9 +142,9 @@ auto Board::remove_full_rows() -> u8 {
         u8 emptyRowsPassed {0};
         for (auto y {botRow}; y != topRow; --y) {
             auto const found {
-                std::any_of(std::cbegin(rowsCleared), std::cend(rowsCleared), [y](auto const& row) {
-                        return row == y;
-                        })
+                any_of(rowsCleared, [y](auto const& row) {
+                       return row == y;
+                       })
             };
             if (!found) {
                 // a non-full row between full rows

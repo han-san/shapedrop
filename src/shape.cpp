@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cassert>
 #include <random>
 #include <stdexcept>
@@ -8,6 +7,7 @@
 
 #include "board.hpp"
 #include "util.hpp"
+#include "rangealgorithms.hpp"
 
 #include "shape.hpp"
 
@@ -174,8 +174,8 @@ auto ShapePool::operator=(ShapePool const& other) -> ShapePool&
 auto ShapePool::reshuffle() -> void
 {
     // TODO: seed random engine
-    std::shuffle(shapePool.begin(), shapePool.end(), std::default_random_engine());
-    std::shuffle(previewPool.begin(), previewPool.end(), std::default_random_engine());
+    shuffle(shapePool, std::default_random_engine());
+    shuffle(previewPool, std::default_random_engine());
 }
 
 auto ShapePool::next_shape() -> Shape
@@ -184,7 +184,7 @@ auto ShapePool::next_shape() -> Shape
     if (currentShapeIterator == shapePool.end()) {
         shapePool = previewPool;
         currentShapeIterator = shapePool.begin();
-        std::shuffle(previewPool.begin(), previewPool.end(), std::default_random_engine());
+        shuffle(previewPool, std::default_random_engine());
     }
     return **currentShapeIterator;
 }
