@@ -14,13 +14,9 @@ public:
         Regular,
     };
 
-    // Shape::dimensions relies on the specific order of these.
-    // Don't move them around!
     enum class Type {
         I, O, L, J, S, Z, T
     };
-
-    std::array<Rect<int>::Size, 7> static constexpr dimensions { Rect<int>::Size {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
 
     // The shape with the maximum height is the I shape (4 blocks tall).
     u8 static constexpr maxHeight {4};
@@ -72,6 +68,21 @@ public:
     // Returns the positions of the blocks relative to the top left corner of the play area
     [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
     [[nodiscard]] auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
+    [[nodiscard]] auto constexpr dimensions() const -> Rect<int>::Size {
+        switch (type) {
+            case Type::I:
+                return {4, 1};
+            case Type::O:
+                return {2, 2};
+            case Type::L:
+            case Type::J:
+            case Type::S:
+            case Type::Z:
+            case Type::T:
+                return {3, 2};
+        }
+        throw; // unreachable
+    }
     [[nodiscard]] auto static constexpr type_to_color(Type const type) -> Color::RGBA {
         switch (type) {
             case Type::I:

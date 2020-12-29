@@ -297,7 +297,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
                 auto is_even = [](auto const n) { return (n % 2) == 0; };
                 // offset to center shape inside hold square
-                auto const shapeDimensions {Shape::dimensions[static_cast<std::size_t>(shape.type)]};
+                auto const shapeDimensions {shape.dimensions()};
                 auto const xOffset {is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5};
                 auto const yOffset {is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5};
 
