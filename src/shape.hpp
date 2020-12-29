@@ -9,6 +9,110 @@ public:
     using ShapeLayout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
     using RotationMap = std::array<ShapeLayout, 4>;
 
+    enum class RotationType {
+        Wallkick,
+        Regular,
+    };
+
+    // Shape::dimensions relies on the specific order of these.
+    // Don't move them around!
+    enum class Type {
+        I, O, L, J, S, Z, T
+    };
+
+    std::array<Rect<int>::Size, 7> static constexpr dimensions { Rect<int>::Size {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
+
+    // The shape with the maximum height is the I shape (4 blocks tall).
+    u8 static constexpr maxHeight {4};
+
+    enum class RotationDirection {
+        Left,
+        Right
+    };
+
+    enum class Rotation {
+        r0, r90, r180, r270
+    };
+
+    auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) -> Rotation& {
+        auto constexpr minRotationValue {static_cast<int>(Rotation::r0)};
+        auto constexpr maxRotationValue {static_cast<int>(Rotation::r270)};
+        auto rotationInt {static_cast<int>(rotationEnum)};
+        switch (direction) {
+            case RotationDirection::Left: {
+                --rotationInt;
+                if (rotationInt < minRotationValue) {
+                    rotationInt = maxRotationValue;
+                }
+            } break;
+            case RotationDirection::Right: {
+                ++rotationInt;
+                if (rotationInt > maxRotationValue) {
+                    rotationInt = minRotationValue;
+                }
+            } break;
+        }
+        rotationEnum = static_cast<Rotation>(rotationInt);
+        return rotationEnum;
+    }
+
+    Type type;
+    Rotation rotation {Rotation::r0};
+    Color::RGBA color {Color::invalid};
+    Point<int> pos;
+
+    Shape(Type type) noexcept;
+
+    // All shapes are composed of 4 blocks.
+    std::size_t static constexpr blockCount {4};
+    using BlockStack = ArrayStack<Point<int>, blockCount>;
+
+    // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
+    [[nodiscard]] auto get_local_block_positions() const -> BlockStack;
+    // Returns the positions of the blocks relative to the top left corner of the play area
+    [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
+    [[nodiscard]] auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
+    [[nodiscard]] auto static constexpr type_to_color(Type const type) -> Color::RGBA {
+        switch (type) {
+            case Type::I:
+                return Color::Shape::I;
+            case Type::O:
+                return Color::Shape::O;
+            case Type::L:
+                return Color::Shape::L;
+            case Type::J:
+                return Color::Shape::J;
+            case Type::S:
+                return Color::Shape::S;
+            case Type::Z:
+                return Color::Shape::Z;
+            case Type::T:
+                return Color::Shape::T;
+        }
+        throw; // unreachable
+    }
+    [[nodiscard]] auto constexpr get_layout() const -> ShapeLayout const& {
+        auto const index {static_cast<RotationMap::size_type>(rotation)};
+        switch (type) {
+            case Shape::Type::I:
+                return IRotationMap[index];
+            case Shape::Type::O:
+                return ORotationMap[index];
+            case Shape::Type::L:
+                return LRotationMap[index];
+            case Shape::Type::J:
+                return JRotationMap[index];
+            case Shape::Type::S:
+                return SRotationMap[index];
+            case Shape::Type::Z:
+                return ZRotationMap[index];
+            case Shape::Type::T:
+                return TRotationMap[index];
+        }
+        throw; // unreachable
+    }
+
+private:
     RotationMap static constexpr IRotationMap {
         ShapeLayout {
             0, 0, 0, 0,
@@ -192,108 +296,6 @@ public:
         },
     };
 
-    enum class RotationType {
-        Wallkick,
-        Regular,
-    };
-
-    // Shape::dimensions relies on the specific order of these.
-    // Don't move them around!
-    enum class Type {
-        I, O, L, J, S, Z, T
-    };
-
-    std::array<Rect<int>::Size, 7> static constexpr dimensions { Rect<int>::Size {4, 1}, {2, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2}, {3, 2} };
-
-    // The shape with the maximum height is the I shape (4 blocks tall).
-    u8 static constexpr maxHeight {4};
-
-    enum class RotationDirection {
-        Left,
-        Right
-    };
-
-    enum class Rotation {
-        r0, r90, r180, r270
-    };
-
-    auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) -> Rotation& {
-        auto constexpr minRotationValue {static_cast<int>(Rotation::r0)};
-        auto constexpr maxRotationValue {static_cast<int>(Rotation::r270)};
-        auto rotationInt {static_cast<int>(rotationEnum)};
-        switch (direction) {
-            case RotationDirection::Left: {
-                --rotationInt;
-                if (rotationInt < minRotationValue) {
-                    rotationInt = maxRotationValue;
-                }
-            } break;
-            case RotationDirection::Right: {
-                ++rotationInt;
-                if (rotationInt > maxRotationValue) {
-                    rotationInt = minRotationValue;
-                }
-            } break;
-        }
-        rotationEnum = static_cast<Rotation>(rotationInt);
-        return rotationEnum;
-    }
-
-    Type type;
-    Rotation rotation {Rotation::r0};
-    Color::RGBA color {Color::invalid};
-    Point<int> pos;
-
-    Shape(Type type) noexcept;
-
-    // All shapes are composed of 4 blocks.
-    std::size_t static constexpr blockCount {4};
-    using BlockStack = ArrayStack<Point<int>, blockCount>;
-
-    // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
-    [[nodiscard]] auto get_local_block_positions() const -> BlockStack;
-    // Returns the positions of the blocks relative to the top left corner of the play area
-    [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
-    [[nodiscard]] auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
-    [[nodiscard]] auto static constexpr type_to_color(Type const type) -> Color::RGBA {
-        switch (type) {
-            case Type::I:
-                return Color::Shape::I;
-            case Type::O:
-                return Color::Shape::O;
-            case Type::L:
-                return Color::Shape::L;
-            case Type::J:
-                return Color::Shape::J;
-            case Type::S:
-                return Color::Shape::S;
-            case Type::Z:
-                return Color::Shape::Z;
-            case Type::T:
-                return Color::Shape::T;
-        }
-        throw; // unreachable
-    }
-    [[nodiscard]] auto constexpr get_layout() const -> ShapeLayout const& {
-        auto const index {static_cast<RotationMap::size_type>(rotation)};
-        switch (type) {
-            case Shape::Type::I:
-                return IRotationMap[index];
-            case Shape::Type::O:
-                return ORotationMap[index];
-            case Shape::Type::L:
-                return LRotationMap[index];
-            case Shape::Type::J:
-                return JRotationMap[index];
-            case Shape::Type::S:
-                return SRotationMap[index];
-            case Shape::Type::Z:
-                return ZRotationMap[index];
-            case Shape::Type::T:
-                return TRotationMap[index];
-        }
-        throw; // unreachable
-    }
 };
 
 class ShapePool {
