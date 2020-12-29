@@ -57,14 +57,12 @@ public:
     Color::RGBA color {Color::invalid};
     Point<int> pos;
 
-    Shape(Type type) noexcept;
-
     // All shapes are composed of 4 blocks.
     std::size_t static constexpr blockCount {4};
     using BlockStack = ArrayStack<Point<int>, blockCount>;
 
-    // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
-    [[nodiscard]] auto get_local_block_positions() const -> BlockStack;
+    Shape(Type type) noexcept;
+
     // Returns the positions of the blocks relative to the top left corner of the play area
     [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
     [[nodiscard]] auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
@@ -83,6 +81,10 @@ public:
         }
         throw; // unreachable
     }
+
+private:
+    // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
+    [[nodiscard]] auto get_local_block_positions() const -> BlockStack;
     [[nodiscard]] auto static constexpr type_to_color(Type const type) -> Color::RGBA {
         switch (type) {
             case Type::I:
@@ -123,7 +125,6 @@ public:
         throw; // unreachable
     }
 
-private:
     RotationMap static constexpr IRotationMap {
         ShapeLayout {
             0, 0, 0, 0,
