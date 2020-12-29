@@ -240,7 +240,6 @@ public:
     }
 
     Type type;
-    RotationMap const* rotationMap {nullptr};
     Rotation rotation {Rotation::r0};
     Color::RGBA color {Color::invalid};
     Point<int> pos;
@@ -272,6 +271,26 @@ public:
                 return Color::Shape::Z;
             case Type::T:
                 return Color::Shape::T;
+        }
+        throw; // unreachable
+    }
+    [[nodiscard]] auto constexpr get_layout() const -> ShapeLayout const& {
+        auto const index {static_cast<RotationMap::size_type>(rotation)};
+        switch (type) {
+            case Shape::Type::I:
+                return IRotationMap[index];
+            case Shape::Type::O:
+                return ORotationMap[index];
+            case Shape::Type::L:
+                return LRotationMap[index];
+            case Shape::Type::J:
+                return JRotationMap[index];
+            case Shape::Type::S:
+                return SRotationMap[index];
+            case Shape::Type::Z:
+                return ZRotationMap[index];
+            case Shape::Type::T:
+                return TRotationMap[index];
         }
         throw; // unreachable
     }

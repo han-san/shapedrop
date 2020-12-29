@@ -17,36 +17,11 @@ Shape::Shape(Type const ttype) noexcept
     : type {ttype}
     , color {type_to_color(ttype)}
     , pos {Board::columns / 2 - 2, 0} // spawn centrally
-{
-    switch (ttype) {
-        case Type::I: {
-            rotationMap = &IRotationMap;
-        } break;
-        case Type::O: {
-            rotationMap = &ORotationMap;
-        } break;
-        case Type::L: {
-            rotationMap = &LRotationMap;
-        } break;
-        case Type::J: {
-            rotationMap = &JRotationMap;
-        } break;
-        case Type::S: {
-            rotationMap = &SRotationMap;
-        } break;
-        case Type::Z: {
-            rotationMap = &ZRotationMap;
-        } break;
-        case Type::T: {
-            rotationMap = &TRotationMap;
-        } break;
-    }
-}
+{}
 
 auto Shape::get_local_block_positions() const -> BlockStack {
     BlockStack positions {};
-    auto const rotationIndex {static_cast<RotationMap::size_type>(rotation)};
-    auto const& layout {(*rotationMap)[rotationIndex]};
+    auto const& layout {get_layout()};
     for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
         for (std::size_t x {0}; x < layoutDimensions.w; ++x) {
             std::size_t const index {y * layoutDimensions.w + x};
@@ -58,7 +33,7 @@ auto Shape::get_local_block_positions() const -> BlockStack {
             }
         }
     }
-    throw std::logic_error(fmt::format("The rotation map in rotationIndex ({}) has fewer than 4 blocks active.", rotationIndex));
+    throw std::logic_error(fmt::format("Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.", type, rotation));
 }
 
 auto Shape::get_absolute_block_positions() const -> BlockStack {
