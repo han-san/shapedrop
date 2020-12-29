@@ -7,29 +7,29 @@
 #include "util.hpp"
 #include "core.hpp"
 
-auto inline to_screen_space(Rect<double> const square) -> Rect<double> {
+[[nodiscard]] auto inline to_screen_space(Rect<double> const square) -> Rect<double> {
     auto const dim {get_window_dimensions()};
     return { square.x * dim.w, square.y * dim.h, square.w * dim.w, square.h * dim.h };
 }
 
-auto inline to_normalized(Rect<double> const square) -> Rect<double> {
+[[nodiscard]] auto inline to_normalized(Rect<double> const square) -> Rect<double> {
     auto const dim {get_window_dimensions()};
     return { square.x / dim.w, square.y / dim.h, square.w / dim.w, square.h / dim.h };
 }
 
-auto inline to_normalized_height(double const height) -> double {
+[[nodiscard]] auto inline to_normalized_height(double const height) -> double {
     return height / get_window_dimensions().h;
 }
 
-auto inline to_normalized_width(double const width) -> double {
+[[nodiscard]] auto inline to_normalized_width(double const width) -> double {
     return width / get_window_dimensions().w;
 }
 
-auto inline to_screen_space_height(double const height) -> double {
+[[nodiscard]] auto inline to_screen_space_height(double const height) -> double {
     return height * get_window_dimensions().h;
 }
 
-auto inline to_screen_space_width(double const width) -> double {
+[[nodiscard]] auto inline to_screen_space_width(double const width) -> double {
     return width * get_window_dimensions().w;
 }
 

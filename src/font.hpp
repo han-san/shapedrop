@@ -34,16 +34,16 @@ public:
     std::vector<FontCharacter> data;
     Rect<double>::Size normalizedDimensions;
 
-    auto static from_width(std::string_view string, double desiredPixelWidth) -> FontString;
-    auto static from_width_normalized(std::string_view string, double desiredWidth) -> FontString;
-    auto static from_height(std::string_view const string, double const desiredPixelHeight) -> FontString {
+    [[nodiscard]] auto static from_width(std::string_view string, double desiredPixelWidth) -> FontString;
+    [[nodiscard]] auto static from_width_normalized(std::string_view string, double desiredWidth) -> FontString;
+    [[nodiscard]] auto static from_height(std::string_view const string, double const desiredPixelHeight) -> FontString {
         return FontString(string, desiredPixelHeight);
     }
-    auto static from_height_normalized(std::string_view const string, double const desiredHeight) -> FontString {
+    [[nodiscard]] auto static from_height_normalized(std::string_view const string, double const desiredHeight) -> FontString {
         return from_height(string, get_window_dimensions().h * desiredHeight);
     }
-    auto static get_text_width(std::string_view text, double fontSize) -> double;
-    auto static get_text_width_normalized(std::string_view text, double fontSize) -> double;
+    [[nodiscard]] auto static get_text_width(std::string_view text, double fontSize) -> double;
+    [[nodiscard]] auto static get_text_width_normalized(std::string_view text, double fontSize) -> double;
 
 private:
     FontString(std::string_view string, double pixelHeight);

@@ -38,15 +38,15 @@ namespace UI {
     };
     std::vector<Background> static backgrounds {};
 
-    auto static to_squaref(WindowScaleRect const rect) -> Rect<double> {
+    [[nodiscard]] auto static to_squaref(WindowScaleRect const rect) -> Rect<double> {
         return {double {rect.x}, double {rect.y}, double {rect.w}, double {rect.h}};
     }
 
-    auto static to_point_double(Point<WindowScale> const point) -> Point<double> {
+    [[nodiscard]] auto static to_point_double(Point<WindowScale> const point) -> Point<double> {
         return {double {point.x}, double {point.y}};
     }
 
-    auto static get_current_ui_region() -> WindowScaleRect {
+    [[nodiscard]] auto static get_current_ui_region() -> WindowScaleRect {
         if (menus.empty()) {
             return {0., 0., 1., 1.};
         } else {
@@ -63,14 +63,14 @@ namespace UI {
         }
     }
 
-    auto static to_window_scale(RelativeScalePoint const offset) -> WindowScalePoint {
+    [[nodiscard]] auto static to_window_scale(RelativeScalePoint const offset) -> WindowScalePoint {
         auto const workingRegion {get_current_ui_region()};
         auto const x {workingRegion.x + double {offset.x} * workingRegion.w};
         auto const y {workingRegion.y + double {offset.y} * workingRegion.h};
         return {x, y};
     }
 
-    auto static to_window_scale(RelativeScaleRect const region) -> WindowScaleRect {
+    [[nodiscard]] auto static to_window_scale(RelativeScaleRect const region) -> WindowScaleRect {
         auto const workingRegion {get_current_ui_region()};
         auto const x {workingRegion.x + double {region.x} * workingRegion.w};
         auto const y {workingRegion.y + double {region.y} * workingRegion.h};
@@ -79,7 +79,7 @@ namespace UI {
         return {x, y, w, h};
     }
 
-    auto static to_window_scale(XAlignment const xAlign, RelativeScale const yOffset, WindowScale const width) -> WindowScalePoint {
+    [[nodiscard]] auto static to_window_scale(XAlignment const xAlign, RelativeScale const yOffset, WindowScale const width) -> WindowScalePoint {
         auto const workingRegion {get_current_ui_region()};
         auto const y {workingRegion.y + double {yOffset} * workingRegion.h};
         auto const x = [xAlign, workingRegion, width]() {
@@ -107,7 +107,7 @@ namespace UI {
         }
     }
 
-    auto static get_text_window_scale_width(std::string_view const text, WindowScale const fontHeight) -> WindowScale {
+    [[nodiscard]] auto static get_text_window_scale_width(std::string_view const text, WindowScale const fontHeight) -> WindowScale {
         return to_normalized_width(FontString::get_text_width_normalized(text, double {fontHeight}));
     }
 
@@ -133,7 +133,7 @@ namespace UI {
         label(std::move(text), region);
     }
 
-    auto static button(std::string text, WindowScaleRect const region) -> bool {
+    [[nodiscard]] auto static button(std::string text, WindowScaleRect const region) -> bool {
         label(std::move(text), region);
 
         auto const screenSpaceRegion {to_screen_space(to_squaref(region))};

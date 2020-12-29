@@ -7,7 +7,7 @@
 
 #include "draw.hpp"
 
-auto static alpha_blend_channel(PositiveU8 const bg, PositiveU8 const fg, PositiveU8 const alpha) -> PositiveU8
+[[nodiscard]] auto static alpha_blend_channel(PositiveU8 const bg, PositiveU8 const fg, PositiveU8 const alpha) -> PositiveU8
 {
     auto const alphaRatio {u8 {alpha} / 255.};
     return static_cast<PositiveU8>(u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio));

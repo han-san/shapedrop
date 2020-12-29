@@ -28,16 +28,16 @@ typedef signed long long sllong;
 
 #ifdef __cplusplus
 
-s8  constexpr operator "" _s8 (ullong n) { return (s8 ) n; }
-s16 constexpr operator "" _s16(ullong n) { return (s16) n; }
-s32 constexpr operator "" _s32(ullong n) { return (s32) n; }
-s64 constexpr operator "" _s64(ullong n) { return (s64) n; }
+[[nodiscard]] s8  constexpr operator "" _s8 (ullong n) { return (s8 ) n; }
+[[nodiscard]] s16 constexpr operator "" _s16(ullong n) { return (s16) n; }
+[[nodiscard]] s32 constexpr operator "" _s32(ullong n) { return (s32) n; }
+[[nodiscard]] s64 constexpr operator "" _s64(ullong n) { return (s64) n; }
 
-u8  constexpr operator "" _u8 (ullong n) { return (u8 ) n; }
-u16 constexpr operator "" _u16(ullong n) { return (u16) n; }
-u32 constexpr operator "" _u32(ullong n) { return (u32) n; }
-u64 constexpr operator "" _u64(ullong n) { return (u64) n; }
+[[nodiscard]] u8  constexpr operator "" _u8 (ullong n) { return (u8 ) n; }
+[[nodiscard]] u16 constexpr operator "" _u16(ullong n) { return (u16) n; }
+[[nodiscard]] u32 constexpr operator "" _u32(ullong n) { return (u32) n; }
+[[nodiscard]] u64 constexpr operator "" _u64(ullong n) { return (u64) n; }
 
-size_t constexpr operator "" _usize(ullong n) { return (size_t) n; }
+[[nodiscard]] size_t constexpr operator "" _usize(ullong n) { return (size_t) n; }
 
 #endif

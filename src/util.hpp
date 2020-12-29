@@ -72,12 +72,14 @@ public:
         assert(static_cast<T>(-1) >= static_cast<ullong>(i));
     }
 
-    explicit operator T() const noexcept { return m_value; }
+    [[nodiscard]] constexpr explicit operator T() const noexcept { return m_value; }
+
     template <typename U>
     operator PositiveGeneric<U>() const noexcept {
         return m_value;
     }
-    explicit operator bool() const noexcept { return m_value; }
+
+    [[nodiscard]] explicit operator bool() const noexcept { return m_value; }
 
     auto constexpr operator -=(ThisType const& rhs) -> ThisType& {
         auto const rhsVal = T {rhs};
@@ -85,7 +87,7 @@ public:
         m_value -= rhsVal;
         return *this;
     }
-    auto constexpr friend operator -(ThisType lhs, ThisType const& rhs) -> ThisType {
+    [[nodiscard]] auto constexpr friend operator -(ThisType lhs, ThisType const& rhs) -> ThisType {
         return lhs -= rhs;
     }
     auto constexpr operator +=(ThisType const& rhs) -> ThisType& {
@@ -93,7 +95,7 @@ public:
         m_value += rhsVal;
         return *this;
     }
-    auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
+    [[nodiscard]] auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
         return lhs += rhs;
     }
     auto constexpr operator *=(ThisType const& rhs) -> ThisType& {
@@ -101,7 +103,7 @@ public:
         m_value *= rhsVal;
         return *this;
     }
-    auto constexpr friend operator *(ThisType lhs, ThisType const& rhs) -> ThisType {
+    [[nodiscard]] auto constexpr friend operator *(ThisType lhs, ThisType const& rhs) -> ThisType {
         return lhs *= rhs;
     }
     auto constexpr operator /=(ThisType const& rhs) -> ThisType& {
@@ -109,26 +111,26 @@ public:
         m_value /= rhsVal;
         return *this;
     }
-    auto constexpr friend operator /(ThisType lhs, ThisType const& rhs) -> ThisType {
+    [[nodiscard]] auto constexpr friend operator /(ThisType lhs, ThisType const& rhs) -> ThisType {
         return lhs /= rhs;
     }
 
-    auto constexpr friend operator ==(ThisType const& lhs, ThisType const& rhs) {
+    [[nodiscard]] auto constexpr friend operator ==(ThisType const& lhs, ThisType const& rhs) {
         return lhs.m_value == rhs.m_value;
     }
-    auto constexpr friend operator !=(ThisType const& lhs, ThisType const& rhs) {
+    [[nodiscard]] auto constexpr friend operator !=(ThisType const& lhs, ThisType const& rhs) {
         return lhs.m_value != rhs.m_value;
     }
-    auto constexpr friend operator <(ThisType const& lhs, ThisType const& rhs) {
+    [[nodiscard]] auto constexpr friend operator <(ThisType const& lhs, ThisType const& rhs) {
         return lhs.m_value < rhs.m_value;
     }
-    auto constexpr friend operator >(ThisType const& lhs, ThisType const& rhs) {
+    [[nodiscard]] auto constexpr friend operator >(ThisType const& lhs, ThisType const& rhs) {
         return lhs.m_value > rhs.m_value;
     }
-    auto constexpr friend operator <=(ThisType const& lhs, ThisType const& rhs) {
+    [[nodiscard]] auto constexpr friend operator <=(ThisType const& lhs, ThisType const& rhs) {
         return lhs.m_value <= rhs.m_value;
     }
-    auto constexpr friend operator >=(ThisType const& lhs, ThisType const& rhs) {
+    [[nodiscard]] auto constexpr friend operator >=(ThisType const& lhs, ThisType const& rhs) {
         return lhs.m_value >= rhs.m_value;
     }
 
@@ -159,14 +161,14 @@ struct V2Generic {
         y += rhs.y;
         return *this;
     }
-    auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
+    [[nodiscard]] auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
         return lhs += rhs;
     }
 
-    auto static constexpr right() -> ThisType { return {1, 0}; }
-    auto static constexpr left() -> ThisType { return {-1, 0}; }
-    auto static constexpr up() -> ThisType { return {0, -1}; }
-    auto static constexpr down() -> ThisType { return {0, 1}; }
+    [[nodiscard]] auto static constexpr right() -> ThisType { return {1, 0}; }
+    [[nodiscard]] auto static constexpr left() -> ThisType { return {-1, 0}; }
+    [[nodiscard]] auto static constexpr up() -> ThisType { return {0, -1}; }
+    [[nodiscard]] auto static constexpr down() -> ThisType { return {0, 1}; }
 };
 
 template <typename T>
@@ -183,7 +185,7 @@ struct V3Generic {
         z += rhs.z;
         return *this;
     }
-    auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
+    [[nodiscard]] auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
         return lhs += rhs;
     }
 };
@@ -250,7 +252,7 @@ struct Rect {
         h *= rhs;
         return *this;
     }
-    auto constexpr friend operator *(Rect<T> lhs, T const& rhs) {
+    [[nodiscard]] auto constexpr friend operator *(Rect<T> lhs, T const& rhs) {
         return lhs *= rhs;
     }
 };
@@ -265,7 +267,7 @@ struct Point {
         y += rhs.y;
         return *this;
     }
-    auto constexpr friend operator +(Point<T> lhs, V2Generic<T> const& rhs) {
+    [[nodiscard]] auto constexpr friend operator +(Point<T> lhs, V2Generic<T> const& rhs) {
         return lhs += rhs;
     }
 };
@@ -316,7 +318,7 @@ private:
 };
 
 template <typename T>
-auto point_is_in_rect(Point<T> const& point, Rect<T> const& rect) {
+[[nodiscard]] auto point_is_in_rect(Point<T> const& point, Rect<T> const& rect) {
     return (point.x >= rect.x) &&
         (point.x < rect.x + rect.w) &&
         (point.y >= rect.y) &&
@@ -327,7 +329,7 @@ auto point_is_in_rect(Point<T> const& point, Rect<T> const& rect) {
 // one, there's a potential performance hit from default constructing every
 // element and then immediately reassigning all of them.
 template <typename T, std::size_t N>
-auto constexpr make_filled_array(T const& val) {
+[[nodiscard]] auto constexpr make_filled_array(T const& val) {
     std::array<T, N> arr;
     arr.fill(val);
     return arr;

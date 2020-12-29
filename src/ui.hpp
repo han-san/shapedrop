@@ -16,35 +16,35 @@ namespace UI {
         double value;
     public:
         WindowScale() noexcept = default;
-        constexpr explicit operator double() const { return value; }
+        [[nodiscard]] constexpr explicit operator double() const { return value; }
         constexpr WindowScale(double const from) noexcept : value {from} {}
 
         auto constexpr operator +=(WindowScale const& rhs) -> WindowScale& {
             value += double {rhs};
             return *this;
         }
-        auto constexpr friend operator +(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
+        [[nodiscard]] auto constexpr friend operator +(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
             return lhs += rhs;
         }
         auto constexpr operator -=(WindowScale const& rhs) -> WindowScale& {
             value -= double {rhs};
             return *this;
         }
-        auto constexpr friend operator -(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
+        [[nodiscard]] auto constexpr friend operator -(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
             return lhs -= rhs;
         }
         auto constexpr operator *=(WindowScale const& rhs) -> WindowScale& {
             value *= double {rhs};
             return *this;
         }
-        auto constexpr friend operator *(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
+        [[nodiscard]] auto constexpr friend operator *(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
             return lhs *= rhs;
         }
         auto constexpr operator /=(WindowScale const& rhs) -> WindowScale& {
             value /= double {rhs};
             return *this;
         }
-        auto constexpr friend operator /(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
+        [[nodiscard]] auto constexpr friend operator /(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
             return lhs /= rhs;
         }
     };
@@ -53,35 +53,35 @@ namespace UI {
         double value;
     public:
         RelativeScale() noexcept = default;
-        constexpr explicit operator double() const { return value; }
+        [[nodiscard]] constexpr explicit operator double() const { return value; }
         constexpr RelativeScale(double const from) noexcept : value {from} {}
 
         auto constexpr operator +=(RelativeScale const& rhs) -> RelativeScale& {
             value += double {rhs};
             return *this;
         }
-        auto constexpr friend operator +(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
+        [[nodiscard]] auto constexpr friend operator +(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
             return lhs += rhs;
         }
         auto constexpr operator -=(RelativeScale const& rhs) -> RelativeScale& {
             value -= double {rhs};
             return *this;
         }
-        auto constexpr friend operator -(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
+        [[nodiscard]] auto constexpr friend operator -(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
             return lhs -= rhs;
         }
         auto constexpr operator *=(RelativeScale const& rhs) -> RelativeScale& {
             value *= double {rhs};
             return *this;
         }
-        auto constexpr friend operator *(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
+        [[nodiscard]] auto constexpr friend operator *(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
             return lhs *= rhs;
         }
         auto constexpr operator /=(RelativeScale const& rhs) -> RelativeScale& {
             value /= double {rhs};
             return *this;
         }
-        auto constexpr friend operator /(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
+        [[nodiscard]] auto constexpr friend operator /(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
             return lhs /= rhs;
         }
     };
@@ -99,8 +99,8 @@ namespace UI {
 
     auto label(std::string text, WindowScale fontHeight, RelativeScalePoint offset) -> void;
     auto label(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> void;
-    auto button(std::string text, WindowScale fontHeight, RelativeScalePoint pos) -> bool;
-    auto button(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> bool;
+    [[nodiscard]] auto button(std::string text, WindowScale fontHeight, RelativeScalePoint pos) -> bool;
+    [[nodiscard]] auto button(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> bool;
     auto spinbox(std::string_view text, WindowScale fontHeight, RelativeScalePoint offset, int& value, int minValue, int maxValue) -> void;
     auto spinbox(std::string_view text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset, int& value, int minValue, int maxValue) -> void;
     auto begin_menu(RelativeScaleRect region, Color::RGBA color = Color::transparent) -> void;

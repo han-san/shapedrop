@@ -73,7 +73,7 @@ std::array static constexpr clearTypeScores {
     1200  // T-Spin Mini Double
 };
 
-auto static get_clear_type(int const rowsCleared, std::optional<TspinType> const tspin) {
+[[nodiscard]] auto static get_clear_type(int const rowsCleared, std::optional<TspinType> const tspin) {
     assert(rowsCleared >= 0);
     assert(rowsCleared <= 4);
 
@@ -117,13 +117,13 @@ auto static get_clear_type(int const rowsCleared, std::optional<TspinType> const
     }
 }
 
-auto static calculate_score(ClearType const clearType, int const level) {
+[[nodiscard]] auto static calculate_score(ClearType const clearType, int const level) {
     auto const index {static_cast<std::size_t>(clearType)};
     assert(index < clearTypeScores.size());
     return clearTypeScores[index] * level;
 }
 
-auto static calculate_score(int const rowsCleared, std::optional<TspinType> tspin, int const level) {
+[[nodiscard]] auto static calculate_score(int const rowsCleared, std::optional<TspinType> tspin, int const level) {
     auto const clearType {get_clear_type(rowsCleared, tspin)};
     return calculate_score(clearType, level);
 }
