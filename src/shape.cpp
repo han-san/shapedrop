@@ -15,35 +15,29 @@ using namespace std::string_literals;
 
 Shape::Shape(Type const ttype) noexcept
     : type {ttype}
+    , color {type_to_color(ttype)}
     , pos {Board::columns / 2 - 2, 0} // spawn centrally
 {
     switch (ttype) {
         case Type::I: {
-            color = Color::Shape::I;
             rotationMap = &IRotationMap;
         } break;
         case Type::O: {
-            color = Color::Shape::O;
             rotationMap = &ORotationMap;
         } break;
         case Type::L: {
-            color = Color::Shape::L;
             rotationMap = &LRotationMap;
         } break;
         case Type::J: {
-            color = Color::Shape::J;
             rotationMap = &JRotationMap;
         } break;
         case Type::S: {
-            color = Color::Shape::S;
             rotationMap = &SRotationMap;
         } break;
         case Type::Z: {
-            color = Color::Shape::Z;
             rotationMap = &ZRotationMap;
         } break;
         case Type::T: {
-            color = Color::Shape::T;
             rotationMap = &TRotationMap;
         } break;
     }

@@ -256,6 +256,25 @@ public:
     // Returns the positions of the blocks relative to the top left corner of the play area
     [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
     [[nodiscard]] auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
+    [[nodiscard]] auto static constexpr type_to_color(Type const type) -> Color::RGBA {
+        switch (type) {
+            case Type::I:
+                return Color::Shape::I;
+            case Type::O:
+                return Color::Shape::O;
+            case Type::L:
+                return Color::Shape::L;
+            case Type::J:
+                return Color::Shape::J;
+            case Type::S:
+                return Color::Shape::S;
+            case Type::Z:
+                return Color::Shape::Z;
+            case Type::T:
+                return Color::Shape::T;
+        }
+        throw; // unreachable
+    }
 };
 
 class ShapePool {
