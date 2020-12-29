@@ -5,10 +5,6 @@
 
 class Shape {
 public:
-    Rect<std::size_t>::Size static constexpr layoutDimensions {4, 4};
-    using ShapeLayout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
-    using RotationMap = std::array<ShapeLayout, 4>;
-
     enum class RotationType {
         Wallkick,
         Regular,
@@ -29,28 +25,6 @@ public:
     enum class Rotation {
         r0, r90, r180, r270
     };
-
-    auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) -> Rotation& {
-        auto constexpr minRotationValue {static_cast<int>(Rotation::r0)};
-        auto constexpr maxRotationValue {static_cast<int>(Rotation::r270)};
-        auto rotationInt {static_cast<int>(rotationEnum)};
-        switch (direction) {
-            case RotationDirection::Left: {
-                --rotationInt;
-                if (rotationInt < minRotationValue) {
-                    rotationInt = maxRotationValue;
-                }
-            } break;
-            case RotationDirection::Right: {
-                ++rotationInt;
-                if (rotationInt > maxRotationValue) {
-                    rotationInt = minRotationValue;
-                }
-            } break;
-        }
-        rotationEnum = static_cast<Rotation>(rotationInt);
-        return rotationEnum;
-    }
 
     Type type;
     Rotation rotation {Rotation::r0};
@@ -82,7 +56,33 @@ public:
         throw; // unreachable
     }
 
+    auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) -> Rotation& {
+        auto constexpr minRotationValue {static_cast<int>(Rotation::r0)};
+        auto constexpr maxRotationValue {static_cast<int>(Rotation::r270)};
+        auto rotationInt {static_cast<int>(rotationEnum)};
+        switch (direction) {
+            case RotationDirection::Left: {
+                --rotationInt;
+                if (rotationInt < minRotationValue) {
+                    rotationInt = maxRotationValue;
+                }
+            } break;
+            case RotationDirection::Right: {
+                ++rotationInt;
+                if (rotationInt > maxRotationValue) {
+                    rotationInt = minRotationValue;
+                }
+            } break;
+        }
+        rotationEnum = static_cast<Rotation>(rotationInt);
+        return rotationEnum;
+    }
+
 private:
+    Rect<std::size_t>::Size static constexpr layoutDimensions {4, 4};
+    using ShapeLayout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
+    using RotationMap = std::array<ShapeLayout, 4>;
+
     // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
     [[nodiscard]] auto get_local_block_positions() const -> BlockStack;
     [[nodiscard]] auto static constexpr type_to_color(Type const type) -> Color::RGBA {
