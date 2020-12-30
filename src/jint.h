@@ -2,6 +2,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+#include <cstddef>
+#endif
+
 typedef int8_t  s8;
 typedef int16_t s16;
 typedef int32_t s32;
@@ -28,16 +32,16 @@ typedef signed long long sllong;
 
 #ifdef __cplusplus
 
-[[nodiscard]] s8  constexpr operator "" _s8 (ullong n) { return (s8 ) n; }
-[[nodiscard]] s16 constexpr operator "" _s16(ullong n) { return (s16) n; }
-[[nodiscard]] s32 constexpr operator "" _s32(ullong n) { return (s32) n; }
-[[nodiscard]] s64 constexpr operator "" _s64(ullong n) { return (s64) n; }
+[[nodiscard]] auto constexpr operator "" _s8 (ullong n) -> s8  { return static_cast<s8> (n); }
+[[nodiscard]] auto constexpr operator "" _s16(ullong n) -> s16 { return static_cast<s16>(n); }
+[[nodiscard]] auto constexpr operator "" _s32(ullong n) -> s32 { return static_cast<s32>(n); }
+[[nodiscard]] auto constexpr operator "" _s64(ullong n) -> s64 { return static_cast<s64>(n); }
 
-[[nodiscard]] u8  constexpr operator "" _u8 (ullong n) { return (u8 ) n; }
-[[nodiscard]] u16 constexpr operator "" _u16(ullong n) { return (u16) n; }
-[[nodiscard]] u32 constexpr operator "" _u32(ullong n) { return (u32) n; }
-[[nodiscard]] u64 constexpr operator "" _u64(ullong n) { return (u64) n; }
+[[nodiscard]] auto constexpr operator "" _u8 (ullong n) -> u8  { return static_cast<u8> (n); }
+[[nodiscard]] auto constexpr operator "" _u16(ullong n) -> u16 { return static_cast<u16>(n); }
+[[nodiscard]] auto constexpr operator "" _u32(ullong n) -> u32 { return static_cast<u32>(n); }
+[[nodiscard]] auto constexpr operator "" _u64(ullong n) -> u64 { return static_cast<u64>(n); }
 
-[[nodiscard]] size_t constexpr operator "" _usize(ullong n) { return (size_t) n; }
+[[nodiscard]] auto constexpr operator "" _zu(ullong n) -> std::size_t { return static_cast<std::size_t>(n); }
 
 #endif
