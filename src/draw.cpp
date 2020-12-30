@@ -271,8 +271,8 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             // draw shape previews
             auto const previewArray {gameState.shapePool.get_preview_shapes_array()};
             auto i {0};
-            for (auto const* shapePointer : previewArray) {
-                auto shape {*shapePointer};
+            for (auto const shapeType : previewArray) {
+                Shape shape {shapeType};
                 shape.pos.x = gSidebarDim.x;
                 auto const ySpacing {3}; // max height of a shape is 2 + 1 for a block of space
                 shape.pos.y = gSidebarDim.y + ySpacing * i;

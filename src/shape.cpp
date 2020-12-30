@@ -45,31 +45,12 @@ auto Shape::get_absolute_block_positions() const -> BlockStack {
     return positions;
 }
 
-ShapePool::ShapePool(std::array<Shape, ShapePool::size> const& shapes)
-    : shapePool {
-        &shapes[0], &shapes[1], &shapes[2],
-        &shapes[3], &shapes[4], &shapes[5],
-        &shapes[6],
-    }, previewPool {shapePool}
+ShapePool::ShapePool(ShapePool::DataType const& shapes)
+    : shapePool {shapes}, previewPool {shapes}
 {
     reshuffle();
-    currentShapeIterator = shapePool.begin();
 }
 
-
-ShapePool::ShapePool(ShapePool const& other)
-{
-    *this = other;
-    currentShapeIterator = shapePool.begin();
-}
-
-auto ShapePool::operator=(ShapePool const& other) -> ShapePool&
-{
-    this->shapePool = other.shapePool;
-    this->previewPool = other.previewPool;
-    currentShapeIterator = shapePool.begin();
-    return *this;
-}
 
 auto ShapePool::reshuffle() -> void
 {
@@ -80,28 +61,28 @@ auto ShapePool::reshuffle() -> void
 
 auto ShapePool::next_shape() -> Shape
 {
-    ++currentShapeIterator;
-    if (currentShapeIterator == shapePool.end()) {
+    ++currentShapeIndex;
+    if (currentShapeIndex == shapePool.size()) {
         shapePool = previewPool;
-        currentShapeIterator = shapePool.begin();
+        currentShapeIndex = 0;
         shuffle(previewPool, std::default_random_engine());
     }
-    return **currentShapeIterator;
+    return shapePool[currentShapeIndex];
 }
 
 auto ShapePool::current_shape() const -> Shape
 {
-    return **currentShapeIterator;
+    return shapePool[currentShapeIndex];
 }
 
 auto ShapePool::get_preview_shapes_array() const -> PreviewStack
 {
     PreviewStack lookaheadArray;
-    for (auto it {currentShapeIterator + 1}; it != shapePool.end(); ++it) {
-        lookaheadArray.push_back(*it);
+    for (auto i {currentShapeIndex + 1}; i != shapePool.size(); ++i) {
+        lookaheadArray.push_back(shapePool[i]);
     }
-    for (auto const& shapePointer : previewPool) {
-        lookaheadArray.push_back(shapePointer);
+    for (auto const shape : previewPool) {
+        lookaheadArray.push_back(shape);
     }
     return lookaheadArray;
 }

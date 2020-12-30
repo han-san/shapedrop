@@ -389,22 +389,18 @@ private:
 class ShapePool {
 public:
     std::size_t static constexpr size {7};
-private:
-    using ShapePoolType = std::array<Shape const*, size>;
-    using PreviewStack = ArrayStack<Shape const*, size * 2>;
+    using DataType = std::array<Shape::Type, size>;
+    using PreviewStack = ArrayStack<Shape::Type, size * 2>;
 
-    ShapePoolType shapePool;
-
-    ShapePoolType previewPool;
-    ShapePoolType::iterator currentShapeIterator;
-
-public:
-    ShapePool(std::array<Shape, size> const& shapes);
-    ShapePool(ShapePool const& other);
-    auto operator=(ShapePool const& other) -> ShapePool&;
+    explicit ShapePool(DataType const& shapes);
 
     auto reshuffle() -> void;
     auto next_shape() -> Shape;
     [[nodiscard]] auto current_shape() const -> Shape;
     [[nodiscard]] auto get_preview_shapes_array() const -> PreviewStack;
+
+private:
+    DataType shapePool {};
+    DataType previewPool {};
+    DataType::size_type currentShapeIndex {0};
 };

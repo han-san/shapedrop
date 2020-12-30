@@ -30,7 +30,7 @@ Rect<int> constexpr gSidebarDim {
 auto constexpr gBaseWindowWidth {gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize};
 auto constexpr gBaseWindowHeight {gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize};
 
-std::array<Shape, ShapePool::size> static const initialShapes {
+ShapePool::DataType static const initialShapes {
     Shape::Type::I,
     Shape::Type::L,
     Shape::Type::J,
