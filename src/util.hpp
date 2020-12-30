@@ -171,29 +171,8 @@ struct V2Generic {
     [[nodiscard]] auto static constexpr down() -> ThisType { return {0, 1}; }
 };
 
-template <typename T>
-struct V3Generic {
-    T x {};
-    T y {};
-    T z {};
-
-    using ThisType = V3Generic<T>;
-
-    auto constexpr operator +=(ThisType const& rhs) -> ThisType& {
-        x += rhs.x;
-        y += rhs.y;
-        z += rhs.z;
-        return *this;
-    }
-    [[nodiscard]] auto constexpr friend operator +(ThisType lhs, ThisType const& rhs) -> ThisType {
-        return lhs += rhs;
-    }
-};
-
 using V2 = V2Generic<int>;
-using V3 = V3Generic<int>;
 using V2f = V2Generic<double>;
-using V3f = V3Generic<double>;
 
 namespace Color {
     struct RGBA {
