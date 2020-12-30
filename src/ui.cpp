@@ -49,18 +49,17 @@ namespace UI {
     [[nodiscard]] auto static get_current_ui_region() -> WindowScaleRect {
         if (menus.empty()) {
             return {0., 0., 1., 1.};
-        } else {
-            // if there is a child, the region's y coordinate should start from
-            // where the child's y coordinate ends.
-            auto const& menu {menus.back()};
-            auto currentRegion {menu.region};
-            if (!menu.children.empty()) {
-                auto const& child {menu.children.back()};
-                currentRegion.y = child.y + child.h;
-                currentRegion.h = menu.region.h - (currentRegion.y - menu.region.y);
-            }
-            return currentRegion;
         }
+        // if there is a child, the region's y coordinate should start from
+        // where the child's y coordinate ends.
+        auto const& menu {menus.back()};
+        auto currentRegion {menu.region};
+        if (!menu.children.empty()) {
+            auto const& child {menu.children.back()};
+            currentRegion.y = child.y + child.h;
+            currentRegion.h = menu.region.h - (currentRegion.y - menu.region.y);
+        }
+        return currentRegion;
     }
 
     [[nodiscard]] auto static to_window_scale(RelativeScalePoint const offset) -> WindowScalePoint {
