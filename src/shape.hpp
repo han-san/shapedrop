@@ -39,7 +39,28 @@ public:
 
     // Returns the positions of the blocks relative to the top left corner of the play area
     [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
-    [[nodiscard]] auto get_wallkicks(Shape::RotationDirection dir) const -> std::array<V2, 4>;
+
+    [[nodiscard]] auto constexpr get_wallkicks(Shape::RotationDirection const dir) const -> std::array<V2, 4> {
+        auto const i {static_cast<std::size_t>(rotation)};
+        auto const j {static_cast<std::size_t>(dir)};
+
+        switch (type) {
+            case Shape::Type::J:
+            case Shape::Type::L:
+            case Shape::Type::S:
+            case Shape::Type::T:
+            case Shape::Type::Z: {
+                return WallKicks::JLSTZ[i][j];
+            }
+            case Shape::Type::I: {
+                return WallKicks::I[i][j];
+            }
+            case Shape::Type::O:
+                return {};
+        }
+        throw; // unreachable
+    }
+
     [[nodiscard]] auto constexpr dimensions() const -> Rect<int>::Size {
         switch (type) {
             case Type::I:
@@ -114,16 +135,67 @@ private:
             case Shape::Type::L:
                 return RotationMaps::L[index];
             case Shape::Type::J:
-                return RotationMaps::O[index];
+                return RotationMaps::J[index];
             case Shape::Type::S:
-                return RotationMaps::O[index];
+                return RotationMaps::S[index];
             case Shape::Type::Z:
-                return RotationMaps::O[index];
+                return RotationMaps::Z[index];
             case Shape::Type::T:
-                return RotationMaps::O[index];
+                return RotationMaps::T[index];
         }
         throw; // unreachable
     }
+
+    struct WallKicks {
+        // Shapes J, L, S, T, and Z all have the same wall kicks while I has its
+        // own and O can't kick since it doesn't rotate at all.
+
+        std::array static constexpr JLSTZ {
+            // r0
+            std::array {
+                // left
+                std::array { V2 {1, 0}, V2 {1, 1}, V2 {0, -2}, V2 {1, -2} },
+                // right
+                std::array { V2 {-1, 0}, V2 {-1, 1}, V2 {0, -2}, V2 {-1, -2} },
+            },
+            // r90
+            std::array {
+                // both directions check the same positions
+                std::array { V2 {1, 0}, V2 {1, -1}, V2 {0, 2}, V2 {1, 2} },
+                std::array { V2 {1, 0}, V2 {1, -1}, V2 {0, 2}, V2 {1, 2} },
+            },
+            // r180
+            std::array {
+                std::array { V2 {-1, 0}, V2 {-1, 1}, V2 {0, -2}, V2 {-1, -2} },
+                std::array { V2 {1, 0}, V2 {1, 1}, V2 {0, -2}, V2 {1, -2} },
+            },
+            // r270
+            std::array {
+                // both directions check the same positions
+                std::array { V2 {-1, 0}, V2 {-1, -1}, V2 {0, 2}, V2 {-1, 2} },
+                std::array { V2 {-1, 0}, V2 {-1, -1}, V2 {0, 2}, V2 {-1, 2} },
+            }
+        };
+
+        std::array static constexpr I {
+            std::array {
+                std::array { V2 {-1, 0}, V2 {2, 0}, V2 {-1, 2}, V2 {2, -1} },
+                std::array { V2 {-2, 0}, V2 {1, 0}, V2 {-2, -1}, V2 {1, 2} },
+            },
+            std::array {
+                std::array { V2 {2, 0}, V2 {-1, 0}, V2 {2, 1}, V2 {-1, -2} },
+                std::array { V2 {-1, 0}, V2 {2, 0}, V2 {-1, 2}, V2 {2, -1} },
+            },
+            std::array {
+                std::array { V2 {1, 0}, V2 {-2, 0}, V2 {1, -2}, V2 {-2, 1} },
+                std::array { V2 {2, 0}, V2 {-1, 0}, V2 {2, 1}, V2 {-1, -2} },
+            },
+            std::array {
+                std::array { V2 {-2, 0}, V2 {1, 0}, V2 {-2, -1}, V2 {1, 2} },
+                std::array { V2 {1, 0}, V2 {-2, 0}, V2 {1, -2}, V2 {-2, 1} },
+            },
+        };
+    };
 
     struct RotationMaps {
         auto static constexpr o {false};
