@@ -85,8 +85,10 @@ namespace UI {
             switch (xAlign) {
                 case XAlignment::Left:
                     return workingRegion.x;
-                case XAlignment::Center:
-                    return workingRegion.x + (workingRegion.w / 2.f) - (width / 2.f);
+                case XAlignment::Center: {
+                    double constexpr half {.5};
+                    return workingRegion.x + (workingRegion.w * half) - (width * half);
+                }
                 case XAlignment::Right:
                     return workingRegion.x + workingRegion.w - width;
             }
@@ -123,7 +125,7 @@ namespace UI {
     // TODO: The font height is currently always considered to be relative to the window space. Should it?
     auto label(std::string text, WindowScale const fontHeight, RelativeScalePoint const offset) -> void {
         auto const windowOffset {to_window_scale(offset)};
-        auto const region {WindowScaleRect {windowOffset.x, windowOffset.y, 0, fontHeight}};
+        auto const region {WindowScaleRect {windowOffset.x, windowOffset.y, 0., fontHeight}};
 
         label(std::move(text), region);
     }
@@ -177,7 +179,8 @@ namespace UI {
 
     // base spinbox function
     auto static spinbox(SpinBox spinBox) -> void {
-        auto const buttonWidth {get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) / 2.};
+        auto constexpr half {.5};
+        auto const buttonWidth {get_text_window_scale_width(SpinBox::buttonsString, spinBox.region.h) * half};
         WindowScaleRect const decreaseButtonRegion {spinBox.region.x, spinBox.region.y, buttonWidth, spinBox.region.h};
         WindowScaleRect const increaseButtonRegion {spinBox.region.x + buttonWidth, spinBox.region.y, buttonWidth, spinBox.region.h};
         auto const decreaseButtonScreenSpaceRegion {to_screen_space(to_squaref(decreaseButtonRegion))};
