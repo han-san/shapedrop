@@ -91,11 +91,7 @@ namespace UI {
                 case XAlignment::Right:
                     return workingRegion.x + workingRegion.w - width;
             }
-            // Gotta return something even though all valid
-            // enumerations are handled. Yay C++.
-            // TODO: @LOG
-            assert(0);
-            return workingRegion.x;
+            throw; // unreachable
         }();
 
         return {x, y};
