@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.10)
+cmake_minimum_required(VERSION 3.0)
 
 project(ShapeDrop)
 
@@ -6,6 +6,7 @@ add_executable(ShapeDrop src/platform/sdlmain.cpp src/font.cpp src/board.cpp src
 
 add_subdirectory("deps/SDL2-2.0.12")
 add_subdirectory("deps/fmt-7.0.3")
+add_subdirectory("deps/glad")
 
 target_compile_features(ShapeDrop PRIVATE cxx_std_17)
 
@@ -18,4 +19,5 @@ endif()
 
 target_link_libraries(ShapeDrop PUBLIC SDL2-static)
 target_link_libraries(ShapeDrop PUBLIC fmt::fmt)
+target_link_libraries(ShapeDrop PUBLIC glad)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/font/DejaVuSans.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
