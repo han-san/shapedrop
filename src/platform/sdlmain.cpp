@@ -1,6 +1,9 @@
 #include <cassert>
+#include <string_view>
 
+#include <glad/glad.h> // must be included before SDL
 #include <SDL.h>
+#include <SDL_opengl.h>
 
 #include "../jint.h"
 
@@ -12,6 +15,11 @@
 #include "sdlmain.hpp"
 
 namespace platform::SDL {
+
+enum class RenderMode {
+    software,
+    opengl
+};
 
 auto windowScale {1};
 
@@ -144,8 +152,29 @@ auto get_event() -> Event
     return event;
 }
 
+auto init_window_opengl() {
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+        throw;
+    }
 
-auto static init_window() {
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    auto scale = 30;
+
+    window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, gBaseWindowWidth * scale, gBaseWindowHeight * scale, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    assert(window.handle);
+
+    auto* glContext = SDL_GL_CreateContext(window.handle);
+    assert(glContext);
+
+    if (gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress)) == 0) {
+        throw;
+    }
+}
+
+auto init_window_software() {
     SDL_Init(SDL_INIT_EVERYTHING);
 
     auto newScale {windowScale};
@@ -178,12 +207,32 @@ auto static init_window() {
     assert(window.bbSurface);
 }
 
+auto static init_window(RenderMode renderMode) {
+    switch (renderMode) {
+        case RenderMode::opengl: {
+            init_window_opengl();
+        } break;
+        case RenderMode::software: {
+            init_window_software();
+        } break;
+    }
+}
+
 } // namespace SDL
 
 auto main(int argc, char** argv) -> int {
-    if (argc || argv) {}
+    auto renderMode {RenderMode::opengl};
+    for (int i = 1; i < argc; ++i) {
+        std::string_view arg {argv[i]};
+        using namespace std::string_view_literals;
+        if (arg == "-opengl"sv) {
+            renderMode = RenderMode::opengl;
+        } else if (arg == "-software"sv) {
+            renderMode = RenderMode::software;
+        }
+    }
 
-    platform::SDL::init_window();
+    platform::SDL::init_window(renderMode);
 
     if (!init_font("DejaVuSans.ttf")) {
         assert(false);
