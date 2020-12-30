@@ -13,7 +13,7 @@
 
 using namespace std::string_literals;
 
-Shape::Shape(Type const ttype) noexcept
+constexpr Shape::Shape(Type const ttype) noexcept
     : type {ttype}
     , color {type_to_color(ttype)}
     , pos {Board::columns / 2 - 2, 0} // spawn centrally
@@ -67,12 +67,12 @@ auto ShapePool::next_shape() -> Shape
         currentShapeIndex = 0;
         shuffle(previewPool, std::default_random_engine());
     }
-    return shapePool[currentShapeIndex];
+    return Shape {shapePool[currentShapeIndex]};
 }
 
 auto ShapePool::current_shape() const -> Shape
 {
-    return shapePool[currentShapeIndex];
+    return Shape {shapePool[currentShapeIndex]};
 }
 
 auto ShapePool::get_preview_shapes_array() const -> PreviewStack
