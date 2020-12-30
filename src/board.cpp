@@ -164,22 +164,3 @@ auto Board::remove_full_rows() -> u8 {
 
     return static_cast<u8>(rowsCleared.size());
 }
-
-auto Board::print_board() const -> void {
-    std::cout << ' ';
-    for (auto i {0}; i < columns; ++i) { std::cout << "_"; }
-    std::cout << '\n';
-    for (auto y {0}; y < rows; ++y) {
-        std::cout << '|';
-        for (auto x {0}; x < columns; ++x) {
-            auto const index {static_cast<std::size_t>(y * columns + x)};
-            auto const currBlock {data[index]};
-
-            std::cout << (currBlock.isActive ? "O" : " ");
-        }
-        std::cout << "|\n";
-    }
-    std::cout << '|';
-    for (auto i {0}; i < columns; ++i) { std::cout << "-"; }
-    std::cout << "|\n";
-}
