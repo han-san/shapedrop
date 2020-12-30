@@ -80,8 +80,8 @@ public:
 
 private:
     Rect<std::size_t>::Size static constexpr layoutDimensions {4, 4};
-    using ShapeLayout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
-    using RotationMap = std::array<ShapeLayout, 4>;
+    using Layout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
+    using RotationMap = std::array<Layout, 4>;
 
     // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
     [[nodiscard]] auto get_local_block_positions() const -> BlockStack;
@@ -104,210 +104,214 @@ private:
         }
         throw; // unreachable
     }
-    [[nodiscard]] auto constexpr get_layout() const -> ShapeLayout const& {
+    [[nodiscard]] auto constexpr get_layout() const -> Layout const& {
         auto const index {static_cast<RotationMap::size_type>(rotation)};
         switch (type) {
             case Shape::Type::I:
-                return IRotationMap[index];
+                return RotationMaps::I[index];
             case Shape::Type::O:
-                return ORotationMap[index];
+                return RotationMaps::O[index];
             case Shape::Type::L:
-                return LRotationMap[index];
+                return RotationMaps::L[index];
             case Shape::Type::J:
-                return JRotationMap[index];
+                return RotationMaps::O[index];
             case Shape::Type::S:
-                return SRotationMap[index];
+                return RotationMaps::O[index];
             case Shape::Type::Z:
-                return ZRotationMap[index];
+                return RotationMaps::O[index];
             case Shape::Type::T:
-                return TRotationMap[index];
+                return RotationMaps::O[index];
         }
         throw; // unreachable
     }
 
-    RotationMap static constexpr IRotationMap {
-        ShapeLayout {
-            0, 0, 0, 0,
-            1, 1, 1, 1,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 0, 1, 0,
-            0, 0, 1, 0,
-            0, 0, 1, 0,
-            0, 0, 1, 0,
-        },
-        ShapeLayout {
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            1, 1, 1, 1,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 0, 0,
-            0, 1, 0, 0,
-            0, 1, 0, 0,
-            0, 1, 0, 0,
-        },
-    };
-    RotationMap static constexpr LRotationMap {
-        ShapeLayout {
-            0, 0, 1, 0,
-            1, 1, 1, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 0, 0,
-            0, 1, 0, 0,
-            0, 1, 1, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 0, 0, 0,
-            1, 1, 1, 0,
-            1, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            1, 1, 0, 0,
-            0, 1, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-    };
-    RotationMap static constexpr JRotationMap {
-        ShapeLayout {
-            1, 0, 0, 0,
-            1, 1, 1, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 1, 0,
-            0, 1, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 0, 0, 0,
-            1, 1, 1, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 0, 0,
-            0, 1, 0, 0,
-            1, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-    };
-    RotationMap static constexpr ORotationMap {
-        ShapeLayout {
-            0, 1, 1, 0,
-            0, 1, 1, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 1, 0,
-            0, 1, 1, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 1, 0,
-            0, 1, 1, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 1, 0,
-            0, 1, 1, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-    };
-    RotationMap static constexpr SRotationMap {
-        ShapeLayout {
-            0, 1, 1, 0,
-            1, 1, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 0, 0,
-            0, 1, 1, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 0, 0, 0,
-            0, 1, 1, 0,
-            1, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            1, 0, 0, 0,
-            1, 1, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-    };
-    RotationMap static constexpr ZRotationMap {
-        ShapeLayout {
-            1, 1, 0, 0,
-            0, 1, 1, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 0, 1, 0,
-            0, 1, 1, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 0, 0, 0,
-            1, 1, 0, 0,
-            0, 1, 1, 1,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 0, 0,
-            1, 1, 0, 0,
-            1, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-    };
-    RotationMap static constexpr TRotationMap {
-        ShapeLayout {
-            0, 1, 0, 0,
-            1, 1, 1, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 0, 0,
-            0, 1, 1, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 0, 0, 0,
-            1, 1, 1, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-        ShapeLayout {
-            0, 1, 0, 0,
-            1, 1, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 0, 0,
-        },
-    };
+    struct RotationMaps {
+        auto static constexpr o {false};
+        auto static constexpr X {true};
 
+        RotationMap static constexpr I {
+            Layout {
+                o, o, o, o,
+                X, X, X, X,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, o, X, o,
+                o, o, X, o,
+                o, o, X, o,
+                o, o, X, o,
+            },
+            Layout {
+                o, o, o, o,
+                o, o, o, o,
+                X, X, X, X,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, o, o,
+                o, X, o, o,
+                o, X, o, o,
+                o, X, o, o,
+            },
+        };
+        RotationMap static constexpr L {
+            Layout {
+                o, o, X, o,
+                X, X, X, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, o, o,
+                o, X, o, o,
+                o, X, X, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, o, o, o,
+                X, X, X, o,
+                X, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                X, X, o, o,
+                o, X, o, o,
+                o, X, o, o,
+                o, o, o, o,
+            },
+        };
+        RotationMap static constexpr J {
+            Layout {
+                X, o, o, o,
+                X, X, X, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, X, o,
+                o, X, o, o,
+                o, X, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, o, o, o,
+                X, X, X, o,
+                o, o, X, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, o, o,
+                o, X, o, o,
+                X, X, o, o,
+                o, o, o, o,
+            },
+        };
+        RotationMap static constexpr O {
+            Layout {
+                o, X, X, o,
+                o, X, X, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, X, o,
+                o, X, X, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, X, o,
+                o, X, X, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, X, o,
+                o, X, X, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+        };
+        RotationMap static constexpr S {
+            Layout {
+                o, X, X, o,
+                X, X, o, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, o, o,
+                o, X, X, o,
+                o, o, X, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, o, o, o,
+                o, X, X, o,
+                X, X, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                X, o, o, o,
+                X, X, o, o,
+                o, X, o, o,
+                o, o, o, o,
+            },
+        };
+        RotationMap static constexpr Z {
+            Layout {
+                X, X, o, o,
+                o, X, X, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, o, X, o,
+                o, X, X, o,
+                o, X, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, o, o, o,
+                X, X, o, o,
+                o, X, X, X,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, o, o,
+                X, X, o, o,
+                X, o, o, o,
+                o, o, o, o,
+            },
+        };
+        RotationMap static constexpr T {
+            Layout {
+                o, X, o, o,
+                X, X, X, o,
+                o, o, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, o, o,
+                o, X, X, o,
+                o, X, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, o, o, o,
+                X, X, X, o,
+                o, X, o, o,
+                o, o, o, o,
+            },
+            Layout {
+                o, X, o, o,
+                X, X, o, o,
+                o, X, o, o,
+                o, o, o, o,
+            },
+        };
+    };
 };
 
 class ShapePool {
