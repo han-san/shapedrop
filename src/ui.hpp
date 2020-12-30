@@ -99,7 +99,7 @@ namespace UI {
 
     auto label(std::string text, WindowScale fontHeight, RelativeScalePoint offset) -> void;
     auto label(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> void;
-    [[nodiscard]] auto button(std::string text, WindowScale fontHeight, RelativeScalePoint pos) -> bool;
+    [[nodiscard]] auto button(std::string text, WindowScale fontHeight, RelativeScalePoint offset) -> bool;
     [[nodiscard]] auto button(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.) -> bool;
     auto spinbox(std::string_view text, WindowScale fontHeight, RelativeScalePoint offset, int& value, int minValue, int maxValue) -> void;
     auto spinbox(std::string_view text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset, int& value, int minValue, int maxValue) -> void;
