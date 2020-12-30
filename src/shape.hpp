@@ -1,5 +1,7 @@
 #pragma once
 
+#include "fmt/core.h"
+
 #include "jint.h"
 #include "util.hpp"
 
@@ -38,7 +40,14 @@ public:
     constexpr explicit Shape(Type type) noexcept;
 
     // Returns the positions of the blocks relative to the top left corner of the play area
-    [[nodiscard]] auto constexpr get_absolute_block_positions() const -> BlockStack;
+    [[nodiscard]] auto constexpr get_absolute_block_positions() const -> BlockStack {
+        auto positions {get_local_block_positions()};
+        for (auto& localPosition : positions) {
+            localPosition.x += pos.x;
+            localPosition.y += pos.y;
+        }
+        return positions;
+    }
 
     [[nodiscard]] auto constexpr get_wallkicks(Shape::RotationDirection const dir) const -> std::array<V2, 4> {
         auto const i {static_cast<std::size_t>(rotation)};
@@ -105,7 +114,23 @@ private:
     using RotationMap = std::array<Layout, 4>;
 
     // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
-    [[nodiscard]] auto constexpr get_local_block_positions() const -> BlockStack;
+    [[nodiscard]] auto constexpr get_local_block_positions() const -> BlockStack {
+        BlockStack positions {};
+        auto const& layout {get_layout()};
+        for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
+            for (std::size_t x {0}; x < layoutDimensions.w; ++x) {
+                std::size_t const index {y * layoutDimensions.w + x};
+                if (layout[index]) {
+                    positions.push_back({static_cast<int>(x), static_cast<int>(y)});
+                    if (positions.size() == positions.max_size()) {
+                        return positions;
+                    }
+                }
+            }
+        }
+        throw std::logic_error(fmt::format("Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.", type, rotation));
+    }
+
     [[nodiscard]] auto static constexpr type_to_color(Type const type) -> Color::RGBA {
         switch (type) {
             case Type::I:

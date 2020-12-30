@@ -3,8 +3,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "fmt/core.h"
-
 #include "board.hpp"
 #include "util.hpp"
 #include "rangealgorithms.hpp"
@@ -19,38 +17,11 @@ constexpr Shape::Shape(Type const ttype) noexcept
     , pos {Board::columns / 2 - 2, 0} // spawn centrally
 {}
 
-auto constexpr Shape::get_local_block_positions() const -> BlockStack {
-    BlockStack positions {};
-    auto const& layout {get_layout()};
-    for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
-        for (std::size_t x {0}; x < layoutDimensions.w; ++x) {
-            std::size_t const index {y * layoutDimensions.w + x};
-            if (layout[index]) {
-                positions.push_back({static_cast<int>(x), static_cast<int>(y)});
-                if (positions.size() == positions.max_size()) {
-                    return positions;
-                }
-            }
-        }
-    }
-    throw std::logic_error(fmt::format("Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.", type, rotation));
-}
-
-auto constexpr Shape::get_absolute_block_positions() const -> BlockStack {
-    auto positions {get_local_block_positions()};
-    for (auto& localPosition : positions) {
-        localPosition.x += pos.x;
-        localPosition.y += pos.y;
-    }
-    return positions;
-}
-
 ShapePool::ShapePool(ShapePool::DataType const& shapes)
     : shapePool {shapes}, previewPool {shapes}
 {
     reshuffle();
 }
-
 
 auto ShapePool::reshuffle() -> void
 {
