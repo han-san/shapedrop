@@ -38,7 +38,7 @@ public:
     constexpr explicit Shape(Type type) noexcept;
 
     // Returns the positions of the blocks relative to the top left corner of the play area
-    [[nodiscard]] auto get_absolute_block_positions() const -> BlockStack;
+    [[nodiscard]] auto constexpr get_absolute_block_positions() const -> BlockStack;
 
     [[nodiscard]] auto constexpr get_wallkicks(Shape::RotationDirection const dir) const -> std::array<V2, 4> {
         auto const i {static_cast<std::size_t>(rotation)};
@@ -77,7 +77,7 @@ public:
         throw; // unreachable
     }
 
-    auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) -> Rotation& {
+    auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) noexcept -> Rotation& {
         auto constexpr minRotationValue {static_cast<int>(Rotation::r0)};
         auto constexpr maxRotationValue {static_cast<int>(Rotation::r270)};
         auto rotationInt {static_cast<int>(rotationEnum)};
@@ -105,7 +105,7 @@ private:
     using RotationMap = std::array<Layout, 4>;
 
     // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
-    [[nodiscard]] auto get_local_block_positions() const -> BlockStack;
+    [[nodiscard]] auto constexpr get_local_block_positions() const -> BlockStack;
     [[nodiscard]] auto static constexpr type_to_color(Type const type) -> Color::RGBA {
         switch (type) {
             case Type::I:

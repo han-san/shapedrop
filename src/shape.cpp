@@ -19,7 +19,7 @@ constexpr Shape::Shape(Type const ttype) noexcept
     , pos {Board::columns / 2 - 2, 0} // spawn centrally
 {}
 
-auto Shape::get_local_block_positions() const -> BlockStack {
+auto constexpr Shape::get_local_block_positions() const -> BlockStack {
     BlockStack positions {};
     auto const& layout {get_layout()};
     for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
@@ -36,7 +36,7 @@ auto Shape::get_local_block_positions() const -> BlockStack {
     throw std::logic_error(fmt::format("Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.", type, rotation));
 }
 
-auto Shape::get_absolute_block_positions() const -> BlockStack {
+auto constexpr Shape::get_absolute_block_positions() const -> BlockStack {
     auto positions {get_local_block_positions()};
     for (auto& localPosition : positions) {
         localPosition.x += pos.x;
