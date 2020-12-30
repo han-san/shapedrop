@@ -114,7 +114,7 @@ namespace UI {
     // Assumes region.w and region.h are the correct sizes for the resulting FontString.
     auto static label(std::string text, WindowScaleRect const region) {
         add_region_as_child_of_current_menu(region);
-        textToDraw.push_back({std::move(text), region.h, region.x, region.y});
+        textToDraw.push_back({std::move(text), region.h, {region.x, region.y}});
     }
 
     auto label(std::string text, WindowScale const fontHeight, XAlignment const xAlign, RelativeScale const yOffset) -> void {
