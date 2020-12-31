@@ -10,22 +10,100 @@ namespace OpenGLRender {
 struct DrawObject {
     GLuint vao;
     GLuint shaderProgram;
+    Color::RGBA color;
 };
 
 std::vector<DrawObject> drawObjects;
+
+struct GLColor {
+    float r;
+    float g;
+    float b;
+    float a;
+
+    // OpenGL uses 0 -> 1 while we use 0 -> maxChannelValue
+    explicit constexpr GLColor(Color::RGBA color)
+    : r {static_cast<float>(u8 {color.r}) / Color::RGBA::maxChannelValue}
+    , g {static_cast<float>(u8 {color.g}) / Color::RGBA::maxChannelValue}
+    , b {static_cast<float>(u8 {color.b}) / Color::RGBA::maxChannelValue}
+    , a {static_cast<float>(u8 {color.a}) / Color::RGBA::maxChannelValue}
+    {}
+};
 
 auto draw(ProgramState& programState, GameState& gameState) -> void {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (auto object : drawObjects) {
-        glBindVertexArray(object.vao);
         glUseProgram(object.shaderProgram);
+        auto vertexColorLocation = glGetUniformLocation(object.shaderProgram, "color");
+        GLColor color {object.color};
+        glUniform4f(vertexColorLocation, color.r, color.g, color.b, color.a);
+
+        glBindVertexArray(object.vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     }
     glBindVertexArray(0);
 
     drawObjects.clear();
+}
+
+auto static create_solid_color_shader() {
+    char const* vertexShaderSource = R"foo(
+        #version 330 core
+        layout (location = 0) in vec3 aPos;
+        void main() {
+            gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+        }
+        )foo";
+
+    auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+    glCompileShader(vertexShader);
+    {
+        GLint success;
+        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+        if (success == 0) {
+            throw;
+        }
+    }
+
+    char const* fragmentShaderSource = R"foo(
+        #version 330 core
+        out vec4 FragColor;
+        uniform vec4 color;
+        void main() {
+            FragColor = color;
+        }
+        )foo";
+
+    auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+    glCompileShader(fragmentShader);
+    {
+        GLint success;
+        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+        if (success == 0) {
+            throw;
+        }
+    }
+
+    auto shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    {
+        GLint success;
+        glGetProgramiv(fragmentShader, GL_LINK_STATUS, &success);
+        if (success == 0) {
+            throw;
+        }
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    return shaderProgram;
 }
 
 auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
@@ -69,70 +147,9 @@ auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    static GLuint shaderProgram;
-    static bool inited = false;
-    if (!inited) {
-        inited = true;
-        // shader
-        char const* vertexShaderSource = R"foo(
-        #version 330 core
-        layout (location = 0) in vec3 aPos;
-        void main() {
-            gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-        }
-        )foo";
+    static auto shaderProgram = create_solid_color_shader();
 
-        auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-        glCompileShader(vertexShader);
-        {
-            GLint success;
-            glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-            if (success == 0) {
-                throw;
-            }
-        }
-
-        char const* fragmentShaderSource = R"foo(
-        #version 330 core
-        out vec4 FragColor;
-        void main() {
-            FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-        }
-        )foo";
-
-        auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-        glCompileShader(fragmentShader);
-        {
-            GLint success;
-            glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-            if (success == 0) {
-                throw;
-            }
-        }
-
-        auto newShaderProgram = glCreateProgram();
-        glAttachShader(newShaderProgram, vertexShader);
-        glAttachShader(newShaderProgram, fragmentShader);
-        glLinkProgram(newShaderProgram);
-        {
-            GLint success;
-            glGetProgramiv(fragmentShader, GL_LINK_STATUS, &success);
-            if (success == 0) {
-                throw;
-            }
-        }
-
-        glUseProgram(newShaderProgram);
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        shaderProgram = newShaderProgram;
-    }
-
-
-    drawObjects.push_back({vao, shaderProgram});
+    drawObjects.push_back({vao, shaderProgram, color});
 }
 
 auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void {
