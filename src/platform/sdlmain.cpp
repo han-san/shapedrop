@@ -239,6 +239,12 @@ auto static init_window(RenderMode renderMode) {
     }
 }
 
+auto static destroy_window() {
+    SDL_DestroyWindow(window.handle);
+    window.handle = nullptr;
+    SDL_Quit();
+}
+
 } // namespace SDL
 
 auto main(int argc, char** argv) -> int {
@@ -260,6 +266,8 @@ auto main(int argc, char** argv) -> int {
     }
 
     run();
+
+    platform::SDL::destroy_window();
 
     return 0;
 }
