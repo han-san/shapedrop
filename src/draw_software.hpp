@@ -2,11 +2,8 @@
 
 #include "core.hpp"
 #include "font.hpp"
-#include "util.hpp"
 
-#include <string_view>
-
-namespace OpenGLRender {
+namespace SoftwareRender {
 
 auto draw(ProgramState& programState, GameState& gameState) -> void;
 
