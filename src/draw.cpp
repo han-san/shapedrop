@@ -6,6 +6,7 @@
 #include "util.hpp"
 
 #include "draw.hpp"
+#include "draw_opengl.hpp"
 
 [[nodiscard]] auto static alpha_blend_channel(PositiveU8 const bg, PositiveU8 const fg, PositiveU8 const alpha) -> PositiveU8
 {
@@ -206,7 +207,7 @@ auto static draw_playarea_rows(BackBuffer bb, PositiveSize_t const startRow, Pos
     }
 }
 
-auto draw(ProgramState& programState, GameState& gameState) -> void {
+auto draw_software(ProgramState& programState, GameState& gameState) -> void {
     auto bb {get_back_buffer()};
     auto const scale {get_window_scale()};
     auto const threadCount {std::thread::hardware_concurrency()};
@@ -315,6 +316,19 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     }
 
     UI::draw(bb);
+
+    swap_buffer();
+}
+
+auto draw(ProgramState& programState, GameState& gameState) -> void {
+    switch (get_render_mode()) {
+        case RenderMode::opengl: {
+            draw_opengl(programState, gameState);
+        } break;
+        case RenderMode::software: {
+            draw_software(programState, gameState);
+        } break;
+    }
 
     swap_buffer();
 }

@@ -16,19 +16,26 @@
 
 namespace platform::SDL {
 
-enum class RenderMode {
-    software,
-    opengl
-};
-
 auto windowScale {1};
 
 struct {
     SDL_Window* handle;
     SDL_Surface* surface;
     SDL_Surface* bbSurface;
+    Rect<int>::Size dimensions;
 } window {};
 
+SDL_GLContext g_glContext {};
+
+RenderMode g_renderMode {RenderMode::opengl};
+
+auto get_render_mode() -> RenderMode {
+    return g_renderMode;
+}
+
+auto get_gl_context() -> SDL_GLContext {
+    return g_glContext;
+}
 auto get_window_scale() -> int
 {
     return windowScale;
@@ -50,10 +57,11 @@ auto get_back_buffer() -> BackBuffer
 
 auto get_window_dimensions() -> Rect<int>::Size
 {
-    return {window.surface->w, window.surface->h};
+    return window.dimensions;
 }
 
 auto static resize_window(Rect<int>::Size const dimensions) {
+    window.dimensions = dimensions;
     SDL_SetWindowSize(window.handle, dimensions.w, dimensions.h);
     window.surface = SDL_GetWindowSurface(window.handle);
     assert(window.surface);
@@ -76,8 +84,15 @@ auto change_window_scale(int newScale) -> void {
 
 auto swap_buffer() -> void
 {
-    SDL_BlitSurface(window.bbSurface, nullptr, window.surface, nullptr);
-    SDL_UpdateWindowSurface(window.handle);
+    switch (get_render_mode()) {
+        case RenderMode::software: {
+            SDL_BlitSurface(window.bbSurface, nullptr, window.surface, nullptr);
+            SDL_UpdateWindowSurface(window.handle);
+        } break;
+        case RenderMode::opengl: {
+            SDL_GL_SwapWindow(window.handle);
+        } break;
+    }
 }
 
 auto static window_fits_on_screen(Rect<int>::Size windowDimensions) -> bool {
@@ -162,16 +177,21 @@ auto init_window_opengl() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     auto scale = 30;
+    auto windowWidth = gBaseWindowWidth * scale;
+    auto windowHeight = gBaseWindowHeight * scale;
 
-    window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, gBaseWindowWidth * scale, gBaseWindowHeight * scale, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+
+    window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     assert(window.handle);
 
-    auto* glContext = SDL_GL_CreateContext(window.handle);
-    assert(glContext);
+    g_glContext = SDL_GL_CreateContext(window.handle);
+    assert(g_glContext);
 
     if (gladLoadGLLoader(static_cast<GLADloadproc>(SDL_GL_GetProcAddress)) == 0) {
         throw;
     }
+
+    glViewport(0, 0, windowWidth, windowHeight);
 }
 
 auto init_window_software() {
@@ -221,18 +241,17 @@ auto static init_window(RenderMode renderMode) {
 } // namespace SDL
 
 auto main(int argc, char** argv) -> int {
-    auto renderMode {RenderMode::opengl};
     for (int i = 1; i < argc; ++i) {
         std::string_view arg {argv[i]};
         using namespace std::string_view_literals;
         if (arg == "-opengl"sv) {
-            renderMode = RenderMode::opengl;
+            g_renderMode = RenderMode::opengl;
         } else if (arg == "-software"sv) {
-            renderMode = RenderMode::software;
+            g_renderMode = RenderMode::software;
         }
     }
 
-    platform::SDL::init_window(renderMode);
+    platform::SDL::init_window(g_renderMode);
 
     if (!init_font("DejaVuSans.ttf")) {
         assert(false);
