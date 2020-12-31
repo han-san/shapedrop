@@ -177,11 +177,10 @@ auto init_window_opengl() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
     auto scale = 30;
-    auto windowWidth = gBaseWindowWidth * scale;
-    auto windowHeight = gBaseWindowHeight * scale;
+    window.dimensions = {gBaseWindowWidth * scale, gBaseWindowHeight * scale};
 
 
-    window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth, windowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+    window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window.dimensions.w, window.dimensions.h, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     assert(window.handle);
 
     g_glContext = SDL_GL_CreateContext(window.handle);
@@ -191,7 +190,7 @@ auto init_window_opengl() {
         throw;
     }
 
-    glViewport(0, 0, windowWidth, windowHeight);
+    glViewport(0, 0, window.dimensions.w, window.dimensions.h);
 }
 
 auto init_window_software() {
@@ -209,6 +208,8 @@ auto init_window_software() {
     windowScale = newScale;
     auto const initialWindowWidth {gBaseWindowWidth * windowScale};
     auto const initialWindowHeight {gBaseWindowHeight * windowScale};
+    window.dimensions.w = initialWindowWidth;
+    window.dimensions.h = initialWindowHeight;
 
     window.handle = SDL_CreateWindow("Tetris",
                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
