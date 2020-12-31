@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(GLAD)
+project(glad)
 
 set(GLAD_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(GLAD_INCLUDE_DIRS "${GLAD_DIR}/include")
