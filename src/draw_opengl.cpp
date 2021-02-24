@@ -48,17 +48,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     drawObjects.clear();
 }
 
-auto static create_solid_color_shader() {
-    char const* vertexShaderSource = R"foo(
-        #version 330 core
-        layout (location = 0) in vec3 aPos;
-        void main() {
-            gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-        }
-        )foo";
 
+auto create_opengl_shader(GLchar const* vertexSource, GLchar const* fragmentSource) {
     auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
+    glShaderSource(vertexShader, 1, &vertexSource, nullptr);
     glCompileShader(vertexShader);
     {
         GLint success;
@@ -68,17 +61,8 @@ auto static create_solid_color_shader() {
         }
     }
 
-    char const* fragmentShaderSource = R"foo(
-        #version 330 core
-        out vec4 FragColor;
-        uniform vec4 color;
-        void main() {
-            FragColor = color;
-        }
-        )foo";
-
     auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
+    glShaderSource(fragmentShader, 1, &fragmentSource, nullptr);
     glCompileShader(fragmentShader);
     {
         GLint success;
@@ -88,10 +72,10 @@ auto static create_solid_color_shader() {
         }
     }
 
-    auto shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
+    auto program = glCreateProgram();
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+    glLinkProgram(program);
     {
         GLint success;
         glGetProgramiv(fragmentShader, GL_LINK_STATUS, &success);
@@ -103,8 +87,34 @@ auto static create_solid_color_shader() {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    return shaderProgram;
+    return program;
 }
+
+struct Shaders {
+    auto static solid() {
+        GLuint static program {0};
+        if (program == 0) {
+            char const* vertexShaderSource = R"foo(
+                #version 330 core
+                layout (location = 0) in vec3 aPos;
+                void main() {
+                    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+                }
+                )foo";
+
+            char const* fragmentShaderSource = R"foo(
+                #version 330 core
+                out vec4 FragColor;
+                uniform vec4 color;
+                void main() {
+                    FragColor = color;
+                }
+                )foo";
+            program = create_opengl_shader(vertexShaderSource, fragmentShaderSource);
+        }
+        return program;
+    }
+};
 
 auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
     // FIXME: probably need to flip the image upside down since opengl counts
@@ -144,10 +154,11 @@ auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+    // provide 3 floats to vertex shader??
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    static auto shaderProgram = create_solid_color_shader();
+    static auto shaderProgram = Shaders::solid();
 
     drawObjects.push_back({vao, shaderProgram, color});
 }
