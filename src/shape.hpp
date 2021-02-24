@@ -5,6 +5,8 @@
 #include "jint.h"
 #include "util.hpp"
 
+#include <stdexcept>
+
 class Shape {
 public:
     enum class RotationType {
