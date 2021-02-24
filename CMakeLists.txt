@@ -8,6 +8,7 @@ add_subdirectory("deps/SDL2-2.0.12")
 add_subdirectory("deps/fmt-7.0.3")
 add_subdirectory("deps/glad")
 add_subdirectory("deps/glm-0.9.9.8")
+add_subdirectory("deps/GSL-3.1.0/")
 
 find_package(OpenGL REQUIRED)
 
@@ -33,6 +34,7 @@ target_link_libraries(ShapeDrop PUBLIC
     fmt::fmt
     glad
     glm
+    Microsoft.GSL::GSL
 )
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/font/DejaVuSans.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
