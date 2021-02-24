@@ -9,7 +9,14 @@ add_subdirectory("deps/fmt-7.0.3")
 add_subdirectory("deps/glad")
 
 find_package(OpenGL REQUIRED)
-target_include_directories(ShapeDrop PUBLIC ${OPENGL_INCLUDE_DIR})
+
+if (OpenGL_EGL_FOUND)
+    target_include_directories(ShapeDrop PUBLIC ${OPENGL_EGL_INCLUDE_DIR})
+    target_link_libraries(ShapeDrop PUBLIC OpenGL::EGL)
+else()
+    target_include_directories(ShapeDrop PUBLIC ${OPENGL_INCLUDE_DIR})
+    target_link_libraries(ShapeDrop PUBLIC OpenGL::GL)
+endif()
 
 target_compile_features(ShapeDrop PRIVATE cxx_std_17)
 
@@ -24,7 +31,6 @@ target_link_libraries(ShapeDrop PUBLIC
     SDL2-static
     fmt::fmt
     glad
-    ${OPENGL_LIBRARIES}
 )
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/font/DejaVuSans.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
