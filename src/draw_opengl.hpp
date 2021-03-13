@@ -74,18 +74,89 @@ private:
 
 class Context {
 public:
+    Context() {
+        // Set up the solid shader's vbo, vao, and ebo.
+        GLfloat vertices[] = {
+            0.F, 1.F, 0.F, // top left
+            1.F, 1.F, 0.F, // top right
+            0.F, 0.F, 0.F, // bottom left
+            1.F, 0.F, 0.F, // bottom right
+        };
+
+        GLuint indices[] = {
+            0, 1, 3,
+            0, 2, 3,
+        };
+
+        glGenBuffers(1, &m_solidShaderVBO);
+        glGenVertexArrays(1, &m_solidShaderVAO);
+        glGenBuffers(1, &m_solidShaderEBO);
+
+        glBindVertexArray(m_solidShaderVAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_solidShaderVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_solidShaderEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        // provide 3 floats to vertex shader??
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+        glEnableVertexAttribArray(0);
+    }
+    Context(Context const&) = delete;
+    auto operator =(Context const&) = delete;
+    Context(Context&& other) noexcept
+        : m_solid {std::move(other.m_solid)}
+    {
+        delete_solid_shader_buffers();
+        m_solidShaderEBO = other.m_solidShaderEBO;
+        m_solidShaderVAO = other.m_solidShaderVAO;
+        m_solidShaderVBO = other.m_solidShaderVBO;
+        other.m_solidShaderEBO = 0;
+        other.m_solidShaderVAO = 0;
+        other.m_solidShaderVBO = 0;
+    }
+    auto operator =(Context&& other) noexcept -> Context& {
+        delete_solid_shader_buffers();
+        m_solid = std::move(other.m_solid);
+        m_solidShaderEBO = other.m_solidShaderEBO;
+        m_solidShaderVAO = other.m_solidShaderVAO;
+        m_solidShaderVBO = other.m_solidShaderVBO;
+        other.m_solidShaderEBO = 0;
+        other.m_solidShaderVAO = 0;
+        other.m_solidShaderVBO = 0;
+        return *this;
+    }
+    ~Context() noexcept {
+        delete_solid_shader_buffers();
+    }
+
     [[nodiscard]]
     auto solid_shader() const -> ShaderProgram const& {
         return m_solid;
     }
+    [[nodiscard]] auto solid_shader_vao() const -> GLuint {
+        return m_solidShaderVAO;
+    }
 
 private:
+    auto delete_solid_shader_buffers() -> void {
+        glDeleteBuffers(1, &m_solidShaderEBO);
+        glDeleteBuffers(1, &m_solidShaderVBO);
+        glDeleteVertexArrays(1, &m_solidShaderVAO);
+    }
+
     ShaderProgram m_solid {
         R"foo(
         #version 330 core
         layout (location = 0) in vec3 aPos;
+
+        uniform mat4 model;
+        uniform mat4 projection;
+
         void main() {
-            gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+            gl_Position = projection * model * vec4(aPos, 1.0);
         }
         )foo",
         R"foo(
@@ -97,6 +168,10 @@ private:
         }
         )foo"
     };
+
+    GLuint m_solidShaderVAO {0};
+    GLuint m_solidShaderVBO {0};
+    GLuint m_solidShaderEBO {0};
 };
 
 

@@ -4,6 +4,9 @@
 #include "draw.hpp"
 
 #include "glad/glad.h"
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace OpenGLRender {
 
@@ -44,6 +47,7 @@ struct DrawObject {
     GLuint vao;
     GLuint shaderProgram;
     Color::RGBA color;
+    Rect<double> rect;
 };
 
 std::vector<DrawObject> drawObjects;
@@ -64,7 +68,7 @@ struct GLColor {
 };
 
 auto draw(ProgramState& programState, GameState& gameState) -> void {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (auto object : drawObjects) {
@@ -73,9 +77,22 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         GLColor color {object.color};
         glUniform4f(vertexColorLocation, color.r, color.g, color.b, color.a);
 
+        glm::mat4 model {1};
+        model = glm::translate(model, glm::vec3 {object.rect.x, object.rect.y, 0.F});
+        model = glm::scale(model, glm::vec3 {object.rect.w, object.rect.h, 0.F});
+
+        auto vertexModelLocation = glGetUniformLocation(object.shaderProgram, "model");
+        glUniformMatrix4fv(vertexModelLocation, 1, GL_FALSE, glm::value_ptr(model));
+
+        auto projection = glm::ortho(0.F, 1.F, 0.F, 1.F, 0.F, 1.F);
+
+        auto vertexProjectionLocation = glGetUniformLocation(object.shaderProgram, "projection");
+        glUniformMatrix4fv(vertexProjectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+
         glBindVertexArray(object.vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     }
+
     glBindVertexArray(0);
 
     drawObjects.clear();
@@ -85,48 +102,10 @@ auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
     // FIXME: probably need to flip the image upside down since opengl counts
     //        0,0 as bottom left corner while we count 0,0 as top left.
 
-    // convert between 0 -> 1 normalized to -1 -> 1 normalized
-    sqr *= 2;
-    sqr.x -= 1;
-    sqr.y -= 1;
-
-    float vertices[] = {
-        float(sqr.x), float(sqr.y), 0.F, // top left
-        float(sqr.x + sqr.w), float(sqr.y), 0.F, // top right
-        float(sqr.x), float(sqr.y + sqr.h), 0.F, // bottom left
-        float(sqr.x + sqr.w), float(sqr.y + sqr.h), 0.F // bottom right
-    };
-
-    unsigned indices[] = {
-        0, 1, 3,
-        0, 2, 3,
-    };
-
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-
-    GLuint ebo;
-    glGenBuffers(1, &ebo);
-
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // provide 3 floats to vertex shader??
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-
     auto const& renderContext = get_opengl_render_context();
     auto const& shaderProgram = renderContext.solid_shader();
 
-    drawObjects.push_back({vao, shaderProgram.handle(), color});
+    drawObjects.push_back({renderContext.solid_shader_vao(), shaderProgram.handle(), color, sqr});
 }
 
 auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void {
