@@ -5,8 +5,8 @@
 #include "util.hpp"
 
 #include "glad/glad.h"
-
-#include <string_view>
+#include "glm/mat4x4.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace OpenGLRender {
 
@@ -66,6 +66,16 @@ public:
 
     auto use() const -> void {
         glUseProgram(m_handle);
+    }
+
+    auto set_matrix4(GLchar const* uniformName, glm::mat4 const& mat) const -> void {
+        auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
+        glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+
+    auto set_vec4(GLchar const* uniformName, float x, float y, float z, float w) const -> void {
+        auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
+        glUniform4f(uniformLoc, x, y, z, w);
     }
 
 private:

@@ -45,7 +45,7 @@ ShaderProgram::ShaderProgram(GLchar const* vertexSource, GLchar const* fragmentS
 
 struct DrawObject {
     GLuint vao;
-    GLuint shaderProgram;
+    ShaderProgram const& shaderProgram;
     Color::RGBA color;
     Rect<double> rect;
 };
@@ -72,22 +72,24 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (auto object : drawObjects) {
-        glUseProgram(object.shaderProgram);
-        auto vertexColorLocation = glGetUniformLocation(object.shaderProgram, "color");
-        GLColor color {object.color};
-        glUniform4f(vertexColorLocation, color.r, color.g, color.b, color.a);
+        object.shaderProgram.use();
 
-        glm::mat4 model {1};
-        model = glm::translate(model, glm::vec3 {object.rect.x, object.rect.y, 0.F});
-        model = glm::scale(model, glm::vec3 {object.rect.w, object.rect.h, 0.F});
+        {
+            auto [r, g, b, a] = GLColor {object.color};
+            object.shaderProgram.set_vec4("color", r, g, b, a);
+        }
 
-        auto vertexModelLocation = glGetUniformLocation(object.shaderProgram, "model");
-        glUniformMatrix4fv(vertexModelLocation, 1, GL_FALSE, glm::value_ptr(model));
+        {
+            glm::mat4 model {1};
+            model = glm::translate(model, glm::vec3 {object.rect.x, object.rect.y, 0.F});
+            model = glm::scale(model, glm::vec3 {object.rect.w, object.rect.h, 0.F});
+            object.shaderProgram.set_matrix4("model", model);
+        }
 
-        auto projection = glm::ortho(0.F, 1.F, 0.F, 1.F, 0.F, 1.F);
-
-        auto vertexProjectionLocation = glGetUniformLocation(object.shaderProgram, "projection");
-        glUniformMatrix4fv(vertexProjectionLocation, 1, GL_FALSE, glm::value_ptr(projection));
+        {
+            auto projection = glm::ortho(0.F, 1.F, 0.F, 1.F, 0.F, 1.F);
+            object.shaderProgram.set_matrix4("projection", projection);
+        }
 
         glBindVertexArray(object.vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
@@ -105,7 +107,7 @@ auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
     auto const& renderContext = get_opengl_render_context();
     auto const& shaderProgram = renderContext.solid_shader();
 
-    drawObjects.push_back({renderContext.solid_shader_vao(), shaderProgram.handle(), color, sqr});
+    drawObjects.push_back({renderContext.solid_shader_vao(), shaderProgram, color, sqr});
 }
 
 auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void {
