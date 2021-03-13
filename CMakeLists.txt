@@ -7,6 +7,7 @@ add_executable(ShapeDrop src/draw_software.cpp src/draw_opengl.cpp src/platform/
 add_subdirectory("deps/SDL2-2.0.12")
 add_subdirectory("deps/fmt-7.0.3")
 add_subdirectory("deps/glad")
+add_subdirectory("deps/glm-0.9.9.8")
 
 find_package(OpenGL REQUIRED)
 
@@ -31,6 +32,7 @@ target_link_libraries(ShapeDrop PUBLIC
     SDL2-static
     fmt::fmt
     glad
+    glm
 )
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/font/DejaVuSans.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
