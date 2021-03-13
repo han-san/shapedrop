@@ -1,5 +1,6 @@
 #include <cassert>
 #include <string_view>
+#include <optional>
 
 #include <glad/glad.h> // must be included before SDL
 #include <SDL.h>
@@ -11,6 +12,7 @@
 #include "../input.hpp"
 #include "../font.hpp"
 #include "../util.hpp"
+#include "../platform.hpp"
 
 #include "sdlmain.hpp"
 
@@ -26,6 +28,8 @@ struct {
 } window {};
 
 SDL_GLContext g_glContext {};
+
+OpenGLRender::Context static* context = nullptr;
 
 RenderMode g_renderMode {RenderMode::opengl};
 
@@ -245,6 +249,10 @@ auto static destroy_window() {
     SDL_Quit();
 }
 
+auto get_opengl_render_context() -> OpenGLRender::Context const& {
+    return *context;
+}
+
 } // namespace SDL
 
 auto main(int argc, char** argv) -> int {
@@ -258,7 +266,12 @@ auto main(int argc, char** argv) -> int {
         }
     }
 
-    platform::SDL::init_window(g_renderMode);
+    init_window(g_renderMode);
+    std::optional<OpenGLRender::Context> openglRenderContext = std::nullopt;
+    if (g_renderMode == RenderMode::opengl) {
+        openglRenderContext = OpenGLRender::Context {};
+        context = &(*openglRenderContext);
+    }
 
     if (!init_font("DejaVuSans.ttf")) {
         assert(false);

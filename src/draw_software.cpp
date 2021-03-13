@@ -2,6 +2,7 @@
 
 #include "ui.hpp"
 #include "font.hpp"
+#include "platform.hpp"
 
 #include <thread>
 

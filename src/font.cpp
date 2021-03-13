@@ -112,3 +112,10 @@ auto FontString::from_width_normalized(std::string_view const string, double con
 {
     return from_width(string, get_window_dimensions().w * desiredWidth);
 }
+
+auto FontString::from_height(std::string_view const string, double const desiredPixelHeight) -> FontString {
+    return FontString(string, desiredPixelHeight);
+}
+auto FontString::from_height_normalized(std::string_view const string, double const desiredHeight) -> FontString {
+    return from_height(string, get_window_dimensions().h * desiredHeight);
+}
