@@ -136,6 +136,10 @@ Context::Context(Context&& other) noexcept
 }
 
 auto Context::operator =(Context&& other) noexcept -> Context& {
+    if (this == &other) {
+        return *this;
+    }
+
     delete_solid_shader_buffers();
     m_solid = std::move(other.m_solid);
     m_solidShaderEBO = other.m_solidShaderEBO;
