@@ -71,6 +71,9 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // The y axis is flipped, i.e. starts at 1.F and ends at 0.F.
+    auto const orthoProjection = glm::ortho(0.F, 1.F, 1.F, 0.F);
+
     // draw playarea
     {
         auto const& solidShader = get_opengl_render_context().solid_shader();
@@ -94,10 +97,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             solidShader.set_matrix4("model", model);
         }
 
-        {
-            auto const projection = glm::ortho(0.F, 1.F, 0.F, 1.F, 0.F, 1.F);
-            solidShader.set_matrix4("projection", projection);
-        }
+        solidShader.set_matrix4("projection", orthoProjection);
 
         glBindVertexArray(get_opengl_render_context().solid_shader_vao());
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
@@ -118,10 +118,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             object.shaderProgram.set_matrix4("model", model);
         }
 
-        {
-            auto projection = glm::ortho(0.F, 1.F, 0.F, 1.F, 0.F, 1.F);
-            object.shaderProgram.set_matrix4("projection", projection);
-        }
+        object.shaderProgram.set_matrix4("projection", orthoProjection);
 
         glBindVertexArray(object.vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
