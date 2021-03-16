@@ -210,7 +210,7 @@ private:
 auto draw(ProgramState& programState, GameState& gameState) -> void;
 
 auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void;
-auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void;
+auto draw_solid_square(Rect<int> sqr, Color::RGBA color) -> void;
 auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color, int borderSize = 1) -> void;
 auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA color, int borderSize = 1) -> void;
 auto draw_font_string(BackBuffer& buf, FontString const& fontString, Point<int> coords) -> void;

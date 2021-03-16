@@ -21,7 +21,7 @@ auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA
 auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void {
     switch (get_render_mode()) {
         case RenderMode::opengl: {
-            OpenGLRender::draw_solid_square(buf, sqr, color);
+            OpenGLRender::draw_solid_square(sqr, color);
         } break;
         case RenderMode::software: {
             SoftwareRender::draw_solid_square(buf, sqr, color);

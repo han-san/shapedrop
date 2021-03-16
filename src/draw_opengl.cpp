@@ -88,6 +88,30 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             glBindVertexArray(get_opengl_render_context().solid_shader_vao());
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         }
+
+        auto draw_shape_in_play_area = [](Shape const& shape) {
+            auto const scale = get_window_scale();
+            for (auto const& position : shape.get_absolute_block_positions()) {
+                // since the top 2 rows shouldn't be visible, the y
+                // position for drawing is 2 less than the shape's
+                auto const actualYPosition {position.y - 2};
+
+                // don't draw if square is above the playarea
+                if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) { continue; }
+                Rect<int> square {
+                    (position.x + gPlayAreaDim.x) * scale,
+                    (actualYPosition + gPlayAreaDim.y) * scale,
+                    scale,
+                    scale
+                };
+
+                draw_solid_square(square, shape.color);
+            }
+        };
+
+        draw_shape_in_play_area(gameState.currentShape);
+        // FIXME: the shadow doesn't seem to be transparent?
+        draw_shape_in_play_area(gameState.currentShapeShadow);
     } break;
     }
 
@@ -123,7 +147,7 @@ auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
     drawObjects.push_back({renderContext.solid_shader_vao(), shaderProgram, color, sqr});
 }
 
-auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void {
+auto draw_solid_square(Rect<int> sqr, Color::RGBA color) -> void {
     auto const& renderContext = get_opengl_render_context();
     auto normalized = to_normalized(
                                     {
