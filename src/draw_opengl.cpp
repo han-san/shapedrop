@@ -59,30 +59,36 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     // The y axis is flipped, i.e. starts at 1.F and ends at 0.F.
     auto const orthoProjection = glm::ortho(0.F, 1.F, 1.F, 0.F);
 
-    // draw playarea
-    {
-        auto const& solidShader = get_opengl_render_context().solid_shader();
-        solidShader.use();
-        solidShader.set_vec4("color", GLColor {Color::black});
-
+    switch (programState.levelType) {
+    case ProgramState::LevelType::Menu: {
+    } break;
+    case ProgramState::LevelType::Game: {
+        // draw playarea
         {
-            glm::mat4 model {1};
-            auto const scale = get_window_scale();
-            auto const normalizedPlayArea = to_normalized({
-                                                          static_cast<double>(gPlayAreaDim.x) * scale,
-                                                          static_cast<double>(gPlayAreaDim.y) * scale,
-                                                          static_cast<double>(gPlayAreaDim.w) * scale,
-                                                          static_cast<double>(gPlayAreaDim.h) * scale,
-                                                          });
-            model = glm::translate(model, glm::vec3 {normalizedPlayArea.x, normalizedPlayArea.y, 0.F});
-            model = glm::scale(model, glm::vec3 {normalizedPlayArea.w, normalizedPlayArea.h, 0.F});
-            solidShader.set_matrix4("model", model);
+            auto const& solidShader = get_opengl_render_context().solid_shader();
+            solidShader.use();
+            solidShader.set_vec4("color", GLColor {Color::black});
+
+            {
+                glm::mat4 model {1};
+                auto const scale = get_window_scale();
+                auto const normalizedPlayArea = to_normalized({
+                                                            static_cast<double>(gPlayAreaDim.x) * scale,
+                                                            static_cast<double>(gPlayAreaDim.y) * scale,
+                                                            static_cast<double>(gPlayAreaDim.w) * scale,
+                                                            static_cast<double>(gPlayAreaDim.h) * scale,
+                                                            });
+                model = glm::translate(model, glm::vec3 {normalizedPlayArea.x, normalizedPlayArea.y, 0.F});
+                model = glm::scale(model, glm::vec3 {normalizedPlayArea.w, normalizedPlayArea.h, 0.F});
+                solidShader.set_matrix4("model", model);
+            }
+
+            solidShader.set_matrix4("projection", orthoProjection);
+
+            glBindVertexArray(get_opengl_render_context().solid_shader_vao());
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
         }
-
-        solidShader.set_matrix4("projection", orthoProjection);
-
-        glBindVertexArray(get_opengl_render_context().solid_shader_vao());
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    } break;
     }
 
     for (auto object : drawObjects) {
