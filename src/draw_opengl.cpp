@@ -8,6 +8,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+#include <utility>
+
 namespace OpenGLRender {
 
 Shader::Shader(GLenum shaderType, GLchar const* src) {
@@ -119,20 +121,14 @@ Context::Context(Context&& other) noexcept
     , m_rainbow {std::move(other.m_rainbow)}
 {
     delete_solid_shader_buffers();
-    m_solidShaderEBO = other.m_solidShaderEBO;
-    m_solidShaderVAO = other.m_solidShaderVAO;
-    m_solidShaderVBO = other.m_solidShaderVBO;
-    other.m_solidShaderEBO = 0;
-    other.m_solidShaderVAO = 0;
-    other.m_solidShaderVBO = 0;
+    m_solidShaderEBO = std::exchange(other.m_solidShaderEBO, 0);
+    m_solidShaderVAO = std::exchange(other.m_solidShaderVAO, 0);
+    m_solidShaderVBO = std::exchange(other.m_solidShaderVBO, 0);
 
     delete_rainbow_shader_buffers();
-    m_rainbowShaderEBO = other.m_rainbowShaderEBO;
-    m_rainbowShaderVAO = other.m_rainbowShaderVAO;
-    m_rainbowShaderVBO = other.m_rainbowShaderVBO;
-    other.m_rainbowShaderEBO = 0;
-    other.m_rainbowShaderVAO = 0;
-    other.m_rainbowShaderVBO = 0;
+    m_rainbowShaderEBO = std::exchange(other.m_rainbowShaderEBO, 0);
+    m_rainbowShaderVAO = std::exchange(other.m_rainbowShaderVAO, 0);
+    m_rainbowShaderVBO = std::exchange(other.m_rainbowShaderVBO, 0);
 }
 
 auto Context::operator =(Context&& other) noexcept -> Context& {
@@ -142,21 +138,16 @@ auto Context::operator =(Context&& other) noexcept -> Context& {
 
     delete_solid_shader_buffers();
     m_solid = std::move(other.m_solid);
-    m_solidShaderEBO = other.m_solidShaderEBO;
-    m_solidShaderVAO = other.m_solidShaderVAO;
-    m_solidShaderVBO = other.m_solidShaderVBO;
-    other.m_solidShaderEBO = 0;
-    other.m_solidShaderVAO = 0;
-    other.m_solidShaderVBO = 0;
+    m_solidShaderEBO = std::exchange(other.m_solidShaderEBO, 0);
+    m_solidShaderVAO = std::exchange(other.m_solidShaderVAO, 0);
+    m_solidShaderVBO = std::exchange(other.m_solidShaderVBO, 0);
 
     delete_rainbow_shader_buffers();
     m_rainbow = std::move(other.m_rainbow);
-    m_rainbowShaderEBO = other.m_rainbowShaderEBO;
-    m_rainbowShaderVAO = other.m_rainbowShaderVAO;
-    m_rainbowShaderVBO = other.m_rainbowShaderVBO;
-    other.m_rainbowShaderEBO = 0;
-    other.m_rainbowShaderVAO = 0;
-    other.m_rainbowShaderVBO = 0;
+    m_rainbowShaderEBO = std::exchange(other.m_rainbowShaderEBO, 0);
+    m_rainbowShaderVAO = std::exchange(other.m_rainbowShaderVAO, 0);
+    m_rainbowShaderVBO = std::exchange(other.m_rainbowShaderVBO, 0);
+
     return *this;
 }
 

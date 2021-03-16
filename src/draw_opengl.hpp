@@ -8,6 +8,8 @@
 #include "glm/mat4x4.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+#include <utility>
+
 namespace OpenGLRender {
 
 struct GLColor {
@@ -32,13 +34,11 @@ public:
     auto operator =(Shader const&) = delete;
     Shader(Shader&& other) noexcept {
         glDeleteShader(m_handle);
-        m_handle = other.m_handle;
-        other.m_handle = 0;
+        m_handle = std::exchange(other.m_handle, 0);
     }
     auto operator =(Shader&& other) noexcept -> Shader& {
         glDeleteShader(m_handle);
-        m_handle = other.m_handle;
-        other.m_handle = 0;
+        m_handle = std::exchange(other.m_handle, 0);
         return *this;
     }
     ~Shader() {
@@ -57,13 +57,11 @@ public:
         auto operator =(Program const&) = delete;
         Program(Program&& other) noexcept {
             glDeleteProgram(m_handle);
-            m_handle = other.m_handle;
-            other.m_handle = 0;
+            m_handle = std::exchange(other.m_handle, 0);
         }
         auto operator =(Program&& other) noexcept -> Program& {
             glDeleteProgram(m_handle);
-            m_handle = other.m_handle;
-            other.m_handle = 0;
+            m_handle = std::exchange(other.m_handle, 0);
             return *this;
         }
 
