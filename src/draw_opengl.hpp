@@ -54,6 +54,27 @@ public:
         return m_handle;
     }
 
+    enum class Uniform {
+        color,
+        model,
+        projection,
+    };
+
+    auto static constexpr to_string_view(Uniform const u) -> std::string_view {
+        switch (u) {
+            case Uniform::color:
+                return "color";
+            case Uniform::model:
+                return "model";
+            case Uniform::projection:
+                return "projection";
+        }
+    }
+
+    auto static to_string(Uniform const u) -> std::string {
+        return std::string(to_string_view(u));
+    }
+
     class Program {
     public:
         Program(GLchar const* vertexSource, GLchar const* fragmentSource);
@@ -86,18 +107,21 @@ public:
             glUseProgram(m_handle);
         }
 
-        auto set_matrix4(GLchar const* uniformName, glm::mat4 const& mat) const -> void {
-            auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
+        auto set_matrix4(Uniform u, glm::mat4 const& mat) const -> void {
+            auto const name = to_string_view(u);
+            auto const uniformLoc = glGetUniformLocation(m_handle, name.data());
             glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(mat));
         }
 
-        auto set_vec4(GLchar const* uniformName, float x, float y, float z, float w) const -> void {
-            auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
+        auto set_vec4(Uniform u, float x, float y, float z, float w) const -> void {
+            auto const name = to_string_view(u);
+            auto uniformLoc = glGetUniformLocation(m_handle, name.data());
             glUniform4f(uniformLoc, x, y, z, w);
         }
 
-        auto set_vec4(GLchar const* uniformName, GLColor const color) const -> void {
-            auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
+        auto set_vec4(Uniform u, GLColor const color) const -> void {
+            auto const name = to_string_view(u);
+            auto uniformLoc = glGetUniformLocation(m_handle, name.data());
             auto const [r, g, b, a] = color;
             glUniform4f(uniformLoc, r, g, b, a);
         }

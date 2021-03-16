@@ -182,7 +182,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         {
             auto const& solidShader = get_opengl_render_context().solid_shader();
             solidShader.use();
-            solidShader.set_vec4("color", GLColor {Color::black});
+            solidShader.set_vec4(Shader::Uniform::color, GLColor {Color::black});
 
             {
                 glm::mat4 model {1};
@@ -195,10 +195,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                                                             });
                 model = glm::translate(model, glm::vec3 {normalizedPlayArea.x, normalizedPlayArea.y, 0.F});
                 model = glm::scale(model, glm::vec3 {normalizedPlayArea.w, normalizedPlayArea.h, 0.F});
-                solidShader.set_matrix4("model", model);
+                solidShader.set_matrix4(Shader::Uniform::model, model);
             }
 
-            solidShader.set_matrix4("projection", orthoProjection);
+            solidShader.set_matrix4(Shader::Uniform::projection, orthoProjection);
 
             glBindVertexArray(get_opengl_render_context().solid_shader_vao());
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
@@ -254,16 +254,16 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     for (auto object : drawObjects) {
         object.shaderProgram.use();
-        object.shaderProgram.set_vec4("color", GLColor {object.color});
+        object.shaderProgram.set_vec4(Shader::Uniform::color, GLColor {object.color});
 
         {
             glm::mat4 model {1};
             model = glm::translate(model, glm::vec3 {object.rect.x, object.rect.y, 0.F});
             model = glm::scale(model, glm::vec3 {object.rect.w, object.rect.h, 0.F});
-            object.shaderProgram.set_matrix4("model", model);
+            object.shaderProgram.set_matrix4(Shader::Uniform::model, model);
         }
 
-        object.shaderProgram.set_matrix4("projection", orthoProjection);
+        object.shaderProgram.set_matrix4(Shader::Uniform::projection, orthoProjection);
 
         glBindVertexArray(object.vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
