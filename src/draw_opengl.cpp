@@ -47,6 +47,115 @@ Shader::Program::Program(GLchar const* vertexSource, GLchar const* fragmentSourc
     m_handle = programHandle;
 }
 
+Context::Context() {
+    // Set up the solid shader's vbo, vao, and ebo.
+    {
+        GLfloat vertices[] = {
+            0.F, 1.F, 0.F, // top left
+            1.F, 1.F, 0.F, // top right
+            0.F, 0.F, 0.F, // bottom left
+            1.F, 0.F, 0.F, // bottom right
+        };
+
+        GLuint indices[] = {
+            0, 1, 3,
+            0, 2, 3,
+        };
+
+        glGenBuffers(1, &m_solidShaderVBO);
+        glGenVertexArrays(1, &m_solidShaderVAO);
+        glGenBuffers(1, &m_solidShaderEBO);
+
+        glBindVertexArray(m_solidShaderVAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_solidShaderVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_solidShaderEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        // provide 3 floats to vertex shader??
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+        glEnableVertexAttribArray(0);
+    }
+
+    // Set up the rainbow shader's vbo, vao, and ebo.
+    {
+        GLfloat vertices[] = {
+            // Positions   // Colors
+            -1.F,  1.F, 0.F, 0.F, 1.F, 0.F, // top left
+             1.F,  1.F, 0.F, 1.F, 1.F, 0.F, // top right
+            -1.F, -1.F, 0.F, 0.F, 1.F, 1.F, // bottom left
+             1.F, -1.F, 0.F, 1.F, 0.F, 1.F, // bottom right
+        };
+
+        GLuint indices[] = {
+            0, 1, 3,
+            0, 2, 3,
+        };
+
+        glGenBuffers(1, &m_rainbowShaderVBO);
+        glGenVertexArrays(1, &m_rainbowShaderVAO);
+        glGenBuffers(1, &m_rainbowShaderEBO);
+
+        glBindVertexArray(m_rainbowShaderVAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_rainbowShaderVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rainbowShaderEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        // provide 3 floats to vertex shader??
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), nullptr);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
+    }
+}
+
+Context::Context(Context&& other) noexcept
+    : m_solid {std::move(other.m_solid)}
+    , m_rainbow {std::move(other.m_rainbow)}
+{
+    delete_solid_shader_buffers();
+    m_solidShaderEBO = other.m_solidShaderEBO;
+    m_solidShaderVAO = other.m_solidShaderVAO;
+    m_solidShaderVBO = other.m_solidShaderVBO;
+    other.m_solidShaderEBO = 0;
+    other.m_solidShaderVAO = 0;
+    other.m_solidShaderVBO = 0;
+
+    delete_rainbow_shader_buffers();
+    m_rainbowShaderEBO = other.m_rainbowShaderEBO;
+    m_rainbowShaderVAO = other.m_rainbowShaderVAO;
+    m_rainbowShaderVBO = other.m_rainbowShaderVBO;
+    other.m_rainbowShaderEBO = 0;
+    other.m_rainbowShaderVAO = 0;
+    other.m_rainbowShaderVBO = 0;
+}
+
+auto Context::operator =(Context&& other) noexcept -> Context& {
+    delete_solid_shader_buffers();
+    m_solid = std::move(other.m_solid);
+    m_solidShaderEBO = other.m_solidShaderEBO;
+    m_solidShaderVAO = other.m_solidShaderVAO;
+    m_solidShaderVBO = other.m_solidShaderVBO;
+    other.m_solidShaderEBO = 0;
+    other.m_solidShaderVAO = 0;
+    other.m_solidShaderVBO = 0;
+
+    delete_rainbow_shader_buffers();
+    m_rainbow = std::move(other.m_rainbow);
+    m_rainbowShaderEBO = other.m_rainbowShaderEBO;
+    m_rainbowShaderVAO = other.m_rainbowShaderVAO;
+    m_rainbowShaderVBO = other.m_rainbowShaderVBO;
+    other.m_rainbowShaderEBO = 0;
+    other.m_rainbowShaderVAO = 0;
+    other.m_rainbowShaderVBO = 0;
+    return *this;
+}
+
 struct DrawObject {
     GLuint vao;
     Shader::Program const& shaderProgram;
@@ -62,6 +171,13 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     // The y axis is flipped, i.e. starts at 1.F and ends at 0.F.
     auto const orthoProjection = glm::ortho(0.F, 1.F, 1.F, 0.F);
+
+    // draw rainbow background
+    {
+        get_opengl_render_context().rainbow_shader().use();
+        glBindVertexArray(get_opengl_render_context().rainbow_shader_vao());
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    }
 
     switch (programState.levelType) {
     case ProgramState::LevelType::Menu: {
