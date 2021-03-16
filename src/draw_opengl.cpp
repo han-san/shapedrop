@@ -143,6 +143,16 @@ auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
 }
 
 auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void {
+    auto const& renderContext = get_opengl_render_context();
+    auto normalized = to_normalized(
+                                    {
+                                    static_cast<double>(sqr.x),
+                                    static_cast<double>(sqr.y),
+                                    static_cast<double>(sqr.w),
+                                    static_cast<double>(sqr.h),
+                                    }
+                                   );
+    draw_solid_square_normalized(normalized, color);
 }
 auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color, int borderSize) -> void {
 }
