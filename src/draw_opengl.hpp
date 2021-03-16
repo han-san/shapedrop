@@ -34,49 +34,50 @@ public:
     auto handle() const noexcept {
         return m_handle;
     }
-private:
-    GLuint m_handle {0};
-};
 
-class ShaderProgram {
-public:
-    ShaderProgram(GLchar const* vertexSource, GLchar const* fragmentSource);
-    ShaderProgram(ShaderProgram const&) = delete;
-    auto operator =(ShaderProgram const&) = delete;
-    ShaderProgram(ShaderProgram&& other) noexcept {
-        glDeleteProgram(m_handle);
-        m_handle = other.m_handle;
-        other.m_handle = 0;
-    }
-    auto operator =(ShaderProgram&& other) noexcept -> ShaderProgram& {
-        glDeleteProgram(m_handle);
-        m_handle = other.m_handle;
-        other.m_handle = 0;
-        return *this;
-    }
+    class Program {
+    public:
+        Program(GLchar const* vertexSource, GLchar const* fragmentSource);
+        Program(Program const&) = delete;
+        auto operator =(Program const&) = delete;
+        Program(Program&& other) noexcept {
+            glDeleteProgram(m_handle);
+            m_handle = other.m_handle;
+            other.m_handle = 0;
+        }
+        auto operator =(Program&& other) noexcept -> Program& {
+            glDeleteProgram(m_handle);
+            m_handle = other.m_handle;
+            other.m_handle = 0;
+            return *this;
+        }
 
-    ~ShaderProgram() {
-        glDeleteProgram(m_handle);
-    }
+        ~Program() {
+            glDeleteProgram(m_handle);
+        }
 
-    [[nodiscard]]
-    auto handle() const -> GLuint {
-        return m_handle;
-    }
+        [[nodiscard]]
+        auto handle() const -> GLuint {
+            return m_handle;
+        }
 
-    auto use() const -> void {
-        glUseProgram(m_handle);
-    }
+        auto use() const -> void {
+            glUseProgram(m_handle);
+        }
 
-    auto set_matrix4(GLchar const* uniformName, glm::mat4 const& mat) const -> void {
-        auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
-        glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(mat));
-    }
+        auto set_matrix4(GLchar const* uniformName, glm::mat4 const& mat) const -> void {
+            auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
+            glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(mat));
+        }
 
-    auto set_vec4(GLchar const* uniformName, float x, float y, float z, float w) const -> void {
-        auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
-        glUniform4f(uniformLoc, x, y, z, w);
-    }
+        auto set_vec4(GLchar const* uniformName, float x, float y, float z, float w) const -> void {
+            auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
+            glUniform4f(uniformLoc, x, y, z, w);
+        }
+
+    private:
+        GLuint m_handle {0};
+    };
 
 private:
     GLuint m_handle {0};
@@ -143,7 +144,7 @@ public:
     }
 
     [[nodiscard]]
-    auto solid_shader() const -> ShaderProgram const& {
+    auto solid_shader() const -> Shader::Program const& {
         return m_solid;
     }
     [[nodiscard]] auto solid_shader_vao() const -> GLuint {
@@ -157,7 +158,7 @@ private:
         glDeleteVertexArrays(1, &m_solidShaderVAO);
     }
 
-    ShaderProgram m_solid {
+    Shader::Program m_solid {
         R"foo(
         #version 330 core
         layout (location = 0) in vec3 aPos;

@@ -24,7 +24,7 @@ Shader::Shader(GLenum shaderType, GLchar const* src) {
     m_handle = shaderHandle;
 }
 
-ShaderProgram::ShaderProgram(GLchar const* vertexSource, GLchar const* fragmentSource) {
+Shader::Program::Program(GLchar const* vertexSource, GLchar const* fragmentSource) {
     Shader vertex {GL_VERTEX_SHADER, vertexSource};
     Shader fragment {GL_FRAGMENT_SHADER, fragmentSource};
 
@@ -45,7 +45,7 @@ ShaderProgram::ShaderProgram(GLchar const* vertexSource, GLchar const* fragmentS
 
 struct DrawObject {
     GLuint vao;
-    ShaderProgram const& shaderProgram;
+    Shader::Program const& shaderProgram;
     Color::RGBA color;
     Rect<double> rect;
 };
