@@ -195,6 +195,8 @@ auto init_window_opengl() {
     }
 
     glViewport(0, 0, window.dimensions.w, window.dimensions.h);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 auto init_window_software() {
