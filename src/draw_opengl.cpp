@@ -18,7 +18,9 @@ Shader::Shader(GLenum shaderType, GLchar const* src) {
         GLint success = 0;
         glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &success);
         if (success == 0) {
-            throw;
+            char infoLog[512];
+            glGetShaderInfoLog(shaderHandle, 512, nullptr, infoLog);
+            throw std::exception(infoLog);
         }
     }
     m_handle = shaderHandle;
@@ -36,7 +38,9 @@ Shader::Program::Program(GLchar const* vertexSource, GLchar const* fragmentSourc
         GLint success = 0;
         glGetProgramiv(programHandle, GL_LINK_STATUS, &success);
         if (success == 0) {
-            throw;
+            char infoLog[512];
+            glGetProgramInfoLog(programHandle, 512, nullptr, infoLog);
+            throw std::exception(infoLog);
         }
     }
 
