@@ -52,21 +52,6 @@ struct DrawObject {
 
 std::vector<DrawObject> drawObjects;
 
-struct GLColor {
-    float r;
-    float g;
-    float b;
-    float a;
-
-    // OpenGL uses 0 -> 1 while we use 0 -> maxChannelValue
-    explicit constexpr GLColor(Color::RGBA color)
-    : r {static_cast<float>(u8 {color.r}) / Color::RGBA::maxChannelValue}
-    , g {static_cast<float>(u8 {color.g}) / Color::RGBA::maxChannelValue}
-    , b {static_cast<float>(u8 {color.b}) / Color::RGBA::maxChannelValue}
-    , a {static_cast<float>(u8 {color.a}) / Color::RGBA::maxChannelValue}
-    {}
-};
-
 auto draw(ProgramState& programState, GameState& gameState) -> void {
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -78,10 +63,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     {
         auto const& solidShader = get_opengl_render_context().solid_shader();
         solidShader.use();
-        {
-            auto const [r, g, b, a] = GLColor {Color::black};
-            solidShader.set_vec4("color", r, g, b, a);
-        }
+        solidShader.set_vec4("color", GLColor {Color::black});
 
         {
             glm::mat4 model {1};
@@ -105,11 +87,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     for (auto object : drawObjects) {
         object.shaderProgram.use();
-
-        {
-            auto [r, g, b, a] = GLColor {object.color};
-            object.shaderProgram.set_vec4("color", r, g, b, a);
-        }
+        object.shaderProgram.set_vec4("color", GLColor {object.color});
 
         {
             glm::mat4 model {1};

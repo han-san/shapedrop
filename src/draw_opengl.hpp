@@ -10,6 +10,21 @@
 
 namespace OpenGLRender {
 
+struct GLColor {
+    float r;
+    float g;
+    float b;
+    float a;
+
+    // OpenGL uses 0 -> 1 while we use 0 -> maxChannelValue
+    explicit constexpr GLColor(Color::RGBA color)
+    : r {static_cast<float>(u8 {color.r}) / Color::RGBA::maxChannelValue}
+    , g {static_cast<float>(u8 {color.g}) / Color::RGBA::maxChannelValue}
+    , b {static_cast<float>(u8 {color.b}) / Color::RGBA::maxChannelValue}
+    , a {static_cast<float>(u8 {color.a}) / Color::RGBA::maxChannelValue}
+    {}
+};
+
 class Shader {
 public:
     Shader(GLenum shaderType, GLchar const* src);
@@ -73,6 +88,12 @@ public:
         auto set_vec4(GLchar const* uniformName, float x, float y, float z, float w) const -> void {
             auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
             glUniform4f(uniformLoc, x, y, z, w);
+        }
+
+        auto set_vec4(GLchar const* uniformName, GLColor const color) const -> void {
+            auto uniformLoc = glGetUniformLocation(m_handle, uniformName);
+            auto const [r, g, b, a] = color;
+            glUniform4f(uniformLoc, r, g, b, a);
         }
 
     private:
