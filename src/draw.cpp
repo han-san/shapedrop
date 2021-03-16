@@ -92,10 +92,6 @@ auto draw_text_normalized(BackBuffer& buf, std::string_view text, Point<double> 
 auto draw(ProgramState& programState, GameState& gameState) -> void {
     switch (get_render_mode()) {
         case RenderMode::opengl: {
-
-            OpenGLRender::draw_solid_square_normalized({0.25, 0.25, 0.25, 0.25}, Color::red);
-            OpenGLRender::draw_solid_square_normalized({0.5, 0.5, 0.25, 0.25}, Color::cyan);
-
             OpenGLRender::draw(programState, gameState);
         } break;
         case RenderMode::software: {

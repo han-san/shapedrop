@@ -71,6 +71,38 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
     glClearColor(0.2F, 0.3F, 0.3F, 1.0F);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // draw playarea
+    {
+        auto const& solidShader = get_opengl_render_context().solid_shader();
+        solidShader.use();
+        {
+            auto const [r, g, b, a] = GLColor {Color::black};
+            solidShader.set_vec4("color", r, g, b, a);
+        }
+
+        {
+            glm::mat4 model {1};
+            auto const scale = get_window_scale();
+            auto const normalizedPlayArea = to_normalized({
+                                                          static_cast<double>(gPlayAreaDim.x) * scale,
+                                                          static_cast<double>(gPlayAreaDim.y) * scale,
+                                                          static_cast<double>(gPlayAreaDim.w) * scale,
+                                                          static_cast<double>(gPlayAreaDim.h) * scale,
+                                                          });
+            model = glm::translate(model, glm::vec3 {normalizedPlayArea.x, normalizedPlayArea.y, 0.F});
+            model = glm::scale(model, glm::vec3 {normalizedPlayArea.w, normalizedPlayArea.h, 0.F});
+            solidShader.set_matrix4("model", model);
+        }
+
+        {
+            auto const projection = glm::ortho(0.F, 1.F, 0.F, 1.F, 0.F, 1.F);
+            solidShader.set_matrix4("projection", projection);
+        }
+
+        glBindVertexArray(get_opengl_render_context().solid_shader_vao());
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    }
+
     for (auto object : drawObjects) {
         object.shaderProgram.use();
 
