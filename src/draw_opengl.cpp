@@ -109,9 +109,31 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             }
         };
 
+        for (std::size_t y = 2; y < Board::rows; ++y) {
+            for (std::size_t x = 0; x < Board::columns; ++x) {
+                auto const currIndex = y * Board::columns + x;
+                auto const& block = gameState.board.data[currIndex];
+                if (!block.isActive) {
+                    continue;
+                }
+
+                auto const scale = static_cast<std::size_t>(get_window_scale());
+
+                Rect<int> square {
+                    static_cast<int>((x + gPlayAreaDim.x) * scale),
+                    static_cast<int>((y - 2 + gPlayAreaDim.y) * scale),
+                    static_cast<int>(scale),
+                    static_cast<int>(scale)
+                };
+                draw_solid_square(square, block.color);
+            }
+        }
+
         draw_shape_in_play_area(gameState.currentShape);
         // FIXME: the shadow doesn't seem to be transparent?
         draw_shape_in_play_area(gameState.currentShapeShadow);
+
+
     } break;
     }
 
