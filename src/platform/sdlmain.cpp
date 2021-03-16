@@ -77,6 +77,10 @@ auto static resize_window(Rect<int>::Size const dimensions) {
                                       window.surface->format->Bmask,
                                       window.surface->format->Amask);
     assert(window.bbSurface);
+
+    if (get_render_mode() == RenderMode::opengl) {
+        glViewport(0, 0, window.dimensions.w, window.dimensions.h);
+    }
 }
 
 auto change_window_scale(int newScale) -> void {
