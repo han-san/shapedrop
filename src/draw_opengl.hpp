@@ -37,6 +37,10 @@ public:
         m_handle = std::exchange(other.m_handle, 0);
     }
     auto operator =(Shader&& other) noexcept -> Shader& {
+        if (this == &other) {
+            return *this;
+        }
+
         glDeleteShader(m_handle);
         m_handle = std::exchange(other.m_handle, 0);
         return *this;
@@ -60,6 +64,10 @@ public:
             m_handle = std::exchange(other.m_handle, 0);
         }
         auto operator =(Program&& other) noexcept -> Program& {
+            if (this == &other) {
+                return *this;
+            }
+
             glDeleteProgram(m_handle);
             m_handle = std::exchange(other.m_handle, 0);
             return *this;
