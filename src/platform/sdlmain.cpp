@@ -180,8 +180,8 @@ auto init_window_opengl() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-    auto scale = 30;
-    window.dimensions = {gBaseWindowWidth * scale, gBaseWindowHeight * scale};
+    windowScale = 30;
+    window.dimensions = {gBaseWindowWidth * windowScale, gBaseWindowHeight * windowScale};
 
 
     window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window.dimensions.w, window.dimensions.h, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
