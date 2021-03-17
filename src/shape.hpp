@@ -39,7 +39,7 @@ public:
     std::size_t static constexpr blockCount {4};
     using BlockStack = ArrayStack<Point<int>, blockCount>;
 
-    constexpr explicit Shape(Type type) noexcept;
+    explicit Shape(Type type) noexcept;
 
     // Returns the positions of the blocks relative to the top left corner of the play area
     [[nodiscard]] auto constexpr get_absolute_block_positions() const -> BlockStack {

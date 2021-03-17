@@ -11,7 +11,7 @@
 
 using namespace std::string_literals;
 
-constexpr Shape::Shape(Type const ttype) noexcept
+Shape::Shape(Type const ttype) noexcept
     : type {ttype}
     , color {type_to_color(ttype)}
     , pos {Board::columns / 2 - 2, 0} // spawn centrally
