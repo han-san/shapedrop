@@ -270,6 +270,33 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                 ++i;
             }
         }
+
+        // draw held shape
+        {
+            auto const scale = get_window_scale();
+            auto const holdShapeDim = gHoldShapeDim * scale;
+            draw_solid_square(holdShapeDim, Color::black);
+            if (gameState.holdShapeType) {
+                Shape shape {*gameState.holdShapeType};
+                shape.pos = {};
+
+                auto is_even = [](auto const n) { return (n % 2) == 0; };
+                // offset to center shape inside hold square
+                auto const shapeDimensions {shape.dimensions()};
+                auto const xOffset {is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5};
+                auto const yOffset {is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5};
+
+                for (auto& position : shape.get_absolute_block_positions()) {
+                    Rect<int> square {
+                        static_cast<int>((position.x + gHoldShapeDim.x + xOffset) * scale),
+                        static_cast<int>((position.y + gHoldShapeDim.y + yOffset) * scale),
+                        scale,
+                        scale
+                    };
+                    draw_solid_square(square, shape.color);
+                }
+            }
+        }
     } break;
     }
 
