@@ -248,7 +248,28 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         // FIXME: the shadow doesn't seem to be transparent?
         draw_shape_in_play_area(gameState.currentShapeShadow);
 
-
+        // draw shape previews
+        {
+            auto const scale = get_window_scale();
+            auto const previewArray = gameState.shapePool.get_preview_shapes_array();
+            int i {0};
+            for (auto const shapeType : previewArray) {
+                Shape shape {shapeType};
+                shape.pos.x = gSidebarDim.x;
+                int const ySpacing {3};
+                shape.pos.y = gSidebarDim.y + ySpacing * i;
+                for (auto const& position : shape.get_absolute_block_positions()) {
+                    Rect<int> square {
+                        position.x * scale,
+                        position.y * scale,
+                        scale,
+                        scale
+                    };
+                    draw_solid_square(square, shape.color);
+                }
+                ++i;
+            }
+        }
     } break;
     }
 
