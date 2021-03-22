@@ -144,6 +144,7 @@ public:
     ~Context() noexcept {
         delete_solid_shader_buffers();
         delete_rainbow_shader_buffers();
+        delete_font_shader_buffers();
     }
 
     [[nodiscard]]
@@ -162,6 +163,10 @@ public:
         return m_rainbowShaderVAO;
     }
 
+    [[nodiscard]] auto font_shader_vao() const -> GLuint {
+        return m_fontShaderVAO;
+    }
+
 private:
     auto delete_solid_shader_buffers() -> void {
         glDeleteBuffers(1, &m_solidShaderEBO);
@@ -172,6 +177,11 @@ private:
         glDeleteBuffers(1, &m_rainbowShaderEBO);
         glDeleteBuffers(1, &m_rainbowShaderVBO);
         glDeleteVertexArrays(1, &m_rainbowShaderVAO);
+    }
+
+    auto delete_font_shader_buffers() -> void {
+        glDeleteBuffers(1, &m_fontShaderVBO);
+        glDeleteVertexArrays(1, &m_fontShaderVAO);
     }
 
     Shader::Program m_solid {
@@ -227,6 +237,10 @@ private:
     GLuint m_rainbowShaderVAO {0};
     GLuint m_rainbowShaderVBO {0};
     GLuint m_rainbowShaderEBO {0};
+
+    GLuint m_fontShaderVAO {0};
+    GLuint m_fontShaderVBO {0};
+    GLuint m_fontTexture {0};
 };
 
 

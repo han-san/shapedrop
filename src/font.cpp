@@ -1,15 +1,17 @@
 #include <string>
 #include <string_view>
 
+#include "font.hpp"
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
 #include "platform.hpp"
 
-#include "font.hpp"
-
 uchar static ttf_buffer[1<<25];
 stbtt_fontinfo font;
+BakedChars static bakedChars;
+BakedCharsBitmap bakedCharsBitmap {};
 
 // FIXME: Temporary implementation. Should probably use std::path or something.
 //        Also the path shouldn't be relative to the current working directory.
@@ -25,6 +27,13 @@ auto init_font(std::string const& fontName) -> bool
     if (!file) { return false; }
     fread(ttf_buffer, 1, 1<<25, file);
     stbtt_InitFont(&font, ttf_buffer, stbtt_GetFontOffsetForIndex(&(*ttf_buffer), 0));
+
+    auto constexpr fontHeight = 32;
+    auto constexpr offset = 0;
+    auto constexpr firstChar = 32;
+    auto constexpr charCount = 96;
+    stbtt_BakeFontBitmap(ttf_buffer, offset, fontHeight, bakedCharsBitmap.bitmap.data(), bakedCharsBitmap.w, bakedCharsBitmap.h, firstChar, charCount, bakedChars.data());
+
     return true;
 }
 
@@ -48,6 +57,14 @@ FontCharacter::FontCharacter(char const c, double const pixelHeight, char const 
 FontCharacter::~FontCharacter()
 {
     stbtt_FreeBitmap(bitmap, font.userdata); // TODO: find out this actually does
+}
+
+auto get_baked_chars() -> BakedChars const& {
+    return bakedChars;
+}
+
+auto get_baked_chars_bitmap() -> BakedCharsBitmap const& {
+    return bakedCharsBitmap;
 }
 
 FontString::FontString(std::string_view const string, double const pixelHeight)

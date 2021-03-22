@@ -1,8 +1,11 @@
 #pragma once
 
+#include <array>
 #include <string>
 #include <vector>
 #include <string_view>
+
+#include "stb_truetype.h"
 
 #include "jint.h"
 #include "util.hpp"
@@ -27,6 +30,16 @@ public:
     auto operator=(FontCharacter const&) -> FontCharacter& = delete;
     FontCharacter(FontCharacter const&) = delete;
 };
+
+using BakedChars = std::array<stbtt_bakedchar, 96>;
+[[nodiscard]] auto get_baked_chars() -> BakedChars const&;
+
+struct BakedCharsBitmap {
+    auto constexpr static w = 512;
+    auto constexpr static h = 512;
+    std::array<uchar, w * h> bitmap;
+};
+[[nodiscard]] auto get_baked_chars_bitmap() -> BakedCharsBitmap const&;
 
 class FontString {
 public:

@@ -114,6 +114,31 @@ Context::Context() {
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
         glEnableVertexAttribArray(1);
     }
+
+    // Set up the font shader's vbo, vao, ebo, and textures
+    {
+        auto const& bakedCharsBitmap = get_baked_chars_bitmap();
+
+        glGenTextures(1, &m_fontTexture);
+        glBindTexture(GL_TEXTURE_2D, m_fontTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bakedCharsBitmap.w, bakedCharsBitmap.h, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bakedCharsBitmap.bitmap.data());
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        glGenVertexArrays(1, &m_fontShaderVAO);
+        glGenBuffers(1, &m_fontShaderVBO);
+
+        glBindVertexArray(m_fontShaderVAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_fontShaderVBO);
+        // the vertex- and texture data gets filled in every time a character is drawn,
+        // so there's no need for them here.
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
 }
 
 Context::Context(Context&& other) noexcept
@@ -129,6 +154,10 @@ Context::Context(Context&& other) noexcept
     m_rainbowShaderEBO = std::exchange(other.m_rainbowShaderEBO, 0);
     m_rainbowShaderVAO = std::exchange(other.m_rainbowShaderVAO, 0);
     m_rainbowShaderVBO = std::exchange(other.m_rainbowShaderVBO, 0);
+
+    delete_font_shader_buffers();
+    m_fontShaderVAO = std::exchange(other.m_fontShaderVAO, 0);
+    m_fontShaderVBO = std::exchange(other.m_fontShaderVBO, 0);
 }
 
 auto Context::operator =(Context&& other) noexcept -> Context& {
@@ -147,6 +176,10 @@ auto Context::operator =(Context&& other) noexcept -> Context& {
     m_rainbowShaderEBO = std::exchange(other.m_rainbowShaderEBO, 0);
     m_rainbowShaderVAO = std::exchange(other.m_rainbowShaderVAO, 0);
     m_rainbowShaderVBO = std::exchange(other.m_rainbowShaderVBO, 0);
+
+    delete_font_shader_buffers();
+    m_fontShaderVAO = std::exchange(other.m_fontShaderVAO, 0);
+    m_fontShaderVBO = std::exchange(other.m_fontShaderVBO, 0);
 
     return *this;
 }
