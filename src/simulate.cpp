@@ -273,7 +273,10 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                                 gameState.backToBackType = BackToBackType::Tspin;
                             }
                         } break;
-                        default: {
+                        case ClearType::None:
+                        case ClearType::Single:
+                        case ClearType::Double:
+                        case ClearType::Triple: {
                             gameState.backToBackType = std::nullopt;
                         } break;
                     }
