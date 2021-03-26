@@ -1,12 +1,12 @@
-#include <string>
-#include <string_view>
-
 #include "font.hpp"
+
+#include "platform.hpp"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
-#include "platform.hpp"
+#include <string>
+#include <string_view>
 
 uchar static ttf_buffer[1<<25];
 stbtt_fontinfo font;

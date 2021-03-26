@@ -1,9 +1,10 @@
 #pragma once
 
-#include "fmt/core.h"
+#include "util.hpp"
 
 #include "jint.h"
-#include "util.hpp"
+
+#include "fmt/core.h"
 
 #include <stdexcept>
 

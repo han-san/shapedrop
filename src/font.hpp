@@ -1,14 +1,14 @@
 #pragma once
 
-#include <array>
-#include <string>
-#include <vector>
-#include <string_view>
+#include "jint.h"
+#include "util.hpp"
 
 #include "stb_truetype.h"
 
-#include "jint.h"
-#include "util.hpp"
+#include <array>
+#include <string>
+#include <string_view>
+#include <vector>
 
 class FontCharacter {
 public:

@@ -1,15 +1,15 @@
-#include <algorithm>
-#include <iostream>
-#include <string_view>
-#include <cassert>
+#include "simulate.hpp"
+
+#include "core.hpp"
+#include "rangealgorithms.hpp"
+#include "ui.hpp"
 
 #include "fmt/core.h"
 
-#include "core.hpp"
-#include "ui.hpp"
-#include "rangealgorithms.hpp"
-
-#include "simulate.hpp"
+#include <algorithm>
+#include <cassert>
+#include <iostream>
+#include <string_view>
 
 using namespace std::string_view_literals;
 

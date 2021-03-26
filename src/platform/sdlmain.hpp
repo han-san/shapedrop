@@ -1,14 +1,14 @@
 #pragma once
 
-#include <string_view>
-#include <vector>
+#include "../core.hpp"
+#include "../draw_opengl.hpp"
+#include "../input.hpp"
+#include "../util.hpp"
 
 #include "../jint.h"
 
-#include "../core.hpp"
-#include "../input.hpp"
-#include "../util.hpp"
-#include "../draw_opengl.hpp"
+#include <string_view>
+#include <vector>
 
 namespace platform::SDL {
 

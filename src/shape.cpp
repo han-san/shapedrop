@@ -1,13 +1,13 @@
+#include "shape.hpp"
+
+#include "board.hpp"
+#include "rangealgorithms.hpp"
+#include "util.hpp"
+
 #include <cassert>
 #include <random>
 #include <stdexcept>
 #include <string>
-
-#include "board.hpp"
-#include "util.hpp"
-#include "rangealgorithms.hpp"
-
-#include "shape.hpp"
 
 using namespace std::string_literals;
 

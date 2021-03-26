@@ -1,12 +1,13 @@
-#include "platform.hpp"
 #include "draw_opengl.hpp"
+
 #include "core.hpp"
 #include "draw.hpp"
+#include "platform.hpp"
 
 #include "glad/glad.h"
-#include "glm/mat4x4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include "glm/mat4x4.hpp"
 
 #include <utility>
 

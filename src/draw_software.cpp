@@ -1,8 +1,8 @@
 #include "draw_software.hpp"
 
-#include "ui.hpp"
 #include "font.hpp"
 #include "platform.hpp"
+#include "ui.hpp"
 
 #include <thread>
 

@@ -1,12 +1,12 @@
-#include <chrono>
-#include <thread>
+#include "core.hpp"
 
 #include "draw.hpp"
 #include "input.hpp"
 #include "simulate.hpp"
 #include "tests.hpp"
 
-#include "core.hpp"
+#include <chrono>
+#include <thread>
 
 auto run() -> void
 {

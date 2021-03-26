@@ -1,11 +1,11 @@
 #pragma once
 
-#include <array>
-#include <optional>
-
 #include "jint.h"
 #include "shape.hpp"
 #include "util.hpp"
+
+#include <array>
+#include <optional>
 
 struct Block {
     Color::RGBA color = Color::invalid;

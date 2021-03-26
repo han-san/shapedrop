@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
-#include <string_view>
-
 #include "core.hpp"
 #include "input.hpp"
 #include "util.hpp"
+
+#include <string>
+#include <string_view>
 
 namespace UI {
     // Sometimes the coordinates and sizes are relative to the entire window

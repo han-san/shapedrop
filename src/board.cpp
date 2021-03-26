@@ -1,12 +1,12 @@
-#include <algorithm>
-#include <cassert>
-#include <iostream>
-#include <optional>
+#include "board.hpp"
 
 #include "jint.h"
 #include "rangealgorithms.hpp"
 
-#include "board.hpp"
+#include <algorithm>
+#include <cassert>
+#include <iostream>
+#include <optional>
 
 auto Board::get_shadow(Shape const& shape) const -> Shape {
     auto shapeShadow = shape;

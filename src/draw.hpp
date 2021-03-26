@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string_view>
-
-#include "platform.hpp"
-#include "font.hpp"
-#include "util.hpp"
 #include "core.hpp"
+#include "font.hpp"
+#include "platform.hpp"
+#include "util.hpp"
+
+#include <string_view>
 
 [[nodiscard]] auto inline to_screen_space(Rect<double> const square) -> Rect<double> {
     auto const dim = get_window_dimensions();

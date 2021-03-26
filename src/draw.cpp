@@ -1,12 +1,11 @@
-#include <string_view>
+#include "draw.hpp"
 
 #include "core.hpp"
-#include "util.hpp"
-
-#include "draw.hpp"
 #include "draw_opengl.hpp"
 #include "draw_software.hpp"
+#include "util.hpp"
 
+#include <string_view>
 
 auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA color) -> void {
     switch (get_render_mode()) {

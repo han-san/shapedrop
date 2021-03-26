@@ -1,20 +1,20 @@
-#include <cassert>
-#include <string_view>
-#include <optional>
+#include "sdlmain.hpp"
+
+#include "../core.hpp"
+#include "../font.hpp"
+#include "../input.hpp"
+#include "../platform.hpp"
+#include "../util.hpp"
+
+#include "../jint.h"
 
 #include <glad/glad.h> // must be included before SDL
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include "../jint.h"
-
-#include "../core.hpp"
-#include "../input.hpp"
-#include "../font.hpp"
-#include "../util.hpp"
-#include "../platform.hpp"
-
-#include "sdlmain.hpp"
+#include <cassert>
+#include <string_view>
+#include <optional>
 
 namespace platform::SDL {
 

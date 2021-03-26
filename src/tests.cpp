@@ -1,8 +1,8 @@
-#include <cassert>
+#include "tests.hpp"
 
 #include "board.hpp"
 
-#include "tests.hpp"
+#include <cassert>
 
 namespace tests {
     auto remove_full_rows() -> void {

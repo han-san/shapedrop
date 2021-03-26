@@ -1,8 +1,8 @@
+#include "input.hpp"
+
 #include "core.hpp"
 #include "platform.hpp"
 #include "ui.hpp"
-
-#include "input.hpp"
 
 auto handle_input(ProgramState& programState, GameState& gameState) -> void {
     Event event;

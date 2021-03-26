@@ -1,16 +1,16 @@
-#include <cassert>
-#include <string>
-#include <vector>
-#include <string_view>
-
-#include "fmt/core.h"
+#include "ui.hpp"
 
 #include "core.hpp"
 #include "draw.hpp"
 #include "font.hpp"
 #include "util.hpp"
 
-#include "ui.hpp"
+#include "fmt/core.h"
+
+#include <cassert>
+#include <string>
+#include <string_view>
+#include <vector>
 
 using namespace std::string_literals;
 

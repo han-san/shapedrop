@@ -1,12 +1,12 @@
 #pragma once
 
+#include "board.hpp"
+#include "shape.hpp"
+#include "util.hpp"
+
 #include <array>
 #include <chrono>
 #include <optional>
-
-#include "board.hpp"
-#include "util.hpp"
-#include "shape.hpp"
 
 struct BackBuffer {
     void* memory {};

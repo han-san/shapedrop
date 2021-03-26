@@ -1,11 +1,11 @@
 #pragma once
 
-#include <array>
-#include <cassert>
+#include "jint.h"
 
 #include <gsl/gsl>
 
-#include "jint.h"
+#include <array>
+#include <cassert>
 
 using gsl::narrow_cast;
 
