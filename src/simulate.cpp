@@ -40,8 +40,6 @@ using namespace std::string_view_literals;
 //     If the shape is hard dropped (and actually moves from it)
 
 enum class ClearType {
-    // Don't change order. clearTypeScores and get_clear_type() depends on the
-    // specific order.
     None,
     Single,
     Double,
@@ -57,21 +55,35 @@ enum class ClearType {
     Tspin_mini_double,
 };
 
-std::array static constexpr clearTypeScores {
-    0,    // None
-    100,  // Single
-    300,  // Double
-    500,  // Triple
-    800,  // Tetris
+auto static clear_type_to_score(ClearType const c) -> int {
+    auto constexpr None = 0;
+    auto constexpr Single = 100;
+    auto constexpr Double = 300;
+    auto constexpr Triple = 500;
+    auto constexpr Tetris = 800;
+    auto constexpr Tspin = 400;
+    auto constexpr Tspin_single = 800;
+    auto constexpr Tspin_double = 1200;
+    auto constexpr Tspin_triple = 1600;
+    auto constexpr Tspin_mini = 100;
+    auto constexpr Tspin_mini_single = 200;
+    auto constexpr Tspin_mini_double = 1200;
 
-    400,  // T-Spin
-    800,  // T-Spin Single
-    1200, // T-Spin Double
-    1600, // T-Spin Triple
-    100,  // T-Spin Mini
-    200,  // T-Spin Mini Single
-    1200  // T-Spin Mini Double
-};
+    switch (c) {
+        case ClearType::None: return None;
+        case ClearType::Single: return Single;
+        case ClearType::Double: return Double;
+        case ClearType::Triple: return Triple;
+        case ClearType::Tetris: return Tetris;
+        case ClearType::Tspin: return Tspin;
+        case ClearType::Tspin_single: return Tspin_single;
+        case ClearType::Tspin_double: return Tspin_double;
+        case ClearType::Tspin_triple: return Tspin_triple;
+        case ClearType::Tspin_mini: return Tspin_mini;
+        case ClearType::Tspin_mini_single: return Tspin_mini_single;
+        case ClearType::Tspin_mini_double: return Tspin_mini_double;
+    }
+}
 
 [[nodiscard]] auto static get_clear_type(int const rowsCleared, std::optional<TspinType> const tspin) {
     assert(rowsCleared >= 0);
@@ -118,14 +130,7 @@ std::array static constexpr clearTypeScores {
 }
 
 [[nodiscard]] auto static calculate_score(ClearType const clearType, int const level) {
-    auto const index {static_cast<std::size_t>(clearType)};
-    assert(index < clearTypeScores.size());
-    return clearTypeScores[index] * level;
-}
-
-[[nodiscard]] auto static calculate_score(int const rowsCleared, std::optional<TspinType> tspin, int const level) {
-    auto const clearType {get_clear_type(rowsCleared, tspin)};
-    return calculate_score(clearType, level);
+    return clear_type_to_score(clearType) * level;
 }
 
 auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuState) -> void {
