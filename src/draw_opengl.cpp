@@ -242,7 +242,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             for (auto const& position : shape.get_absolute_block_positions()) {
                 // since the top 2 rows shouldn't be visible, the y
                 // position for drawing is 2 less than the shape's
-                auto const actualYPosition {position.y - 2};
+                auto const actualYPosition = position.y - 2;
 
                 // don't draw if square is above the playarea
                 if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) { continue; }
@@ -315,9 +315,9 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
                 auto is_even = [](auto const n) { return (n % 2) == 0; };
                 // offset to center shape inside hold square
-                auto const shapeDimensions {shape.dimensions()};
-                auto const xOffset {is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5};
-                auto const yOffset {is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5};
+                auto const shapeDimensions = shape.dimensions();
+                auto const xOffset = is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5;
+                auto const yOffset = is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5;
 
                 for (auto& position : shape.get_absolute_block_positions()) {
                     Rect<int> square {

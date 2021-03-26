@@ -8,12 +8,12 @@
 #include "core.hpp"
 
 [[nodiscard]] auto inline to_screen_space(Rect<double> const square) -> Rect<double> {
-    auto const dim {get_window_dimensions()};
+    auto const dim = get_window_dimensions();
     return { square.x * dim.w, square.y * dim.h, square.w * dim.w, square.h * dim.h };
 }
 
 [[nodiscard]] auto inline to_normalized(Rect<double> const square) -> Rect<double> {
-    auto const dim {get_window_dimensions()};
+    auto const dim = get_window_dimensions();
     return { square.x / dim.w, square.y / dim.h, square.w / dim.w, square.h / dim.h };
 }
 

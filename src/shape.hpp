@@ -43,7 +43,7 @@ public:
 
     // Returns the positions of the blocks relative to the top left corner of the play area
     [[nodiscard]] auto constexpr get_absolute_block_positions() const -> BlockStack {
-        auto positions {get_local_block_positions()};
+        auto positions = get_local_block_positions();
         for (auto& localPosition : positions) {
             localPosition.x += pos.x;
             localPosition.y += pos.y;
@@ -52,8 +52,8 @@ public:
     }
 
     [[nodiscard]] auto constexpr get_wallkicks(Shape::RotationDirection const dir) const -> std::array<V2, 4> {
-        auto const i {static_cast<gsl::index>(rotation)};
-        auto const j {static_cast<gsl::index>(dir)};
+        auto const i = static_cast<gsl::index>(rotation);
+        auto const j = static_cast<gsl::index>(dir);
 
         using gsl::at;
 
@@ -91,9 +91,9 @@ public:
     }
 
     auto constexpr friend operator +=(Rotation& rotationEnum, RotationDirection const& direction) noexcept -> Rotation& {
-        auto constexpr minRotationValue {static_cast<int>(Rotation::r0)};
-        auto constexpr maxRotationValue {static_cast<int>(Rotation::r270)};
-        auto rotationInt {static_cast<int>(rotationEnum)};
+        auto constexpr minRotationValue = static_cast<int>(Rotation::r0);
+        auto constexpr maxRotationValue = static_cast<int>(Rotation::r270);
+        auto rotationInt = static_cast<int>(rotationEnum);
         switch (direction) {
             case RotationDirection::Left: {
                 --rotationInt;
@@ -120,7 +120,7 @@ private:
     // Returns the positions of the blocks relative to the top left corner of its 4x4 rotation map
     [[nodiscard]] auto constexpr get_local_block_positions() const -> BlockStack {
         BlockStack positions {};
-        auto const& layout {get_layout()};
+        auto const& layout = get_layout();
         for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
             for (std::size_t x {0}; x < layoutDimensions.w; ++x) {
                 auto const index = gsl::narrow_cast<gsl::index>(y * layoutDimensions.w + x);
@@ -155,7 +155,7 @@ private:
         throw; // unreachable
     }
     [[nodiscard]] auto constexpr get_layout() const -> Layout const& {
-        auto const index {static_cast<RotationMap::size_type>(rotation)};
+        auto const index = static_cast<RotationMap::size_type>(rotation);
         switch (type) {
             case Shape::Type::I:
                 return RotationMaps::I[index];
@@ -227,8 +227,8 @@ private:
     };
 
     struct RotationMaps {
-        auto static constexpr o {false};
-        auto static constexpr X {true};
+        auto static constexpr o = false;
+        auto static constexpr X = true;
 
         RotationMap static constexpr I {
             Layout {

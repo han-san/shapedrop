@@ -15,7 +15,7 @@ struct BackBuffer {
     PositiveU8 bpp {};
 };
 
-auto constexpr gBorderSize {1};
+auto constexpr gBorderSize = 1;
 
 Rect<int> constexpr gHoldShapeDim {gBorderSize, gBorderSize, 5, 3};
 Rect<int> constexpr gPlayAreaDim {
@@ -27,8 +27,8 @@ Rect<int> constexpr gSidebarDim {
     4, (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)
 };
 
-auto constexpr gBaseWindowWidth {gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize};
-auto constexpr gBaseWindowHeight {gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize};
+auto constexpr gBaseWindowWidth = gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize;
+auto constexpr gBaseWindowHeight = gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize;
 
 ShapePool::DataType static constexpr initialShapes {
     Shape::Type::I,
@@ -45,8 +45,8 @@ enum class BackToBackType {
     Tspin
 };
 
-auto constexpr gMinLevel {1};
-auto constexpr gMaxLevel {99};
+auto constexpr gMinLevel = 1;
+auto constexpr gMaxLevel = 99;
 
 struct MenuState {
     int level {gMinLevel};
@@ -115,7 +115,7 @@ struct GameState {
 
     [[nodiscard]] auto drop_delay_for_level() const {
         using namespace std::chrono_literals;
-        auto const dropDelay {initialDropDelay - (this->level * 100ms)};
+        auto const dropDelay = initialDropDelay - (this->level * 100ms);
         // dropDelay can't be negative
         return dropDelay > 0s ? dropDelay : 0s;
     }

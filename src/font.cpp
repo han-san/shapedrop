@@ -22,7 +22,7 @@ BakedCharsBitmap bakedCharsBitmap {};
 
 auto init_font(std::string const& fontName) -> bool
 {
-    auto const filePath {get_font_path() + fontName};
+    auto const filePath = get_font_path() + fontName;
     auto* file {fopen(filePath.data(), "rb")};
     if (!file) { return false; }
     fread(ttf_buffer, 1, 1<<25, file);
@@ -69,18 +69,18 @@ auto get_baked_chars_bitmap() -> BakedCharsBitmap const& {
 
 FontString::FontString(std::string_view const string, double const pixelHeight)
 {
-    auto w {0.};
+    auto w = 0.;
 
-    auto const size {string.size()};
+    auto const size = string.size();
     data.reserve(size);
     for (std::size_t i {0}; i < size; ++i) {
-        auto const c {string[i]};
-        auto const nextChar {i + 1 == size ? '\0' : string[i + 1]};
-        auto const& fontCharacter {data.emplace_back(c, pixelHeight, nextChar)};
+        auto const c = string[i];
+        auto const nextChar = i + 1 == size ? '\0' : string[i + 1];
+        auto const& fontCharacter = data.emplace_back(c, pixelHeight, nextChar);
         w += fontCharacter.advance;
     }
 
-    auto const windim {get_window_dimensions()};
+    auto const windim = get_window_dimensions();
     normalizedDimensions = {
         w / windim.w,
         pixelHeight / windim.h,
@@ -88,13 +88,13 @@ FontString::FontString(std::string_view const string, double const pixelHeight)
 }
 
 auto FontString::get_text_width(std::string_view const text, double const fontHeight) -> double {
-    auto width {0.};
-    auto const scale {static_cast<double>(stbtt_ScaleForPixelHeight(&font, static_cast<float>(fontHeight)))};
-    auto const size {text.size()};
+    auto width = 0.;
+    auto const scale = static_cast<double>(stbtt_ScaleForPixelHeight(&font, static_cast<float>(fontHeight)));
+    auto const size = text.size();
     for (std::size_t i {0}; i < size; ++i) {
-        auto const c {text[i]};
-        auto const nextChar {(i + 1 == size) ? '\0' : text[i + 1]};
-        auto const advance {get_codepoint_kern_advance(c, nextChar, scale)};
+        auto const c = text[i];
+        auto const nextChar = (i + 1 == size) ? '\0' : text[i + 1];
+        auto const advance = get_codepoint_kern_advance(c, nextChar, scale);
         width += advance;
     }
 
@@ -108,10 +108,10 @@ auto FontString::get_text_width_normalized(std::string_view const text, double c
 auto FontString::from_width(std::string_view const string, double const desiredPixelWidth) -> FontString
 {
     // start with a reasonable pixelheight value
-    auto pixelHeight {12.};
+    auto pixelHeight = 12.;
 
     while (true) {
-        auto width {get_text_width(string, pixelHeight)};
+        auto width = get_text_width(string, pixelHeight);
 
         if (width > desiredPixelWidth) {
             pixelHeight -= 1.;

@@ -118,7 +118,7 @@ auto static to_string_view(ClearType const c) -> std::string_view {
             case 3: return ClearType::Triple;
             case 4: return ClearType::Tetris;
             default: {
-                auto errMsg {bad_row_count_msg(0, 4)};
+                auto errMsg = bad_row_count_msg(0, 4);
                 std::cerr << errMsg << '\n';
                 throw std::logic_error(errMsg);
             }
@@ -139,7 +139,7 @@ auto static to_string_view(ClearType const c) -> std::string_view {
             // going to be represented internally as a mini).
             return ClearType::Tspin_triple;
         default: {
-            auto errMsg {bad_row_count_msg(0, 3)};
+            auto errMsg = bad_row_count_msg(0, 3);
             std::cerr << errMsg << '\n';
             throw std::logic_error(errMsg);
         }
@@ -153,7 +153,7 @@ auto static to_string_view(ClearType const c) -> std::string_view {
 auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuState) -> void {
     if (programState.levelType == ProgramState::LevelType::Game) {
         auto const dropDelay = [&]() {
-            auto const levelDropDelay {gameState.drop_delay_for_level()};
+            auto const levelDropDelay = gameState.drop_delay_for_level();
             if (gameState.isSoftDropping && (GameState::softDropDelay < levelDropDelay)) {
                 return GameState::softDropDelay;
             } else {
@@ -165,7 +165,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
             // TODO: make it possible for shapes to drop more than one block
             // (e.g. at max drop speed it should drop all the way to the bottom
             // instantly)
-            auto const nextdropClock {gameState.dropClock + dropDelay};
+            auto const nextdropClock = gameState.dropClock + dropDelay;
             if (programState.frameStartClock > nextdropClock) {
                 gameState.dropClock = programState.frameStartClock;
                 if (gameState.board.try_move(gameState.currentShape, V2::down())) {
@@ -185,12 +185,11 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                 if (!gameState.board.is_valid_move(gameState.currentShape, V2::down())) {
                     // game over if entire piece is above visible portion
                     // of board
-                    auto const shapePositions {gameState.currentShape.get_absolute_block_positions()};
-                    auto gameOver {
-                        all_of(shapePositions, [](auto const& pos) {
-                               return pos.y < (Board::rows - Board::visibleRows);
-                               })
-                    };
+                    auto const shapePositions = gameState.currentShape.get_absolute_block_positions();
+                    auto gameOver = all_of(shapePositions,
+                                           [](auto const& pos) {
+                                           return pos.y < (Board::rows - Board::visibleRows);
+                                           });
 
                     // fix currentBlocks position on board
                     for (auto const position : shapePositions) {
@@ -199,11 +198,11 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                         gsl::at(gameState.board.data, index) = {gameState.currentShape.color, true};
                     }
 
-                    auto const tspin {gameState.currentRotationType ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType) : std::nullopt};
+                    auto const tspin = gameState.currentRotationType ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType) : std::nullopt;
 
-                    auto const rowsCleared {gameState.board.remove_full_rows()};
+                    auto const rowsCleared = gameState.board.remove_full_rows();
                     gameState.linesCleared += rowsCleared;
-                    auto const clearType {get_clear_type(rowsCleared, tspin)};
+                    auto const clearType = get_clear_type(rowsCleared, tspin);
                     auto const clearName = to_string_view(clearType);
                     if (!clearName.empty()) {
                         std::cout << clearName << std::endl;
@@ -234,7 +233,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                         case ClearType::Tspin_mini_single:
                         case ClearType::Tspin_mini_double: {
                             ++gameState.comboCounter;
-                            auto const comboScore {50 * gameState.comboCounter * gameState.level};
+                            auto const comboScore = 50 * gameState.comboCounter * gameState.level;
                             gameState.score += comboScore;
                             if (comboScore) {
                                 fmt::print(stderr, "Combo {}! {} pts.\n", gameState.comboCounter, comboScore);
@@ -249,7 +248,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                     }
 
                     // check for back to back tetris/t-spin
-                    auto backToBackModifier {1.0};
+                    auto backToBackModifier = 1.0;
                     switch (clearType) {
                         case ClearType::Tetris: {
                             if (gameState.backToBackType && (gameState.backToBackType == BackToBackType::Tetris)) {
@@ -281,7 +280,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                         } break;
                     }
 
-                    auto clearScore {static_cast<int>(calculate_score(clearType, gameState.level) * backToBackModifier)};
+                    auto clearScore = static_cast<int>(calculate_score(clearType, gameState.level) * backToBackModifier);
                     gameState.score += clearScore;
 
                     gameState.level = gameState.linesCleared / 10 + gameState.startingLevel;
@@ -313,13 +312,13 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
         }
 
         {
-            auto const fontSize {0.048};
+            auto const fontSize = 0.048;
             UI::label(fmt::format("Score: {}", gameState.score), fontSize, UI::XAlignment::Right);
 
             // Round up linesCleared to nearest 10
-            auto const linesRequired {(gameState.linesCleared / 10 + 1) * 10};
+            auto const linesRequired = (gameState.linesCleared / 10 + 1) * 10;
             // Not const since it's later moved
-            auto levelString {fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired)};
+            auto levelString = fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired);
             UI::label(std::move(levelString), fontSize, UI::XAlignment::Right, fontSize);
         }
 
@@ -344,11 +343,11 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
         }
 
     } else if (programState.levelType == ProgramState::LevelType::Menu) {
-        auto const highScoreFontSize {0.048};
+        auto const highScoreFontSize = 0.048;
         UI::label(fmt::format("High Score: {}", programState.highScore), highScoreFontSize, UI::XAlignment::Right);
 
-        auto const menuY {1. / 10.};
-        auto const menuFontSize {1. / 10.};
+        auto const menuY = 1. / 10.;
+        auto const menuFontSize = 1. / 10.;
         UI::begin_menu({0., menuY, 1., 1. - menuY});
         UI::label("ShapeDrop", menuFontSize, UI::XAlignment::Center);
         if (UI::button("Play", menuFontSize, UI::XAlignment::Center)) {

@@ -10,7 +10,7 @@ namespace SoftwareRender {
 
 [[nodiscard]] auto static alpha_blend_channel(PositiveU8 const bg, PositiveU8 const fg, PositiveU8 const alpha) -> PositiveU8
 {
-    auto const alphaRatio {u8 {alpha} / 255.};
+    auto const alphaRatio = u8 {alpha} / 255.;
     return static_cast<PositiveU8>(u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio));
 }
 
@@ -26,18 +26,18 @@ auto static draw_pixel(void* data, Color::RGBA const color) -> void
 
 auto static draw_font_character(BackBuffer& buf, FontCharacter const& fontCharacter, Point<int> const characterCoords) -> void
 {
-    for (auto y {0}; y < fontCharacter.dimensions.h; ++y) {
-        auto const currY {characterCoords.y + y + fontCharacter.yoff + static_cast<int>(fontCharacter.ascent * fontCharacter.scale)};
+    for (int y {0}; y < fontCharacter.dimensions.h; ++y) {
+        auto const currY = characterCoords.y + y + fontCharacter.yoff + static_cast<int>(fontCharacter.ascent * fontCharacter.scale);
         if (currY < 0 || static_cast<uint>(currY) >= uint {buf.dimensions.h}) { continue; }
-        for (auto x {0}; x < fontCharacter.dimensions.w; ++x) {
-            auto const currX {characterCoords.x + x + fontCharacter.xoff};
+        for (int x {0}; x < fontCharacter.dimensions.w; ++x) {
+            auto const currX = characterCoords.x + x + fontCharacter.xoff;
             if (currX < 0 || static_cast<uint>(currX) >= uint {buf.dimensions.w}) { continue; }
 
-            auto const currbyteindex {static_cast<uint>(currY) * uint {buf.dimensions.w} + static_cast<uint>(currX)};
-            auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
+            auto const currbyteindex = static_cast<uint>(currY) * uint {buf.dimensions.w} + static_cast<uint>(currX);
+            auto* currbyte = static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp});
 
-            auto const relativeIndex {static_cast<std::size_t>(y * fontCharacter.dimensions.w + x)};
-            auto const a {fontCharacter.bitmap[relativeIndex]};
+            auto const relativeIndex = static_cast<std::size_t>(y * fontCharacter.dimensions.w + x);
+            auto const a = fontCharacter.bitmap[relativeIndex];
 
             draw_pixel(currbyte, Color::RGBA {0u, 0u, 0u, a});
         }
@@ -63,7 +63,7 @@ auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString, 
 
 auto draw_text(BackBuffer& buf, std::string_view const text, Point<int> const coords, double const pixelHeight) -> void
 {
-    auto const fontString {FontString::from_height(text, pixelHeight)};
+    auto const fontString = FontString::from_height(text, pixelHeight);
     draw_font_string(buf, fontString, coords);
 }
 
@@ -78,18 +78,18 @@ auto draw_text_normalized(BackBuffer& buf, std::string_view const text, Point<do
 
 auto draw_solid_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const color) -> void
 {
-    for (auto y {0}; y < sqr.h; ++y) {
-        auto const pixely {static_cast<std::size_t>(sqr.y + y)};
+    for (int y {0}; y < sqr.h; ++y) {
+        auto const pixely = static_cast<std::size_t>(sqr.y + y);
         if ((sqr.y + y) < 0 || pixely >= uint {buf.dimensions.h}) {
             continue;
         }
-        for (auto x {0}; x < sqr.w; ++x) {
-            auto const pixelx {static_cast<std::size_t>(sqr.x + x)};
+        for (int x {0}; x < sqr.w; ++x) {
+            auto const pixelx = static_cast<std::size_t>(sqr.x + x);
             if ((sqr.x + x) < 0 || pixelx >= uint {buf.dimensions.w}) {
                 continue;
             }
 
-            auto const currbyteindex {pixely * uint {buf.dimensions.w} + pixelx};
+            auto const currbyteindex = pixely * uint {buf.dimensions.w} + pixelx;
             auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
             draw_pixel(currbyte, color);
@@ -112,12 +112,12 @@ auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA
 auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const color, int const borderSize) -> void
 {
     for (int y {0}; y < sqr.h; ++y) {
-        auto const pixely {static_cast<std::size_t>(sqr.y + y)};
+        auto const pixely = static_cast<std::size_t>(sqr.y + y);
         if (sqr.y + y < 0 || pixely >= uint {buf.dimensions.h}) {
             continue;
         }
         for (int x {0}; x < sqr.w; ++x) {
-            auto const pixelx {static_cast<std::size_t>(sqr.x + x)};
+            auto const pixelx = static_cast<std::size_t>(sqr.x + x);
             if (sqr.x + x < 0 || pixelx >= uint {buf.dimensions.w}) {
                 continue;
             }
@@ -128,7 +128,7 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr, Color::RGBA const 
                 continue;
             }
 
-            auto const currbyteindex {pixely * uint {buf.dimensions.w} + pixelx};
+            auto const currbyteindex = pixely * uint {buf.dimensions.w} + pixelx;
             auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
             draw_pixel(currbyte, color);
@@ -193,9 +193,9 @@ auto static draw_playarea_rows(BackBuffer bb, PositiveSize_t const startRow, Pos
     uint const scale {positiveScale};
     for (std::size_t y {startRow}; y < endRow; ++y) {
         for (std::size_t x {0}; x < Board::columns; ++x) {
-            auto currindex {y * Board::columns + x};
-            auto const& block {board.data[currindex]};
-            auto color {block.isActive ? block.color : Color::black};
+            auto currindex = y * Board::columns + x;
+            auto const& block = board.data[currindex];
+            auto color = block.isActive ? block.color : Color::black;
             Rect<int> square {
                 static_cast<int>((x + gPlayAreaDim.x) * scale),
                     static_cast<int>((y - 2 + gPlayAreaDim.y) * scale),
@@ -208,9 +208,9 @@ auto static draw_playarea_rows(BackBuffer bb, PositiveSize_t const startRow, Pos
 }
 
 auto draw(ProgramState& programState, GameState& gameState) -> void {
-    auto bb {get_back_buffer()};
-    auto const scale {get_window_scale()};
-    auto const threadCount {std::thread::hardware_concurrency()};
+    auto bb = get_back_buffer();
+    auto const scale = get_window_scale();
+    auto const threadCount = std::thread::hardware_concurrency();
     std::vector<std::thread> threads {};
     threads.reserve(threadCount);
 
@@ -223,7 +223,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     // draw window background
     {
-        auto const rowsPerThread {uint {bb.dimensions.h} / threadCount};
+        auto const rowsPerThread = uint {bb.dimensions.h} / threadCount;
         for (std::size_t i {0}; i < threadCount - 1; ++i) {
             threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * i}, PositiveSize_t {rowsPerThread * (i + 1)});
         }
@@ -238,7 +238,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             // draw playarea
             {
                 PositiveUInt const positiveScale {scale};
-                auto const rowsPerThread {(Board::rows - 2) / threadCount};
+                auto const rowsPerThread = (Board::rows - 2) / threadCount;
                 for (std::size_t i {0}; i < threadCount - 1; ++i) {
                     threads.emplace_back(&draw_playarea_rows, bb, PositiveSize_t {2 + (rowsPerThread * i)}, PositiveSize_t {2 + rowsPerThread * (i + 1)}, gameState.board, positiveScale);
                 }
@@ -251,7 +251,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
                 for (auto& position : shape.get_absolute_block_positions()) {
                     // since the top 2 rows shouldn't be visible, the y
                     // position for drawing is 2 less than the shape's
-                    auto const actualYPosition {position.y - 2};
+                    auto const actualYPosition = position.y - 2;
 
                     // don't draw if square is above the playarea
                     if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) { continue; }
@@ -270,12 +270,12 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             draw_shape_in_play_area(gameState.currentShape);
 
             // draw shape previews
-            auto const previewArray {gameState.shapePool.get_preview_shapes_array()};
-            auto i {0};
+            auto const previewArray = gameState.shapePool.get_preview_shapes_array();
+            auto i = 0;
             for (auto const shapeType : previewArray) {
                 Shape shape {shapeType};
                 shape.pos.x = gSidebarDim.x;
-                auto const ySpacing {3}; // max height of a shape is 2 + 1 for a block of space
+                auto const ySpacing = 3; // max height of a shape is 2 + 1 for a block of space
                 shape.pos.y = gSidebarDim.y + ySpacing * i;
                 for (auto& position : shape.get_absolute_block_positions()) {
                     Rect<int> square {
@@ -290,7 +290,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
             }
 
             // draw held shape
-            auto const holdShapeDim {gHoldShapeDim * scale};
+            auto const holdShapeDim = gHoldShapeDim * scale;
             draw_solid_square(bb, holdShapeDim, Color::black);
             if (gameState.holdShapeType) {
                 Shape shape {*gameState.holdShapeType};
@@ -298,9 +298,9 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
                 auto is_even = [](auto const n) { return (n % 2) == 0; };
                 // offset to center shape inside hold square
-                auto const shapeDimensions {shape.dimensions()};
-                auto const xOffset {is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5};
-                auto const yOffset {is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5};
+                auto const shapeDimensions = shape.dimensions();
+                auto const xOffset = is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5;
+                auto const yOffset = is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5;
 
                 for (auto& position : shape.get_absolute_block_positions()) {
                     Rect<int> square {

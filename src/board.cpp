@@ -9,7 +9,7 @@
 #include "board.hpp"
 
 auto Board::get_shadow(Shape const& shape) const -> Shape {
-    auto shapeShadow {shape};
+    auto shapeShadow = shape;
     while (try_move(shapeShadow, V2::down())) {
         // Intentionally empty body.
     }
@@ -26,7 +26,7 @@ auto Board::try_move(Shape& shape, V2 const move) const -> bool {
 }
 
 auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const -> std::optional<Shape::RotationType> {
-    auto rotatingShape {shape};
+    auto rotatingShape = shape;
     rotatingShape.rotation += dir;
     if (is_valid_shape(rotatingShape)) {
         shape.rotation = rotatingShape.rotation;
@@ -64,7 +64,7 @@ auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
 }
 
 auto Board::is_valid_shape(Shape const& shape) const -> bool {
-    auto const blockPositions {shape.get_absolute_block_positions()};
+    auto const blockPositions = shape.get_absolute_block_positions();
     return all_of(blockPositions, [this](auto const& position) {
                   return is_valid_spot(position);
                   });
@@ -76,11 +76,10 @@ auto Board::is_valid_shape(Shape const& shape) const -> bool {
 auto Board::check_for_tspin(Shape const& shape, Shape::RotationType const rotationType) const -> std::optional<TspinType> {
     if (shape.type == Shape::Type::T) {
         std::array<V2, 4> static constexpr cornerOffsets {V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
-        auto const cornersOccupied {
-            count_if(cornerOffsets, [this, &shape](auto const& offset) {
-                     return !is_valid_spot(shape.pos + offset);
-                     })
-        };
+        auto const cornersOccupied = count_if(cornerOffsets,
+                                              [this, &shape](auto const& offset) {
+                                              return !is_valid_spot(shape.pos + offset);
+                                              });
         if (cornersOccupied >= 3) {
             return (rotationType == Shape::RotationType::Wallkick) ? TspinType::Mini : TspinType::Regular;
         }
@@ -92,13 +91,12 @@ auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
     ArrayStack<u8, Shape::maxHeight> rowsCleared;
 
     for (u8 y {0}; y < rows; ++y) {
-        auto const rowStartIt {data.cbegin() + (y * columns)};
-        auto const rowEndIt {data.cbegin() + ((y + 1) * columns)};
-        auto const rowIsFull {
-            std::all_of(rowStartIt, rowEndIt, [](auto const& block) {
-                        return block.isActive;
-                        })
-        };
+        auto const rowStartIt = data.cbegin() + (y * columns);
+        auto const rowEndIt = data.cbegin() + ((y + 1) * columns);
+        auto const rowIsFull = std::all_of(rowStartIt, rowEndIt,
+                                           [](auto const& block) {
+                                           return block.isActive;
+                                           });
         if (rowIsFull) {
             rowsCleared.push_back(y);
         }
@@ -108,7 +106,7 @@ auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
 }
 
 auto Board::remove_full_rows() -> u8 {
-    auto const rowsCleared {get_cleared_rows()};
+    auto const rowsCleared = get_cleared_rows();
 
     if (rowsCleared.empty()) {
         return 0;
@@ -133,19 +131,18 @@ auto Board::remove_full_rows() -> u8 {
 
     // first move any potential rows between the cleared ones
     if (rowsCleared.size() == 2 || rowsCleared.size() == 3) {
-        auto const topRow {rowsCleared.front()};
-        auto const botRow {rowsCleared.back()};
+        auto const topRow = rowsCleared.front();
+        auto const botRow = rowsCleared.back();
         assert(topRow < rows);
         assert(botRow < rows);
         assert(botRow >= topRow);
 
         u8 emptyRowsPassed {0};
-        for (auto y {botRow}; y != topRow; --y) {
-            auto const found {
-                any_of(rowsCleared, [y](auto const& row) {
-                       return row == y;
-                       })
-            };
+        for (auto y = botRow; y != topRow; --y) {
+            auto const found = any_of(rowsCleared,
+                                      [y](auto const& row) {
+                                      return row == y;
+                                      });
             if (!found) {
                 // a non-full row between full rows
                 // move down the amount of empty rows that have been passed
@@ -157,7 +154,7 @@ auto Board::remove_full_rows() -> u8 {
     }
 
     // then move all rows above removed rows
-    auto const rowAboveRemovedRows {PositiveSize_t {rowsCleared.front()} - 1U};
+    PositiveSize_t const rowAboveRemovedRows {rowsCleared.front() - 1U};
     for (std::size_t y {0}; y <= rowAboveRemovedRows; ++y) {
         move_row_down(rowAboveRemovedRows - y, rowsCleared.size());
     }

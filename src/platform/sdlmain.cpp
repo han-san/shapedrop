@@ -18,7 +18,7 @@
 
 namespace platform::SDL {
 
-auto windowScale {1};
+auto windowScale = 1;
 
 struct {
     SDL_Window* handle;
@@ -206,7 +206,7 @@ auto init_window_opengl() {
 auto init_window_software() {
     SDL_Init(SDL_INIT_EVERYTHING);
 
-    auto newScale {windowScale};
+    auto newScale = windowScale;
     {
         Rect<int>::Size dim {};
         do {
@@ -216,8 +216,8 @@ auto init_window_software() {
     }
     --newScale;
     windowScale = newScale;
-    auto const initialWindowWidth {gBaseWindowWidth * windowScale};
-    auto const initialWindowHeight {gBaseWindowHeight * windowScale};
+    auto const initialWindowWidth = gBaseWindowWidth * windowScale;
+    auto const initialWindowHeight = gBaseWindowHeight * windowScale;
     window.dimensions.w = initialWindowWidth;
     window.dimensions.h = initialWindowHeight;
 
