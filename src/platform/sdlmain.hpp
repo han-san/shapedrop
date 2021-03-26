@@ -12,10 +12,7 @@
 
 namespace platform::SDL {
 
-enum class RenderMode {
-    software,
-    opengl
-};
+enum class RenderMode { software, opengl };
 
 auto swap_buffer() -> void;
 auto get_back_buffer() -> BackBuffer;
@@ -26,4 +23,4 @@ auto get_event() -> Event;
 auto get_render_mode() -> RenderMode;
 auto get_opengl_render_context() -> OpenGLRender::Context const&;
 
-}
+} // namespace platform::SDL
