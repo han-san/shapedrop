@@ -52,8 +52,8 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
 
 auto Board::is_valid_spot(Point<int> const pos) const -> bool {
     if (point_is_in_rect(pos, {0, 0, columns, rows})) {
-        auto const index {static_cast<std::size_t>(pos.y * columns + pos.x)};
-        return !data[index].isActive;
+        gsl::index const index {pos.y * columns + pos.x};
+        return !gsl::at(data, index).isActive;
     }
     return false;
 }
@@ -118,10 +118,10 @@ auto Board::remove_full_rows() -> u8 {
         assert(std::size_t {distance} != 0);
         assert(std::size_t {rowNumber} + std::size_t {distance} < rows);
         for (u8 x {0}; x < columns; ++x) {
-            std::size_t const index {rowNumber * columns + x};
-            std::size_t const newIndex {(rowNumber + distance) * columns + x};
-            auto& oldBlock {this->data[index]};
-            auto& newBlock {this->data[newIndex]};
+            auto const index = gsl::narrow_cast<gsl::index>(std::size_t {rowNumber * columns + x});
+            auto const newIndex = gsl::narrow_cast<gsl::index>(std::size_t {(rowNumber + distance) * columns + x});
+            auto& oldBlock = gsl::at(data, index);
+            auto& newBlock = gsl::at(data, newIndex);
             newBlock = oldBlock;
             oldBlock.isActive = false;
             oldBlock.color = Color::black;

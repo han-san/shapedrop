@@ -52,8 +52,10 @@ public:
     }
 
     [[nodiscard]] auto constexpr get_wallkicks(Shape::RotationDirection const dir) const -> std::array<V2, 4> {
-        auto const i {static_cast<std::size_t>(rotation)};
-        auto const j {static_cast<std::size_t>(dir)};
+        auto const i {static_cast<gsl::index>(rotation)};
+        auto const j {static_cast<gsl::index>(dir)};
+
+        using gsl::at;
 
         switch (type) {
             case Shape::Type::J:
@@ -61,10 +63,10 @@ public:
             case Shape::Type::S:
             case Shape::Type::T:
             case Shape::Type::Z: {
-                return WallKicks::JLSTZ[i][j];
+                return at(at(WallKicks::JLSTZ, i), j);
             }
             case Shape::Type::I: {
-                return WallKicks::I[i][j];
+                return at(at(WallKicks::I, i), j);
             }
             case Shape::Type::O:
                 return {};
@@ -121,8 +123,8 @@ private:
         auto const& layout {get_layout()};
         for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
             for (std::size_t x {0}; x < layoutDimensions.w; ++x) {
-                std::size_t const index {y * layoutDimensions.w + x};
-                if (layout[index]) {
+                auto const index = gsl::narrow_cast<gsl::index>(y * layoutDimensions.w + x);
+                if (gsl::at(layout, index)) {
                     positions.push_back({static_cast<int>(x), static_cast<int>(y)});
                     if (positions.size() == positions.max_size()) {
                         return positions;

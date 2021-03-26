@@ -173,8 +173,8 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                     // fix currentBlocks position on board
                     for (auto const position : shapePositions) {
                         assert(gameState.board.is_valid_spot(position));
-                        auto const boardIndex {static_cast<std::size_t>(position.y * gameState.board.columns + position.x)};
-                        gameState.board.data[boardIndex] = {gameState.currentShape.color, true};
+                        gsl::index index {position.y * gameState.board.columns + position.x};
+                        gsl::at(gameState.board.data, index) = {gameState.currentShape.color, true};
                     }
 
                     auto const tspin {gameState.currentRotationType ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType) : std::nullopt};
