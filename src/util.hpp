@@ -7,6 +7,8 @@
 
 #include "jint.h"
 
+using gsl::narrow_cast;
+
 template <typename T>
 class PositiveGeneric {
     using ThisType = PositiveGeneric<T>;
@@ -269,10 +271,10 @@ public:
 
     [[nodiscard]] auto constexpr begin() noexcept -> iterator { return m_data.begin(); }
     [[nodiscard]] auto constexpr begin() const noexcept -> const_iterator { return m_data.begin(); }
-    [[nodiscard]] auto constexpr end() noexcept -> iterator { return begin() + static_cast<difference_type>(m_size); }
-    [[nodiscard]] auto constexpr end() const noexcept -> const_iterator { return begin() + static_cast<difference_type>(m_size); }
+    [[nodiscard]] auto constexpr end() noexcept -> iterator { return begin() + narrow_cast<difference_type>(m_size); }
+    [[nodiscard]] auto constexpr end() const noexcept -> const_iterator { return begin() + narrow_cast<difference_type>(m_size); }
     [[nodiscard]] auto constexpr cbegin() const noexcept -> const_iterator { return m_data.cbegin(); }
-    [[nodiscard]] auto constexpr cend() const noexcept -> const_iterator { return cbegin() + static_cast<difference_type>(m_size); }
+    [[nodiscard]] auto constexpr cend() const noexcept -> const_iterator { return cbegin() + narrow_cast<difference_type>(m_size); }
     [[nodiscard]] auto constexpr front() -> reference { return m_data.front(); }
     [[nodiscard]] auto constexpr front() const -> const_reference { return m_data.front(); }
     [[nodiscard]] auto constexpr back() -> reference { return m_data[m_size - 1]; }
