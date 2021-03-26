@@ -85,6 +85,23 @@ auto static clear_type_to_score(ClearType const c) -> int {
     }
 }
 
+auto static to_string_view(ClearType const c) -> std::string_view {
+    switch (c) {
+        case ClearType::None: return "";
+        case ClearType::Single: return "Single";
+        case ClearType::Double: return "Double";
+        case ClearType::Triple: return "Triple";
+        case ClearType::Tetris: return "Tetris";
+        case ClearType::Tspin: return "Tspin";
+        case ClearType::Tspin_single: return "Tspin_single";
+        case ClearType::Tspin_double: return "Tspin_double";
+        case ClearType::Tspin_triple: return "Tspin_triple";
+        case ClearType::Tspin_mini: return "Tspin_mini";
+        case ClearType::Tspin_mini_single: return "Tspin_mini_single";
+        case ClearType::Tspin_mini_double: return "Tspin_mini_double";
+    }
+}
+
 [[nodiscard]] auto static get_clear_type(int const rowsCleared, std::optional<TspinType> const tspin) {
     assert(rowsCleared >= 0);
     assert(rowsCleared <= 4);
@@ -187,21 +204,7 @@ auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuS
                     auto const rowsCleared {gameState.board.remove_full_rows()};
                     gameState.linesCleared += rowsCleared;
                     auto const clearType {get_clear_type(rowsCleared, tspin)};
-                    std::array static constexpr clearTypeToName {
-                        ""sv,
-                            "Single"sv,
-                            "Double"sv,
-                            "Triple"sv,
-                            "Tetris"sv,
-                            "T-Spin"sv,
-                            "T-Spin Single"sv,
-                            "T-Spin Double"sv,
-                            "T-Spin Triple"sv,
-                            "T-Spin Mini"sv,
-                            "T-Spin Mini Single"sv,
-                            "T-Spin Mini Double"sv,
-                    };
-                    auto const clearName {clearTypeToName[static_cast<std::size_t>(clearType)]};
+                    auto const clearName = to_string_view(clearType);
                     if (!clearName.empty()) {
                         std::cout << clearName << std::endl;
                     }
