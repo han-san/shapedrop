@@ -162,5 +162,5 @@ auto Board::remove_full_rows() -> u8 {
         move_row_down(rowAboveRemovedRows - y, rowsCleared.size());
     }
 
-    return static_cast<u8>(rowsCleared.size());
+    return gsl::narrow_cast<u8>(rowsCleared.size());
 }

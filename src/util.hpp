@@ -3,6 +3,8 @@
 #include <array>
 #include <cassert>
 
+#include <gsl/gsl>
+
 #include "jint.h"
 
 template <typename T>
@@ -23,42 +25,42 @@ public:
         : PositiveGeneric {sllong {i}}
     {}
     explicit PositiveGeneric(sllong const i)
-        : m_value {static_cast<T>(i)}
+        : m_value {gsl::narrow_cast<T>(i)}
     {
         // make sure it fits the type's range
         assert(i >= 0);
         assert(static_cast<T>(-1) >= i);
     }
     constexpr PositiveGeneric(uchar const i)
-        : m_value {static_cast<T>(i)}
+        : m_value {gsl::narrow_cast<T>(i)}
     {
         if constexpr (sizeof(i) > sizeof(T)) {
             assert(static_cast<T>(-1) >= i);
         }
     }
     constexpr PositiveGeneric(ushort const i)
-        : m_value {static_cast<T>(i)}
+        : m_value {gsl::narrow_cast<T>(i)}
     {
         if constexpr (sizeof(i) > sizeof(T)) {
             assert(static_cast<T>(-1) >= i);
         }
     }
     constexpr PositiveGeneric(uint const i)
-        : m_value {static_cast<T>(i)}
+        : m_value {gsl::narrow_cast<T>(i)}
     {
         if constexpr (sizeof(i) > sizeof(T)) {
             assert(static_cast<T>(-1) >= i);
         }
     }
     constexpr PositiveGeneric(ulong const i)
-        : m_value {i}
+        : m_value {gsl::narrow_cast<T>(i)}
     {
         if constexpr (sizeof(i) > sizeof(T)) {
             assert(static_cast<T>(-1) >= i);
         }
     }
     constexpr PositiveGeneric(ullong const i)
-        : m_value {i}
+        : m_value {gsl::narrow_cast<T>(i)}
     {
         if constexpr (sizeof(i) > sizeof(T)) {
             assert(static_cast<T>(-1) >= i);
