@@ -13,7 +13,6 @@ namespace UI {
     // children's regions. These two classes make sure that values of one scale
     // aren't accidentally assigned to variables of the other scale.
     class WindowScale {
-        double value;
     public:
         WindowScale() noexcept = default;
         [[nodiscard]] constexpr explicit operator double() const { return value; }
@@ -47,10 +46,11 @@ namespace UI {
         [[nodiscard]] auto constexpr friend operator /(WindowScale lhs, WindowScale const& rhs) -> WindowScale {
             return lhs /= rhs;
         }
+    private:
+        double value;
     };
 
     class RelativeScale {
-        double value;
     public:
         RelativeScale() noexcept = default;
         [[nodiscard]] constexpr explicit operator double() const { return value; }
@@ -84,6 +84,8 @@ namespace UI {
         [[nodiscard]] auto constexpr friend operator /(RelativeScale lhs, RelativeScale const& rhs) -> RelativeScale {
             return lhs /= rhs;
         }
+    private:
+        double value;
     };
 
     using WindowScalePoint = Point<WindowScale>;
