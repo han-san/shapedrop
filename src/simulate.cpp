@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <exception>
 #include <iostream>
 #include <string_view>
 
@@ -95,6 +96,8 @@ auto static clear_type_to_score(ClearType const c) -> int {
   case ClearType::Tspin_mini_double:
     return Tspin_mini_double;
   }
+  // Unreachable.
+  std::terminate();
 }
 
 auto static to_string_view(ClearType const c) -> std::string_view {
@@ -124,6 +127,8 @@ auto static to_string_view(ClearType const c) -> std::string_view {
   case ClearType::Tspin_mini_double:
     return "Tspin_mini_double";
   }
+  // Unreachable.
+  std::terminate();
 }
 
 [[nodiscard]] auto static get_clear_type(int const rowsCleared,

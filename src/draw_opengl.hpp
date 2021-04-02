@@ -8,6 +8,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/mat4x4.hpp"
 
+#include <exception>
 #include <utility>
 
 namespace OpenGLRender {
@@ -63,6 +64,8 @@ public:
     case Uniform::projection:
       return "projection";
     }
+    // Unreachable.
+    std::terminate();
   }
 
   auto static to_string(Uniform const u) -> std::string {

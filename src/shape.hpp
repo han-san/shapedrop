@@ -6,6 +6,7 @@
 
 #include "fmt/core.h"
 
+#include <exception>
 #include <stdexcept>
 
 class Shape {
@@ -68,7 +69,8 @@ public:
     case Shape::Type::O:
       return {};
     }
-    throw; // unreachable
+    // Unreachable.
+    std::terminate();
   }
 
   [[nodiscard]] auto constexpr dimensions() const -> Rect<int>::Size {
@@ -84,7 +86,8 @@ public:
     case Type::T:
       return {3, 2};
     }
-    throw; // unreachable
+    // Unreachable.
+    std::terminate();
   }
 
   auto constexpr friend operator+=(Rotation& rotation,
@@ -173,7 +176,8 @@ private:
     case Type::T:
       return Color::Shape::T;
     }
-    throw; // unreachable
+    // Unreachable.
+    std::terminate();
   }
   [[nodiscard]] auto constexpr get_layout() const -> Layout const& {
     auto const index = static_cast<RotationMap::size_type>(rotation);
@@ -193,7 +197,8 @@ private:
     case Shape::Type::T:
       return RotationMaps::T[index];
     }
-    throw; // unreachable
+    // Unreachable.
+    std::terminate();
   }
 
   struct WallKicks {

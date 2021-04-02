@@ -8,6 +8,7 @@
 #include "fmt/core.h"
 
 #include <cassert>
+#include <exception>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -99,7 +100,8 @@ std::vector<Background> static backgrounds {};
     case XAlignment::Right:
       return workingRegion.x + workingRegion.w - width;
     }
-    throw; // unreachable
+    // Unreachable.
+    std::terminate();
   }();
 
   return {x, y};
