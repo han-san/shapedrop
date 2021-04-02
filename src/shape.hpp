@@ -87,28 +87,45 @@ public:
     throw; // unreachable
   }
 
-  auto constexpr friend operator+=(Rotation& rotationEnum,
+  auto constexpr friend operator+=(Rotation& rotation,
                                    RotationDirection const& direction) noexcept
       -> Rotation& {
-    auto constexpr minRotationValue = static_cast<int>(Rotation::r0);
-    auto constexpr maxRotationValue = static_cast<int>(Rotation::r270);
-    auto rotationInt = static_cast<int>(rotationEnum);
     switch (direction) {
-    case RotationDirection::Left: {
-      --rotationInt;
-      if (rotationInt < minRotationValue) {
-        rotationInt = maxRotationValue;
+    case RotationDirection::Left:
+      switch (rotation) {
+      case Rotation::r0:
+        rotation = Rotation::r270;
+        break;
+      case Rotation::r90:
+        rotation = Rotation::r0;
+        break;
+      case Rotation::r180:
+        rotation = Rotation::r90;
+        break;
+      case Rotation::r270:
+        rotation = Rotation::r180;
+        break;
       }
-    } break;
-    case RotationDirection::Right: {
-      ++rotationInt;
-      if (rotationInt > maxRotationValue) {
-        rotationInt = minRotationValue;
+      break;
+    case RotationDirection::Right:
+      switch (rotation) {
+      case Rotation::r0:
+        rotation = Rotation::r90;
+        break;
+      case Rotation::r90:
+        rotation = Rotation::r180;
+        break;
+      case Rotation::r180:
+        rotation = Rotation::r270;
+        break;
+      case Rotation::r270:
+        rotation = Rotation::r0;
+        break;
       }
-    } break;
+      break;
     }
-    rotationEnum = static_cast<Rotation>(rotationInt);
-    return rotationEnum;
+
+    return rotation;
   }
 
 private:
