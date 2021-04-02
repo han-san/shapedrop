@@ -10,6 +10,7 @@
 #include <cassert>
 #include <exception>
 #include <iostream>
+#include <stdexcept>
 #include <string_view>
 
 using namespace std::string_view_literals;
@@ -133,9 +134,6 @@ auto static to_string_view(ClearType const c) -> std::string_view {
 
 [[nodiscard]] auto static get_clear_type(int const rowsCleared,
                                          std::optional<TspinType> const tspin) {
-  assert(rowsCleared >= 0);
-  assert(rowsCleared <= 4);
-
   auto bad_row_count_msg = [rowsCleared](std::size_t min, std::size_t max) {
     return fmt::format("The amount of rows cleared should be between {} and "
                        "{}, but is currently {}",
@@ -155,14 +153,12 @@ auto static to_string_view(ClearType const c) -> std::string_view {
     case 4:
       return ClearType::Tetris;
     default: {
-      auto errMsg = bad_row_count_msg(0, 4);
-      std::cerr << errMsg << '\n';
-      throw std::logic_error(errMsg);
+      auto const errMsg = bad_row_count_msg(0, 4);
+      throw std::invalid_argument(errMsg);
     }
     }
   }
 
-  assert(rowsCleared <= 3); // A t-spin can't clear more than 3 rows.
   switch (rowsCleared) {
   case 0:
     return *tspin == TspinType::Mini ? ClearType::Tspin_mini : ClearType::Tspin;
@@ -177,10 +173,10 @@ auto static to_string_view(ClearType const c) -> std::string_view {
     // distinction between regular and mini (although it's
     // going to be represented internally as a mini).
     return ClearType::Tspin_triple;
+  // T-spins can't clear more than 3 rows.
   default: {
     auto errMsg = bad_row_count_msg(0, 3);
-    std::cerr << errMsg << '\n';
-    throw std::logic_error(errMsg);
+    throw std::invalid_argument(errMsg);
   }
   }
 }
