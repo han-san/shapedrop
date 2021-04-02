@@ -158,8 +158,7 @@ private:
         type, rotation));
   }
 
-  [[nodiscard]] auto static constexpr type_to_color(Type const type)
-      -> Color::RGBA {
+  [[nodiscard]] auto static constexpr to_color(Type const type) -> Color::RGBA {
     switch (type) {
     case Type::I:
       return Color::Shape::I;
