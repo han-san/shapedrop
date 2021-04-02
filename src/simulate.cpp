@@ -152,32 +152,43 @@ auto static to_string_view(ClearType const c) -> std::string_view {
       return ClearType::Triple;
     case 4:
       return ClearType::Tetris;
-    default: {
+    default:
       auto const errMsg = bad_row_count_msg(0, 4);
       throw std::invalid_argument(errMsg);
     }
+  }
+
+  if (*tspin == TspinType::Mini) {
+    switch (rowsCleared) {
+    case 0:
+      return ClearType::Tspin_mini;
+    case 1:
+      return ClearType::Tspin_mini_single;
+    case 2:
+      return ClearType::Tspin_mini_double;
+    case 3:
+      // T-spin triple requires a wallkick so there is no
+      // distinction between regular and mini (although it's
+      // going to be represented internally as a mini).
+      return ClearType::Tspin_triple;
+    default:
+      auto errMsg = bad_row_count_msg(0, 3);
+      throw std::invalid_argument(errMsg);
     }
   }
 
   switch (rowsCleared) {
   case 0:
-    return *tspin == TspinType::Mini ? ClearType::Tspin_mini : ClearType::Tspin;
+    return ClearType::Tspin;
   case 1:
-    return *tspin == TspinType::Mini ? ClearType::Tspin_mini_single
-                                     : ClearType::Tspin_single;
+    return ClearType::Tspin_single;
   case 2:
-    return *tspin == TspinType::Mini ? ClearType::Tspin_mini_double
-                                     : ClearType::Tspin_double;
+    return ClearType::Tspin_double;
   case 3:
-    // T-spin triple requires a wallkick so there is no
-    // distinction between regular and mini (although it's
-    // going to be represented internally as a mini).
     return ClearType::Tspin_triple;
-  // T-spins can't clear more than 3 rows.
-  default: {
+  default:
     auto errMsg = bad_row_count_msg(0, 3);
     throw std::invalid_argument(errMsg);
-  }
   }
 }
 
