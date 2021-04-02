@@ -43,8 +43,8 @@ auto init_font(std::string const& fontName) -> bool {
                                                      char const nextCodepoint,
                                                      double const scale)
     -> double {
-  int advance;
-  int lsb;
+  int advance {};
+  int lsb {};
   stbtt_GetCodepointHMetrics(&font, codepoint, &advance, &lsb);
   return scale *
          static_cast<double>(advance + stbtt_GetCodepointKernAdvance(

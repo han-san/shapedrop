@@ -12,14 +12,15 @@
 
 class FontCharacter {
 public:
-  uchar* bitmap;
-  Rect<int>::Size dimensions;
-  int xoff, yoff;
-  int ascent;
-  char character;
+  uchar* bitmap {};
+  Rect<int>::Size dimensions {};
+  int xoff {};
+  int yoff {};
+  int ascent {};
+  char character {};
   // advance depends on scale and must be declared after
-  double scale;
-  double advance;
+  double scale {};
+  double advance {};
 
   FontCharacter(char c, double pixelHeight, char nextChar);
   ~FontCharacter();

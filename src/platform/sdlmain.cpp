@@ -21,10 +21,10 @@ namespace platform::SDL {
 auto windowScale = 1;
 
 struct {
-  SDL_Window* handle;
-  SDL_Surface* surface;
-  SDL_Surface* bbSurface;
-  Rect<int>::Size dimensions;
+  SDL_Window* handle {};
+  SDL_Surface* surface {};
+  SDL_Surface* bbSurface {};
+  Rect<int>::Size dimensions {};
 } window {};
 
 SDL_GLContext g_glContext {};
