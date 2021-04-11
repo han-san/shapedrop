@@ -22,14 +22,13 @@ endif()
 
 target_compile_features(ShapeDrop PRIVATE cxx_std_17)
 
-if(MSVC)
-    target_compile_options(ShapeDrop PRIVATE /W4)
-    target_link_libraries(ShapeDrop PUBLIC SDL2main)
-else()
-    target_compile_options(ShapeDrop PRIVATE -Wall -Wextra -Wpedantic)
-endif()
+target_compile_options(ShapeDrop PRIVATE
+    $<$<CXX_COMPILER_ID:Clang,AppleClang>:-Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic>
+    $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic>
+    $<$<CXX_COMPILER_ID:MSVC>:/W4>)
 
 target_link_libraries(ShapeDrop PUBLIC
+    $<$<PLATFORM_ID:Windows>:SDL2main>
     SDL2-static
     fmt::fmt
     glad
