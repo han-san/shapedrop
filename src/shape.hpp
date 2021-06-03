@@ -25,7 +25,6 @@ public:
 
   enum class Rotation { r0, r90, r180, r270 };
 
-  Rotation rotation {Rotation::r0};
   Color::RGBA color {Color::invalid};
   Point<int> pos;
 
@@ -49,7 +48,7 @@ public:
 
   [[nodiscard]] auto constexpr get_wallkicks(
       Shape::RotationDirection const dir) const -> std::array<V2, 4> {
-    auto const i = static_cast<gsl::index>(rotation);
+    auto const i = static_cast<gsl::index>(m_rotation);
     auto const j = static_cast<gsl::index>(dir);
 
     using gsl::at;
@@ -132,6 +131,11 @@ public:
 
   [[nodiscard]] auto type() const noexcept -> Type { return m_type; }
 
+  auto rotate(RotationDirection const dir) -> Shape& {
+    m_rotation += dir;
+    return *this;
+  }
+
 private:
   Rect<std::size_t>::Size static constexpr layoutDimensions {4, 4};
   using Layout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
@@ -156,7 +160,7 @@ private:
     }
     throw std::logic_error(fmt::format(
         "Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.",
-        m_type, rotation));
+        m_type, m_rotation));
   }
 
   [[nodiscard]] auto static constexpr to_color(Type const type) -> Color::RGBA {
@@ -181,7 +185,7 @@ private:
   }
 
   [[nodiscard]] auto constexpr get_layout() const -> Layout const& {
-    auto const index = static_cast<RotationMap::size_type>(rotation);
+    auto const index = static_cast<RotationMap::size_type>(m_rotation);
     switch (m_type) {
     case Shape::Type::I:
       return RotationMaps::I[index];
@@ -441,6 +445,7 @@ private:
   };
 
   Type m_type;
+  Rotation m_rotation {Rotation::r0};
 };
 
 class ShapePool {

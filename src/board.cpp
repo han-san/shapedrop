@@ -28,9 +28,9 @@ auto Board::try_move(Shape& shape, V2 const move) const -> bool {
 auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
     -> std::optional<Shape::RotationType> {
   auto rotatingShape = shape;
-  rotatingShape.rotation += dir;
+  rotatingShape.rotate(dir);
   if (is_valid_shape(rotatingShape)) {
-    shape.rotation = rotatingShape.rotation;
+    shape = rotatingShape;
     return Shape::RotationType::Regular;
   }
 
