@@ -273,8 +273,7 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   auto backToBackModifier = 1.0;
   switch (clearType) {
   case ClearType::Tetris: {
-    if (gameState.backToBackType and
-        (gameState.backToBackType == BackToBackType::Tetris)) {
+    if (gameState.backToBackType == BackToBackType::Tetris) {
       std::cerr << "Back to back Tetris\n";
       backToBackModifier = 1.5;
     } else {
@@ -288,8 +287,7 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   case ClearType::Tspin_double:
   case ClearType::Tspin_mini_double:
   case ClearType::Tspin_triple: {
-    if (gameState.backToBackType and
-        (gameState.backToBackType == BackToBackType::Tspin)) {
+    if (gameState.backToBackType == BackToBackType::Tspin) {
       std::cerr << "Back to back T-Spin\n";
       backToBackModifier = 1.5;
     } else {
