@@ -25,7 +25,7 @@ target_compile_features(ShapeDrop PRIVATE cxx_std_17)
 target_compile_options(ShapeDrop PRIVATE
     $<$<CXX_COMPILER_ID:Clang,AppleClang>:-Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic>
     $<$<CXX_COMPILER_ID:GNU>:-Wall -Wextra -Wpedantic>
-    $<$<CXX_COMPILER_ID:MSVC>:/W4>)
+    $<$<CXX_COMPILER_ID:MSVC>:/W4 /permissive->)
 
 target_link_libraries(ShapeDrop PUBLIC
     $<$<PLATFORM_ID:Windows>:SDL2main>
