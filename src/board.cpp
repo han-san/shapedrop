@@ -54,7 +54,7 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
 auto Board::is_valid_spot(Point<int> const pos) const -> bool {
   if (point_is_in_rect(pos, {0, 0, columns, rows})) {
     gsl::index const index {pos.y * columns + pos.x};
-    return !gsl::at(data, index).isActive;
+    return !block_at(index).isActive;
   }
   return false;
 }
@@ -97,8 +97,8 @@ auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
   ArrayStack<u8, Shape::maxHeight> rowsCleared;
 
   for (u8 y {0}; y < rows; ++y) {
-    auto const rowStartIt = data.cbegin() + (y * columns);
-    auto const rowEndIt = data.cbegin() + ((y + 1) * columns);
+    auto const rowStartIt = m_data.cbegin() + (y * columns);
+    auto const rowEndIt = m_data.cbegin() + ((y + 1) * columns);
     auto const rowIsFull = std::all_of(
         rowStartIt, rowEndIt, [](auto const& block) { return block.isActive; });
     if (rowIsFull) {
@@ -125,8 +125,8 @@ auto Board::remove_full_rows() -> u8 {
           gsl::narrow_cast<gsl::index>(std::size_t {rowNumber * columns + x});
       auto const newIndex = gsl::narrow_cast<gsl::index>(
           std::size_t {(rowNumber + distance) * columns + x});
-      auto& oldBlock = gsl::at(data, index);
-      auto& newBlock = gsl::at(data, newIndex);
+      auto& oldBlock = block_at(index);
+      auto& newBlock = block_at(newIndex);
       newBlock = oldBlock;
       oldBlock.isActive = false;
       oldBlock.color = Color::black;

@@ -224,8 +224,8 @@ auto static draw_playarea_rows(BackBuffer bb, PositiveSize_t const startRow,
   uint const scale {positiveScale};
   for (std::size_t y {startRow}; y < endRow; ++y) {
     for (std::size_t x {0}; x < Board::columns; ++x) {
-      auto currindex = y * Board::columns + x;
-      auto const& block = board.data[currindex];
+      auto currindex = gsl::narrow_cast<gsl::index>(y * Board::columns + x);
+      auto const& block = board.block_at(currindex);
       auto color = block.isActive ? block.color : Color::black;
       Rect<int> square {static_cast<int>((x + gPlayAreaDim.x) * scale),
                         static_cast<int>((y - 2 + gPlayAreaDim.y) * scale),

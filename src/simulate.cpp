@@ -211,7 +211,7 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   for (auto const position : shapePositions) {
     assert(gameState.board.is_valid_spot(position));
     gsl::index index {position.y * gameState.board.columns + position.x};
-    gsl::at(gameState.board.data, index) = {gameState.currentShape.color, true};
+    gameState.board.block_at(index) = {gameState.currentShape.color, true};
   }
 
   auto const tspin =

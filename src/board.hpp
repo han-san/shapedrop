@@ -20,8 +20,13 @@ public:
   u8 static constexpr columns {10};
   u8 static constexpr visibleRows {rows - 2};
 
-  std::array<Block, rows * columns> data {
-      make_filled_array<Block, rows * columns>({Color::black, false})};
+  [[nodiscard]] auto block_at(gsl::index i) -> Block& {
+    return gsl::at(m_data, i);
+  }
+
+  [[nodiscard]] auto block_at(gsl::index i) const -> Block const& {
+    return gsl::at(m_data, i);
+  }
 
   auto rotate_shape(Shape& shape, Shape::RotationDirection dir) const
       -> std::optional<Shape::RotationType>;
@@ -39,4 +44,7 @@ public:
 private:
   [[nodiscard]] auto get_cleared_rows() const
       -> ArrayStack<u8, Shape::maxHeight>;
+
+  std::array<Block, rows * columns> m_data {
+      make_filled_array<Block, rows * columns>({Color::black, false})};
 };
