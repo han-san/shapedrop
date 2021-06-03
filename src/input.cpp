@@ -112,10 +112,10 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
           if (gameState.holdShapeType) {
             auto const holdType = *gameState.holdShapeType;
 
-            gameState.holdShapeType = gameState.currentShape.type;
+            gameState.holdShapeType = gameState.currentShape.type();
             gameState.currentShape = Shape {holdType};
           } else {
-            gameState.holdShapeType = gameState.currentShape.type;
+            gameState.holdShapeType = gameState.currentShape.type();
             gameState.currentShape = gameState.shapePool.next_shape();
           }
 

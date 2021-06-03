@@ -11,8 +11,8 @@
 
 using namespace std::string_literals;
 
-Shape::Shape(Type const ttype) noexcept
-    : type {ttype}, color {to_color(ttype)}, pos {Board::columns / 2 - 2, 0} {}
+Shape::Shape(Type const type) noexcept
+    : m_type {type}, color {to_color(type)}, pos {Board::columns / 2 - 2, 0} {}
 
 ShapePool::ShapePool(ShapePool::DataType const& shapes)
     : shapePool {shapes}, previewPool {shapes} {

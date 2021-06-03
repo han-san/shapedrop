@@ -78,7 +78,7 @@ auto Board::is_valid_shape(Shape const& shape) const -> bool {
 auto Board::check_for_tspin(Shape const& shape,
                             Shape::RotationType const rotationType) const
     -> std::optional<TspinType> {
-  if (shape.type == Shape::Type::T) {
+  if (shape.type() == Shape::Type::T) {
     std::array<V2, 4> static constexpr cornerOffsets {
         V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
     auto const cornersOccupied =
