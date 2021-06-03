@@ -304,7 +304,7 @@ public:
     return maxSize;
   }
   [[nodiscard]] auto constexpr empty() const noexcept -> bool {
-    return !m_size;
+    return m_size == 0;
   }
   auto constexpr push_back(const_reference i) -> void {
     assert(m_size < maxSize);
