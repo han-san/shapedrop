@@ -9,7 +9,8 @@
 
 using gsl::narrow_cast;
 
-template <typename T> class PositiveGeneric {
+template <typename T>
+class PositiveGeneric {
   using ThisType = PositiveGeneric<T>;
 
 public:
@@ -58,7 +59,8 @@ public:
     return m_value;
   }
 
-  template <typename U> operator PositiveGeneric<U>() const noexcept {
+  template <typename U>
+  operator PositiveGeneric<U>() const noexcept {
     return m_value;
   }
 
@@ -146,7 +148,8 @@ using PositiveU32 = PositiveGeneric<u32>;
 using PositiveU64 = PositiveGeneric<u64>;
 using PositiveSize_t = PositiveGeneric<std::size_t>;
 
-template <typename T> struct V2Generic {
+template <typename T>
+struct V2Generic {
   T x {};
   T y {};
 
@@ -211,7 +214,8 @@ struct Shape {
 };
 } // namespace Color
 
-template <typename T> struct Rect {
+template <typename T>
+struct Rect {
   T x {};
   T y {};
   T w {};
@@ -234,7 +238,8 @@ template <typename T> struct Rect {
   }
 };
 
-template <typename T> struct Point {
+template <typename T>
+struct Point {
   T x {};
   T y {};
 
@@ -249,7 +254,8 @@ template <typename T> struct Point {
   }
 };
 
-template <typename T, std::size_t maxSize> class ArrayStack {
+template <typename T, std::size_t maxSize>
+class ArrayStack {
   using ArrayType = std::array<T, maxSize>;
 
 public:
