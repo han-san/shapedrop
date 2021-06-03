@@ -152,7 +152,7 @@ auto label(std::string text, WindowScale const fontHeight,
   label(std::move(text), region);
 
   auto const screenSpaceRegion = to_screen_space(to_squaref(region));
-  return clicked && point_is_in_rect(cursor, screenSpaceRegion);
+  return clicked and point_is_in_rect(cursor, screenSpaceRegion);
 }
 
 auto button(std::string text, WindowScale const fontHeight,

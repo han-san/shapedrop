@@ -97,7 +97,7 @@ auto static window_fits_on_screen(Rect<int>::Size windowDimensions) -> bool {
   SDL_Rect displayBounds {};
   SDL_GetDisplayUsableBounds(0, &displayBounds);
 
-  return windowDimensions.w < displayBounds.w &&
+  return windowDimensions.w < displayBounds.w and
          windowDimensions.h < displayBounds.h;
 }
 

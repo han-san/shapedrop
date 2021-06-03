@@ -57,7 +57,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
           gameState.currentRotationType = rotation;
           // if you rotate the piece you cancel the drop
           gameState.droppedRows = 0;
-          if ((rotation == Shape::RotationType::Wallkick) && isGrounded) {
+          if ((rotation == Shape::RotationType::Wallkick) and isGrounded) {
             gameState.softDropRowCount = 0;
           }
         }
