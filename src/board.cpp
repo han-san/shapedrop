@@ -137,7 +137,7 @@ auto Board::remove_full_rows() -> u8 {
   // between full rows which need to be moved different amounts
 
   // first move any potential rows between the cleared ones
-  if (rowsCleared.size() == 2 || rowsCleared.size() == 3) {
+  if (rowsCleared.size() == 2 or rowsCleared.size() == 3) {
     auto const topRow = rowsCleared.front();
     auto const botRow = rowsCleared.back();
     assert(topRow < rows);

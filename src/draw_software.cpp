@@ -33,12 +33,12 @@ auto static draw_font_character(BackBuffer& buf,
     auto const currY =
         characterCoords.y + y + fontCharacter.yoff +
         static_cast<int>(fontCharacter.ascent * fontCharacter.scale);
-    if (currY < 0 || static_cast<uint>(currY) >= uint {buf.dimensions.h}) {
+    if (currY < 0 or static_cast<uint>(currY) >= uint {buf.dimensions.h}) {
       continue;
     }
     for (int x {0}; x < fontCharacter.dimensions.w; ++x) {
       auto const currX = characterCoords.x + x + fontCharacter.xoff;
-      if (currX < 0 || static_cast<uint>(currX) >= uint {buf.dimensions.w}) {
+      if (currX < 0 or static_cast<uint>(currX) >= uint {buf.dimensions.w}) {
         continue;
       }
 
@@ -94,12 +94,12 @@ auto draw_solid_square(BackBuffer& buf, Rect<int> const sqr,
                        Color::RGBA const color) -> void {
   for (int y {0}; y < sqr.h; ++y) {
     auto const pixely = static_cast<std::size_t>(sqr.y + y);
-    if ((sqr.y + y) < 0 || pixely >= uint {buf.dimensions.h}) {
+    if ((sqr.y + y) < 0 or pixely >= uint {buf.dimensions.h}) {
       continue;
     }
     for (int x {0}; x < sqr.w; ++x) {
       auto const pixelx = static_cast<std::size_t>(sqr.x + x);
-      if ((sqr.x + x) < 0 || pixelx >= uint {buf.dimensions.w}) {
+      if ((sqr.x + x) < 0 or pixelx >= uint {buf.dimensions.w}) {
         continue;
       }
 
@@ -126,17 +126,17 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr,
                         Color::RGBA const color, int const borderSize) -> void {
   for (int y {0}; y < sqr.h; ++y) {
     auto const pixely = static_cast<std::size_t>(sqr.y + y);
-    if (sqr.y + y < 0 || pixely >= uint {buf.dimensions.h}) {
+    if (sqr.y + y < 0 or pixely >= uint {buf.dimensions.h}) {
       continue;
     }
     for (int x {0}; x < sqr.w; ++x) {
       auto const pixelx = static_cast<std::size_t>(sqr.x + x);
-      if (sqr.x + x < 0 || pixelx >= uint {buf.dimensions.w}) {
+      if (sqr.x + x < 0 or pixelx >= uint {buf.dimensions.w}) {
         continue;
       }
 
       // check if pixel is part of border
-      if (not point_is_in_rect(Point<int> {x, y}, {0, 0, sqr.w, sqr.h}) ||
+      if (not point_is_in_rect(Point<int> {x, y}, {0, 0, sqr.w, sqr.h}) or
           point_is_in_rect(Point<int> {x, y},
                            {borderSize, borderSize, sqr.w - borderSize * 2,
                             sqr.h - borderSize * 2})) {

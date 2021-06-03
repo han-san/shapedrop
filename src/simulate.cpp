@@ -234,7 +234,7 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   if (clearType != ClearType::None) {
     // you shouldn't be able to soft drop and hard drop at the same
     // time.
-    assert(not gameState.droppedRows || not gameState.softDropRowCount);
+    assert(not gameState.droppedRows or not gameState.softDropRowCount);
     gameState.score += 2 * gameState.droppedRows;
     gameState.score += gameState.softDropRowCount;
   }
