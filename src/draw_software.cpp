@@ -136,7 +136,7 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> const sqr,
       }
 
       // check if pixel is part of border
-      if (!point_is_in_rect(Point<int> {x, y}, {0, 0, sqr.w, sqr.h}) ||
+      if (not point_is_in_rect(Point<int> {x, y}, {0, 0, sqr.w, sqr.h}) ||
           point_is_in_rect(Point<int> {x, y},
                            {borderSize, borderSize, sqr.w - borderSize * 2,
                             sqr.h - borderSize * 2})) {

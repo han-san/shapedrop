@@ -54,7 +54,7 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
 auto Board::is_valid_spot(Point<int> const pos) const -> bool {
   if (point_is_in_rect(pos, {0, 0, columns, rows})) {
     gsl::index const index {pos.y * columns + pos.x};
-    return !block_at(index).isActive;
+    return not block_at(index).isActive;
   }
   return false;
 }
@@ -82,7 +82,7 @@ auto Board::check_for_tspin(Shape const& shape,
         V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
     auto const cornersOccupied =
         count_if(cornerOffsets, [this, &shape](auto const& offset) {
-          return !is_valid_spot(shape.pos + offset);
+          return not is_valid_spot(shape.pos + offset);
         });
     if (cornersOccupied >= 3) {
       return (rotationType == Shape::RotationType::Wallkick)
@@ -148,7 +148,7 @@ auto Board::remove_full_rows() -> u8 {
     for (auto y = botRow; y != topRow; --y) {
       auto const found =
           any_of(rowsCleared, [y](auto const& row) { return row == y; });
-      if (!found) {
+      if (not found) {
         // a non-full row between full rows
         // move down the amount of empty rows that have been passed
         move_row_down(y, emptyRowsPassed);

@@ -268,7 +268,7 @@ auto main(int argc, char** argv) -> int {
     context = &(*openglRenderContext);
   }
 
-  if (!init_font("DejaVuSans.ttf")) {
+  if (not init_font("DejaVuSans.ttf")) {
     assert(false);
     return 1;
   }

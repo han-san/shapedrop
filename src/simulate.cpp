@@ -140,7 +140,7 @@ auto static to_string_view(ClearType const c) -> std::string_view {
                        min, max, rowsCleared);
   };
 
-  if (!tspin) {
+  if (not tspin) {
     switch (rowsCleared) {
     case 0:
       return ClearType::None;
@@ -224,7 +224,7 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   gameState.linesCleared += rowsCleared;
   auto const clearType = get_clear_type(rowsCleared, tspin);
   auto const clearName = to_string_view(clearType);
-  if (!clearName.empty()) {
+  if (not clearName.empty()) {
     std::cout << clearName << std::endl;
   }
 
@@ -234,7 +234,7 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   if (clearType != ClearType::None) {
     // you shouldn't be able to soft drop and hard drop at the same
     // time.
-    assert(!gameState.droppedRows || !gameState.softDropRowCount);
+    assert(not gameState.droppedRows || not gameState.softDropRowCount);
     gameState.score += 2 * gameState.droppedRows;
     gameState.score += gameState.softDropRowCount;
   }
@@ -320,7 +320,7 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   gameState.hasHeld = false;
 
   // game over if the new shape spawned on top of another shape
-  if (!gameState.board.is_valid_shape(gameState.currentShape)) {
+  if (not gameState.board.is_valid_shape(gameState.currentShape)) {
     gameOver = true;
   }
 
@@ -345,7 +345,7 @@ auto static simulate_game(ProgramState& programState, GameState& gameState)
     }
   }();
 
-  if (!gameState.paused) {
+  if (not gameState.paused) {
     // TODO: make it possible for shapes to drop more than one block
     // (e.g. at max drop speed it should drop all the way to the bottom
     // instantly)
@@ -367,7 +367,8 @@ auto static simulate_game(ProgramState& programState, GameState& gameState)
     if (programState.frameStartClock >
         gameState.lockClock + GameState::lockDelay) {
       // only care about locking if currentShape is on top of a block
-      if (!gameState.board.is_valid_move(gameState.currentShape, V2::down())) {
+      if (not gameState.board.is_valid_move(gameState.currentShape,
+                                            V2::down())) {
         lock_current_shape(gameState, programState);
       }
     }

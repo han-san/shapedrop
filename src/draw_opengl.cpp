@@ -270,7 +270,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         auto const currIndex =
             gsl::narrow_cast<gsl::index>(y * Board::columns + x);
         auto const& block = gameState.board.block_at(currIndex);
-        if (!block.isActive) {
+        if (not block.isActive) {
           continue;
         }
 

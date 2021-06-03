@@ -57,7 +57,7 @@ std::vector<Background> static backgrounds {};
   // where the child's y coordinate ends.
   auto const& menu = menus.back();
   auto currentRegion = menu.region;
-  if (!menu.children.empty()) {
+  if (not menu.children.empty()) {
     auto const& child = menu.children.back();
     currentRegion.y = child.y + child.h;
     currentRegion.h = menu.region.h - (currentRegion.y - menu.region.y);
@@ -108,7 +108,7 @@ std::vector<Background> static backgrounds {};
 }
 
 auto static add_region_as_child_of_current_menu(WindowScaleRect const region) {
-  if (!menus.empty()) {
+  if (not menus.empty()) {
     menus.back().children.push_back(region);
   }
 }

@@ -33,8 +33,8 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
       auto move_horizontal = [&](HorDir const dir) {
         // if currentShape is on top of a block before move,
         // the drop clock needs to be reset
-        auto const isGrounded =
-            !gameState.board.is_valid_move(gameState.currentShape, V2::down());
+        auto const isGrounded = not gameState.board.is_valid_move(
+            gameState.currentShape, V2::down());
         auto const dirVec = dir == HorDir::Right ? V2::right() : V2::left();
         if (gameState.board.try_move(gameState.currentShape, dirVec)) {
           update_shadow_and_clocks(isGrounded);
@@ -49,8 +49,8 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
       auto rotate_current_shape = [&](Shape::RotationDirection rot) {
         // if currentShape is on top of a block before rotation,
         // the drop clock needs to be reset
-        auto const isGrounded =
-            !gameState.board.is_valid_move(gameState.currentShape, V2::down());
+        auto const isGrounded = not gameState.board.is_valid_move(
+            gameState.currentShape, V2::down());
         if (auto const rotation =
                 gameState.board.rotate_shape(gameState.currentShape, rot)) {
           update_shadow_and_clocks(isGrounded);
@@ -77,7 +77,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
         // will continue resetting it while the button is pressed.
         // In order to avoid that we check if isSoftDropping has
         // been set, which only happens during spam.
-        if (!gameState.isSoftDropping) {
+        if (not gameState.isSoftDropping) {
           gameState.softDropRowCount = 0;
         }
         gameState.isSoftDropping = true;
@@ -106,7 +106,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
       } else if (event.type == Event::Type::Rotate_right) {
         rotate_current_shape(Shape::RotationDirection::Right);
       } else if (event.type == Event::Type::Hold) {
-        if (!gameState.hasHeld) {
+        if (not gameState.hasHeld) {
           gameState.hasHeld = true;
           gameState.currentRotationType = std::nullopt;
           if (gameState.holdShapeType) {
@@ -122,12 +122,12 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
           gameState.softDropRowCount = 0;
           gameState.droppedRows = 0;
 
-          auto const isGrounded = !gameState.board.is_valid_move(
+          auto const isGrounded = not gameState.board.is_valid_move(
               gameState.currentShape, V2::down());
           update_shadow_and_clocks(isGrounded);
         }
       } else if (event.type == Event::Type::Pause) {
-        gameState.paused = !gameState.paused;
+        gameState.paused = not gameState.paused;
         // TODO: maybe save the amount of clocks left when the game was paused
         // and set them again here.
         gameState.dropClock = programState.frameStartClock;
