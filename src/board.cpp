@@ -19,7 +19,7 @@ auto Board::get_shadow(Shape const& shape) const -> Shape {
 
 auto Board::try_move(Shape& shape, V2 const move) const -> bool {
   if (is_valid_move(shape, move)) {
-    shape.pos += move;
+    shape.translate(move);
     return true;
   }
   return false;
@@ -40,10 +40,9 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
     // rotatingShape already has the new rotation, but has to reset its
     // position every time it checks a new kick.
     rotatingShape.pos = shape.pos;
-    rotatingShape.pos.x += kickMove.x;
     // the y in kicks is bottom up while it's top down for the shape
-    // position so we have to invert it by subtracting instead of adding
-    rotatingShape.pos.y -= kickMove.y;
+    // position so we have to negate it for the translation.
+    rotatingShape.translate({kickMove.x, -kickMove.y});
     if (is_valid_shape(rotatingShape)) {
       shape = rotatingShape;
       return Shape::RotationType::Wallkick;
@@ -61,7 +60,7 @@ auto Board::is_valid_spot(Point<int> const pos) const -> bool {
 }
 
 auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
-  shape.pos += move;
+  shape.translate(move);
   return is_valid_shape(shape);
 }
 

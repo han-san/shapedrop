@@ -136,6 +136,11 @@ public:
     return *this;
   }
 
+  auto translate(V2 const dir) -> Shape& {
+    pos += dir;
+    return *this;
+  }
+
 private:
   Rect<std::size_t>::Size static constexpr layoutDimensions {4, 4};
   using Layout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
