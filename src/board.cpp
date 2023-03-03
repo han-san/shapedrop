@@ -7,6 +7,8 @@
 #include <cassert>
 #include <iostream>
 #include <optional>
+#include <ranges>
+#include <span>
 
 auto Board::get_shadow(Shape const& shape) const -> Shape {
   auto shapeShadow = shape;
@@ -94,17 +96,19 @@ auto Board::check_for_tspin(Shape const& shape,
 }
 
 auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
+  using std::ranges::copy_if, std::ranges::all_of, std::views::iota,
+      std::back_inserter, std::span;
+
   ArrayStack<u8, Shape::maxHeight> rowsCleared;
 
-  for (u8 y {0}; y < rows; ++y) {
-    auto const rowStartIt = m_data.cbegin() + (y * columns);
-    auto const rowEndIt = m_data.cbegin() + ((y + 1) * columns);
-    auto const rowIsFull = std::all_of(
-        rowStartIt, rowEndIt, [](auto const& block) { return block.isActive; });
-    if (rowIsFull) {
-      rowsCleared.push_back(y);
-    }
-  }
+  const auto row_is_full = [this](auto y) {
+    const auto rowStartIterator = std::next(m_data.cbegin(), y * columns);
+    const auto row = span(rowStartIterator, std::size_t {columns});
+    return all_of(row, &Block::isActive);
+  };
+
+  const auto& yValues = iota(0_u8, rows);
+  copy_if(yValues, back_inserter(rowsCleared), row_is_full);
 
   return rowsCleared;
 }
