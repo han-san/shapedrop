@@ -1,0 +1,1 @@
+Checks: '*,-fuchsia-*,-google-*,-android*,-zircon-*,-abseil-*,-altera**,-llvm-*,-llvmlibc-*,-readability-identifier-length,-hicpp*'
