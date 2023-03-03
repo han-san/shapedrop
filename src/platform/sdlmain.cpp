@@ -8,9 +8,10 @@
 
 #include "../jint.h"
 
+#include <glad/glad.h> // must be included before SDL
+
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <glad/glad.h> // must be included before SDL
 
 #include <cassert>
 #include <optional>
