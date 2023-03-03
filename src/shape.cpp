@@ -1,7 +1,6 @@
 #include "shape.hpp"
 
 #include "board.hpp"
-#include "rangealgorithms.hpp"
 #include "util.hpp"
 
 #include <cassert>
@@ -21,8 +20,8 @@ ShapePool::ShapePool(ShapePool::DataType const& shapes)
 
 auto ShapePool::reshuffle() -> void {
   // TODO: seed random engine
-  shuffle(shapePool, std::default_random_engine());
-  shuffle(previewPool, std::default_random_engine());
+  std::ranges::shuffle(shapePool, std::default_random_engine());
+  std::ranges::shuffle(previewPool, std::default_random_engine());
 }
 
 auto ShapePool::next_shape() -> Shape {
@@ -30,7 +29,7 @@ auto ShapePool::next_shape() -> Shape {
   if (currentShapeIndex == shapePool.size()) {
     shapePool = previewPool;
     currentShapeIndex = 0;
-    shuffle(previewPool, std::default_random_engine());
+    std::ranges::shuffle(previewPool, std::default_random_engine());
   }
   return Shape {shapePool[currentShapeIndex]};
 }

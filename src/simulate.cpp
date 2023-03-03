@@ -1,7 +1,6 @@
 #include "simulate.hpp"
 
 #include "core.hpp"
-#include "rangealgorithms.hpp"
 #include "ui.hpp"
 
 #include "fmt/core.h"
@@ -203,7 +202,7 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   // of board
   auto const shapePositions =
       gameState.currentShape.get_absolute_block_positions();
-  auto gameOver = all_of(shapePositions, [](auto const& pos) {
+  auto gameOver = std::ranges::all_of(shapePositions, [](auto const& pos) {
     return pos.y < (Board::rows - Board::visibleRows);
   });
 

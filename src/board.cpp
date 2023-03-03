@@ -1,7 +1,6 @@
 #include "board.hpp"
 
 #include "jint.h"
-#include "rangealgorithms.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -68,7 +67,7 @@ auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
 
 auto Board::is_valid_shape(Shape const& shape) const -> bool {
   auto const blockPositions = shape.get_absolute_block_positions();
-  return all_of(blockPositions, [this](auto const& position) {
+  return std::ranges::all_of(blockPositions, [this](auto const& position) {
     return is_valid_spot(position);
   });
 }
@@ -82,8 +81,8 @@ auto Board::check_for_tspin(Shape const& shape,
   if (shape.type() == Shape::Type::T) {
     std::array<V2, 4> static constexpr cornerOffsets {
         V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
-    auto const cornersOccupied =
-        count_if(cornerOffsets, [this, &shape](auto const& offset) {
+    auto const cornersOccupied = std::ranges::count_if(
+        cornerOffsets, [this, &shape](auto const& offset) {
           return not is_valid_spot(shape.pos + offset);
         });
     if (cornersOccupied >= 3) {
@@ -150,8 +149,8 @@ auto Board::remove_full_rows() -> u8 {
 
     u8 emptyRowsPassed {0};
     for (auto y = botRow; y != topRow; --y) {
-      auto const found =
-          any_of(rowsCleared, [y](auto const& row) { return row == y; });
+      auto const found = std::ranges::any_of(
+          rowsCleared, [y](auto const& row) { return row == y; });
       if (not found) {
         // a non-full row between full rows
         // move down the amount of empty rows that have been passed
