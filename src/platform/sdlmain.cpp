@@ -31,7 +31,7 @@ SDL_GLContext g_glContext {};
 
 OpenGLRender::Context static* context = nullptr;
 
-RenderMode g_renderMode {RenderMode::opengl};
+RenderMode g_renderMode {RenderMode::software};
 
 auto get_render_mode() -> RenderMode { return g_renderMode; }
 
@@ -270,6 +270,7 @@ auto main(int argc, char** argv) -> int {
 
   if (not init_font("DejaVuSans.ttf")) {
     assert(false);
+    abort();
     return 1;
   }
 

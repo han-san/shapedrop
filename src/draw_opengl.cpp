@@ -10,6 +10,7 @@
 #include "glm/mat4x4.hpp"
 
 #include <utility>
+#include <stdexcept>
 
 namespace OpenGLRender {
 
@@ -23,7 +24,7 @@ Shader::Shader(GLenum shaderType, GLchar const* src) {
     if (success == 0) {
       char infoLog[512];
       glGetShaderInfoLog(shaderHandle, 512, nullptr, infoLog);
-      throw std::exception(infoLog);
+      throw std::logic_error(infoLog);
     }
   }
   m_handle = shaderHandle;
@@ -44,7 +45,7 @@ Shader::Program::Program(GLchar const* vertexSource,
     if (success == 0) {
       char infoLog[512];
       glGetProgramInfoLog(programHandle, 512, nullptr, infoLog);
-      throw std::exception(infoLog);
+      throw std::logic_error(infoLog);
     }
   }
 

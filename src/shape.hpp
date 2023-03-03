@@ -165,7 +165,7 @@ private:
     }
     throw std::logic_error(fmt::format(
         "Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.",
-        m_type, m_rotation));
+        static_cast<int>(m_type), static_cast<int>(m_rotation)));
   }
 
   [[nodiscard]] auto static constexpr to_color(Type const type) -> Color::RGBA {
