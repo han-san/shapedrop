@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <random>
+#include <ranges>
 #include <stdexcept>
 #include <string>
 
@@ -39,12 +40,10 @@ auto ShapePool::current_shape() const -> Shape {
 }
 
 auto ShapePool::get_preview_shapes_array() const -> PreviewStack {
+  using namespace std::views;
+  const auto poolViews = {all(shapePool), all(previewPool)};
+  auto lookaheadView = poolViews | join | drop(currentShapeIndex + 1);
   PreviewStack lookaheadArray;
-  for (auto i = currentShapeIndex + 1; i != shapePool.size(); ++i) {
-    lookaheadArray.push_back(shapePool[i]);
-  }
-  for (auto const shape : previewPool) {
-    lookaheadArray.push_back(shape);
-  }
+  std::ranges::copy(lookaheadView, std::back_inserter(lookaheadArray));
   return lookaheadArray;
 }
