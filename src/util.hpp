@@ -253,16 +253,16 @@ public:
     return m_data.begin();
   }
   [[nodiscard]] auto constexpr end() noexcept -> iterator {
-    return begin() + gsl::narrow_cast<difference_type>(m_size);
+    return std::next(begin(), m_size);
   }
   [[nodiscard]] auto constexpr end() const noexcept -> const_iterator {
-    return begin() + gsl::narrow_cast<difference_type>(m_size);
+    return std::next(begin(), m_size);
   }
   [[nodiscard]] auto constexpr cbegin() const noexcept -> const_iterator {
     return m_data.cbegin();
   }
   [[nodiscard]] auto constexpr cend() const noexcept -> const_iterator {
-    return cbegin() + gsl::narrow_cast<difference_type>(m_size);
+    return std::next(cbegin(), m_size);
   }
   [[nodiscard]] auto constexpr front() -> reference { return m_data.front(); }
   [[nodiscard]] auto constexpr front() const -> const_reference {
@@ -284,12 +284,10 @@ public:
     return m_size == 0;
   }
   auto constexpr push_back(const_reference i) -> void {
-    assert(m_size < maxSize);
-    m_data[m_size++] = i;
+    m_data.at(m_size++) = i;
   }
   auto constexpr push_back(value_type&& i) -> void {
-    assert(m_size < maxSize);
-    m_data[m_size++] = std::move(i);
+    m_data.at(m_size++) = std::move(i);
   }
   auto constexpr pop_back() -> void {
     assert(m_size > 0);
