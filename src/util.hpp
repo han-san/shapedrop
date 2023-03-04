@@ -108,30 +108,8 @@ public:
     return lhs /= rhs;
   }
 
-  [[nodiscard]] auto constexpr friend operator==(ThisType const& lhs,
-                                                 ThisType const& rhs) {
-    return lhs.m_value == rhs.m_value;
-  }
-  [[nodiscard]] auto constexpr friend operator!=(ThisType const& lhs,
-                                                 ThisType const& rhs) {
-    return lhs.m_value != rhs.m_value;
-  }
-  [[nodiscard]] auto constexpr friend operator<(ThisType const& lhs,
-                                                ThisType const& rhs) {
-    return lhs.m_value < rhs.m_value;
-  }
-  [[nodiscard]] auto constexpr friend operator>(ThisType const& lhs,
-                                                ThisType const& rhs) {
-    return lhs.m_value > rhs.m_value;
-  }
-  [[nodiscard]] auto constexpr friend operator<=(ThisType const& lhs,
-                                                 ThisType const& rhs) {
-    return lhs.m_value <= rhs.m_value;
-  }
-  [[nodiscard]] auto constexpr friend operator>=(ThisType const& lhs,
-                                                 ThisType const& rhs) {
-    return lhs.m_value >= rhs.m_value;
-  }
+  friend constexpr auto operator<=>(const ThisType& lhs,
+                                    const ThisType& rhs) = default;
 
 private:
   T m_value {};
