@@ -6,8 +6,7 @@
 
 #include <array>
 #include <cassert>
-
-using gsl::narrow_cast;
+#include <limits>
 
 template <typename T>
 class PositiveGeneric {
@@ -22,37 +21,37 @@ public:
   explicit PositiveGeneric(sllong const i) : m_value {gsl::narrow_cast<T>(i)} {
     // make sure it fits the type's range
     assert(i >= 0);
-    assert(static_cast<T>(-1) >= i);
+    assert(std::numeric_limits<T>::max() >= i);
   }
   constexpr PositiveGeneric(uchar const i) : m_value {gsl::narrow_cast<T>(i)} {
     if constexpr (sizeof(i) > sizeof(T)) {
-      assert(static_cast<T>(-1) >= i);
+      assert(std::numeric_limits<T>::max() >= i);
     }
   }
   constexpr PositiveGeneric(ushort const i) : m_value {gsl::narrow_cast<T>(i)} {
     if constexpr (sizeof(i) > sizeof(T)) {
-      assert(static_cast<T>(-1) >= i);
+      assert(std::numeric_limits<T>::max() >= i);
     }
   }
   constexpr PositiveGeneric(uint const i) : m_value {gsl::narrow_cast<T>(i)} {
     if constexpr (sizeof(i) > sizeof(T)) {
-      assert(static_cast<T>(-1) >= i);
+      assert(std::numeric_limits<T>::max() >= i);
     }
   }
   constexpr PositiveGeneric(ulong const i) : m_value {gsl::narrow_cast<T>(i)} {
     if constexpr (sizeof(i) > sizeof(T)) {
-      assert(static_cast<T>(-1) >= i);
+      assert(std::numeric_limits<T>::max() >= i);
     }
   }
   constexpr PositiveGeneric(ullong const i) : m_value {gsl::narrow_cast<T>(i)} {
     if constexpr (sizeof(i) > sizeof(T)) {
-      assert(static_cast<T>(-1) >= i);
+      assert(std::numeric_limits<T>::max() >= i);
     }
   }
-  explicit PositiveGeneric(double const i) : m_value {static_cast<T>(i)} {
+  explicit PositiveGeneric(double const i) : m_value {gsl::narrow_cast<T>(i)} {
     // make sure it fits the type's range
     assert(i >= 0);
-    assert(static_cast<T>(-1) >= static_cast<ullong>(i));
+    assert(i <= static_cast<double>(std::numeric_limits<T>::max()));
   }
 
   [[nodiscard]] constexpr explicit operator T() const noexcept {
@@ -254,16 +253,16 @@ public:
     return m_data.begin();
   }
   [[nodiscard]] auto constexpr end() noexcept -> iterator {
-    return begin() + narrow_cast<difference_type>(m_size);
+    return begin() + gsl::narrow_cast<difference_type>(m_size);
   }
   [[nodiscard]] auto constexpr end() const noexcept -> const_iterator {
-    return begin() + narrow_cast<difference_type>(m_size);
+    return begin() + gsl::narrow_cast<difference_type>(m_size);
   }
   [[nodiscard]] auto constexpr cbegin() const noexcept -> const_iterator {
     return m_data.cbegin();
   }
   [[nodiscard]] auto constexpr cend() const noexcept -> const_iterator {
-    return cbegin() + narrow_cast<difference_type>(m_size);
+    return cbegin() + gsl::narrow_cast<difference_type>(m_size);
   }
   [[nodiscard]] auto constexpr front() -> reference { return m_data.front(); }
   [[nodiscard]] auto constexpr front() const -> const_reference {
