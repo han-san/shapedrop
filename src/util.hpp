@@ -38,10 +38,12 @@ public:
     }
   }
 
-  explicit PositiveGeneric(double const i) : m_value {gsl::narrow_cast<T>(i)} {
+  template <std::floating_point Float>
+  constexpr explicit PositiveGeneric(const Float i)
+      : m_value {gsl::narrow_cast<T>(i)} {
     // make sure it fits the type's range
     assert(i >= 0);
-    assert(i <= static_cast<double>(std::numeric_limits<T>::max()));
+    assert(i <= static_cast<Float>(std::numeric_limits<T>::max()));
   }
 
   [[nodiscard]] constexpr explicit operator T() const noexcept {
