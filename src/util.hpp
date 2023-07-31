@@ -59,9 +59,8 @@ public:
   [[nodiscard]] explicit operator bool() const noexcept { return m_value; }
 
   auto constexpr operator-=(ThisType const& rhs) -> ThisType& {
-    auto const rhsVal = T {rhs};
-    assert(m_value >= rhsVal);
-    m_value -= rhsVal;
+    assert(m_value >= T {rhs});
+    m_value -= T {rhs};
     return *this;
   }
   [[nodiscard]] auto constexpr friend operator-(ThisType lhs,
@@ -70,8 +69,7 @@ public:
     return lhs -= rhs;
   }
   auto constexpr operator+=(ThisType const& rhs) -> ThisType& {
-    auto const rhsVal = T {rhs};
-    m_value += rhsVal;
+    m_value += T {rhs};
     return *this;
   }
   [[nodiscard]] auto constexpr friend operator+(ThisType lhs,
@@ -80,8 +78,7 @@ public:
     return lhs += rhs;
   }
   auto constexpr operator*=(ThisType const& rhs) -> ThisType& {
-    auto const rhsVal = T {rhs};
-    m_value *= rhsVal;
+    m_value *= T {rhs};
     return *this;
   }
   [[nodiscard]] auto constexpr friend operator*(ThisType lhs,
@@ -90,8 +87,7 @@ public:
     return lhs *= rhs;
   }
   auto constexpr operator/=(ThisType const& rhs) -> ThisType& {
-    auto const rhsVal = T {rhs};
-    m_value /= rhsVal;
+    m_value /= T {rhs};
     return *this;
   }
   [[nodiscard]] auto constexpr friend operator/(ThisType lhs,
