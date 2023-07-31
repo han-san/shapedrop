@@ -6,48 +6,38 @@
 
 #include <array>
 #include <cassert>
+#include <concepts>
 #include <limits>
 
-template <typename T>
+template <std::unsigned_integral T>
 class PositiveGeneric {
   using ThisType = PositiveGeneric<T>;
 
 public:
   PositiveGeneric() = default;
-  explicit PositiveGeneric(schar const i) : PositiveGeneric {sllong {i}} {}
-  explicit PositiveGeneric(sshort const i) : PositiveGeneric {sllong {i}} {}
-  explicit PositiveGeneric(sint const i) : PositiveGeneric {sllong {i}} {}
-  explicit PositiveGeneric(slong const i) : PositiveGeneric {sllong {i}} {}
-  explicit PositiveGeneric(sllong const i) : m_value {gsl::narrow_cast<T>(i)} {
-    // make sure it fits the type's range
-    assert(i >= 0);
-    assert(std::numeric_limits<T>::max() >= i);
-  }
-  constexpr PositiveGeneric(uchar const i) : m_value {gsl::narrow_cast<T>(i)} {
-    if constexpr (sizeof(i) > sizeof(T)) {
-      assert(std::numeric_limits<T>::max() >= i);
+
+  template <std::integral FromIntType>
+  constexpr explicit(std::is_signed_v<FromIntType>)
+      PositiveGeneric(const FromIntType i)
+      : m_value {gsl::narrow_cast<T>(i)} {
+    static_assert(std::numeric_limits<T>::min() == 0);
+    constexpr auto lowerBoundIsUnsafe =
+        std::numeric_limits<FromIntType>::min() < 0;
+    if constexpr (lowerBoundIsUnsafe) {
+      if (i < 0) {
+        throw gsl::narrowing_error();
+      }
+    }
+
+    constexpr auto upperBoundIsUnsafe =
+        std::numeric_limits<FromIntType>::max() > std::numeric_limits<T>::max();
+    if constexpr (upperBoundIsUnsafe) {
+      if (std::numeric_limits<T>::max() < i) {
+        throw gsl::narrowing_error();
+      }
     }
   }
-  constexpr PositiveGeneric(ushort const i) : m_value {gsl::narrow_cast<T>(i)} {
-    if constexpr (sizeof(i) > sizeof(T)) {
-      assert(std::numeric_limits<T>::max() >= i);
-    }
-  }
-  constexpr PositiveGeneric(uint const i) : m_value {gsl::narrow_cast<T>(i)} {
-    if constexpr (sizeof(i) > sizeof(T)) {
-      assert(std::numeric_limits<T>::max() >= i);
-    }
-  }
-  constexpr PositiveGeneric(ulong const i) : m_value {gsl::narrow_cast<T>(i)} {
-    if constexpr (sizeof(i) > sizeof(T)) {
-      assert(std::numeric_limits<T>::max() >= i);
-    }
-  }
-  constexpr PositiveGeneric(ullong const i) : m_value {gsl::narrow_cast<T>(i)} {
-    if constexpr (sizeof(i) > sizeof(T)) {
-      assert(std::numeric_limits<T>::max() >= i);
-    }
-  }
+
   explicit PositiveGeneric(double const i) : m_value {gsl::narrow_cast<T>(i)} {
     // make sure it fits the type's range
     assert(i >= 0);
