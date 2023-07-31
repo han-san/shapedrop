@@ -9,12 +9,12 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/mat4x4.hpp"
 
-#include <utility>
 #include <stdexcept>
+#include <utility>
 
 namespace OpenGLRender {
 
-Shader::Shader(GLenum shaderType, GLchar const* src) {
+Shader::Shader(GLenum shaderType, const GLchar* src) {
   auto shaderHandle = glCreateShader(shaderType);
   glShaderSource(shaderHandle, 1, &src, nullptr);
   glCompileShader(shaderHandle);
@@ -30,8 +30,7 @@ Shader::Shader(GLenum shaderType, GLchar const* src) {
   m_handle = shaderHandle;
 }
 
-Shader::Program::Program(GLchar const* vertexSource,
-                         GLchar const* fragmentSource) {
+Shader::Program::Program(const GLchar* vertexSource, const GLchar* fragmentSource) {
   Shader vertex {GL_VERTEX_SHADER, vertexSource};
   Shader fragment {GL_FRAGMENT_SHADER, fragmentSource};
 
@@ -76,8 +75,7 @@ Context::Context() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_solidShaderEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // provide 3 floats to vertex shader??
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
@@ -108,12 +106,10 @@ Context::Context() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rainbowShaderEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
-                 GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // provide 3 floats to vertex shader??
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
-                          nullptr);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), nullptr);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat),
                           reinterpret_cast<GLvoid*>(3 * sizeof(GLfloat)));
@@ -122,13 +118,12 @@ Context::Context() {
 
   // Set up the font shader's vbo, vao, ebo, and textures
   {
-    auto const& bakedCharsBitmap = get_baked_chars_bitmap();
+    const auto& bakedCharsBitmap = get_baked_chars_bitmap();
 
     glGenTextures(1, &m_fontTexture);
     glBindTexture(GL_TEXTURE_2D, m_fontTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bakedCharsBitmap.w,
-                 bakedCharsBitmap.h, 0, GL_ALPHA, GL_UNSIGNED_BYTE,
-                 bakedCharsBitmap.bitmap.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, bakedCharsBitmap.w, bakedCharsBitmap.h, 0, GL_ALPHA,
+                 GL_UNSIGNED_BYTE, bakedCharsBitmap.bitmap.data());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     glGenVertexArrays(1, &m_fontShaderVAO);
@@ -139,20 +134,17 @@ Context::Context() {
     glBindBuffer(GL_ARRAY_BUFFER, m_fontShaderVBO);
     // the vertex- and texture data gets filled in every time a character is
     // drawn, so there's no need for them here.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, nullptr,
-                 GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, nullptr, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
-                          nullptr);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
   }
 }
 
 Context::Context(Context&& other) noexcept
-    : m_solid {std::move(other.m_solid)}, m_rainbow {
-                                              std::move(other.m_rainbow)} {
+    : m_solid {std::move(other.m_solid)}, m_rainbow {std::move(other.m_rainbow)} {
   delete_solid_shader_buffers();
   m_solidShaderEBO = std::exchange(other.m_solidShaderEBO, 0);
   m_solidShaderVAO = std::exchange(other.m_solidShaderVAO, 0);
@@ -194,7 +186,7 @@ auto Context::operator=(Context&& other) noexcept -> Context& {
 
 struct DrawObject {
   GLuint vao;
-  Shader::Program const& shaderProgram;
+  const Shader::Program& shaderProgram;
   Color::RGBA color;
   Rect<double> rect;
 };
@@ -206,7 +198,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
   glClear(GL_COLOR_BUFFER_BIT);
 
   // The y axis is flipped, i.e. starts at 1.F and ends at 0.F.
-  auto const orthoProjection = glm::ortho(0.F, 1.F, 1.F, 0.F);
+  const auto orthoProjection = glm::ortho(0.F, 1.F, 1.F, 0.F);
 
   // draw rainbow background
   {
@@ -221,23 +213,21 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
   case ProgramState::LevelType::Game: {
     // draw playarea
     {
-      auto const& solidShader = get_opengl_render_context().solid_shader();
+      const auto& solidShader = get_opengl_render_context().solid_shader();
       solidShader.use();
       solidShader.set_vec4(Shader::Uniform::color, GLColor {Color::black});
 
       {
         glm::mat4 model {1};
-        auto const scale = get_window_scale();
-        auto const normalizedPlayArea = to_normalized({
+        const auto scale = get_window_scale();
+        const auto normalizedPlayArea = to_normalized({
             static_cast<double>(gPlayAreaDim.x) * scale,
             static_cast<double>(gPlayAreaDim.y) * scale,
             static_cast<double>(gPlayAreaDim.w) * scale,
             static_cast<double>(gPlayAreaDim.h) * scale,
         });
-        model = glm::translate(
-            model, glm::vec3 {normalizedPlayArea.x, normalizedPlayArea.y, 0.F});
-        model = glm::scale(
-            model, glm::vec3 {normalizedPlayArea.w, normalizedPlayArea.h, 0.F});
+        model = glm::translate(model, glm::vec3 {normalizedPlayArea.x, normalizedPlayArea.y, 0.F});
+        model = glm::scale(model, glm::vec3 {normalizedPlayArea.w, normalizedPlayArea.h, 0.F});
         solidShader.set_matrix4(Shader::Uniform::model, model);
       }
 
@@ -247,20 +237,19 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     }
 
-    auto draw_shape_in_play_area = [](Shape const& shape) {
-      auto const scale = get_window_scale();
-      for (auto const& position : shape.get_absolute_block_positions()) {
+    auto draw_shape_in_play_area = [](const Shape& shape) {
+      const auto scale = get_window_scale();
+      for (const auto& position : shape.get_absolute_block_positions()) {
         // since the top 2 rows shouldn't be visible, the y
         // position for drawing is 2 less than the shape's
-        auto const actualYPosition = position.y - 2;
+        const auto actualYPosition = position.y - 2;
 
         // don't draw if square is above the playarea
         if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) {
           continue;
         }
         Rect<int> square {(position.x + gPlayAreaDim.x) * scale,
-                          (actualYPosition + gPlayAreaDim.y) * scale, scale,
-                          scale};
+                          (actualYPosition + gPlayAreaDim.y) * scale, scale, scale};
 
         draw_solid_square(square, shape.color);
       }
@@ -268,14 +257,13 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     for (std::size_t y = 2; y < Board::rows; ++y) {
       for (std::size_t x = 0; x < Board::columns; ++x) {
-        auto const currIndex =
-            gsl::narrow_cast<gsl::index>(y * Board::columns + x);
-        auto const& block = gameState.board.block_at(currIndex);
+        const auto currIndex = gsl::narrow_cast<gsl::index>(y * Board::columns + x);
+        const auto& block = gameState.board.block_at(currIndex);
         if (not block.isActive) {
           continue;
         }
 
-        auto const scale = static_cast<std::size_t>(get_window_scale());
+        const auto scale = static_cast<std::size_t>(get_window_scale());
 
         Rect<int> square {static_cast<int>((x + gPlayAreaDim.x) * scale),
                           static_cast<int>((y - 2 + gPlayAreaDim.y) * scale),
@@ -290,17 +278,16 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     // draw shape previews
     {
-      auto const scale = get_window_scale();
-      auto const previewArray = gameState.shapePool.get_preview_shapes_array();
+      const auto scale = get_window_scale();
+      const auto previewArray = gameState.shapePool.get_preview_shapes_array();
       int i {0};
-      for (auto const shapeType : previewArray) {
+      for (const auto shapeType : previewArray) {
         Shape shape {shapeType};
         shape.pos.x = gSidebarDim.x;
-        int const ySpacing {3};
+        const int ySpacing {3};
         shape.pos.y = gSidebarDim.y + ySpacing * i;
-        for (auto const& position : shape.get_absolute_block_positions()) {
-          Rect<int> square {position.x * scale, position.y * scale, scale,
-                            scale};
+        for (const auto& position : shape.get_absolute_block_positions()) {
+          Rect<int> square {position.x * scale, position.y * scale, scale, scale};
           draw_solid_square(square, shape.color);
         }
         ++i;
@@ -309,28 +296,23 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     // draw held shape
     {
-      auto const scale = get_window_scale();
-      auto const holdShapeDim = gHoldShapeDim * scale;
+      const auto scale = get_window_scale();
+      const auto holdShapeDim = gHoldShapeDim * scale;
       draw_solid_square(holdShapeDim, Color::black);
       if (gameState.holdShapeType) {
         Shape shape {*gameState.holdShapeType};
         shape.pos = {};
 
-        auto is_even = [](auto const n) { return (n % 2) == 0; };
+        auto is_even = [](const auto n) { return (n % 2) == 0; };
         // offset to center shape inside hold square
-        auto const shapeDimensions = shape.dimensions();
-        auto const xOffset =
-            is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5;
-        auto const yOffset =
-            is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5;
+        const auto shapeDimensions = shape.dimensions();
+        const auto xOffset = is_even(gHoldShapeDim.w - shapeDimensions.w) ? 1.0 : 0.5;
+        const auto yOffset = is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5;
 
         for (auto& position : shape.get_absolute_block_positions()) {
-          Rect<int> square {
-              static_cast<int>((position.x + gHoldShapeDim.x + xOffset) *
-                               scale),
-              static_cast<int>((position.y + gHoldShapeDim.y + yOffset) *
-                               scale),
-              scale, scale};
+          Rect<int> square {static_cast<int>((position.x + gHoldShapeDim.x + xOffset) * scale),
+                            static_cast<int>((position.y + gHoldShapeDim.y + yOffset) * scale),
+                            scale, scale};
           draw_solid_square(square, shape.color);
         }
       }
@@ -340,19 +322,16 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
   for (auto object : drawObjects) {
     object.shaderProgram.use();
-    object.shaderProgram.set_vec4(Shader::Uniform::color,
-                                  GLColor {object.color});
+    object.shaderProgram.set_vec4(Shader::Uniform::color, GLColor {object.color});
 
     {
       glm::mat4 model {1};
-      model =
-          glm::translate(model, glm::vec3 {object.rect.x, object.rect.y, 0.F});
+      model = glm::translate(model, glm::vec3 {object.rect.x, object.rect.y, 0.F});
       model = glm::scale(model, glm::vec3 {object.rect.w, object.rect.h, 0.F});
       object.shaderProgram.set_matrix4(Shader::Uniform::model, model);
     }
 
-    object.shaderProgram.set_matrix4(Shader::Uniform::projection,
-                                     orthoProjection);
+    object.shaderProgram.set_matrix4(Shader::Uniform::projection, orthoProjection);
 
     glBindVertexArray(object.vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
@@ -367,15 +346,14 @@ auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
   // FIXME: probably need to flip the image upside down since opengl counts
   //        0,0 as bottom left corner while we count 0,0 as top left.
 
-  auto const& renderContext = get_opengl_render_context();
-  auto const& shaderProgram = renderContext.solid_shader();
+  const auto& renderContext = get_opengl_render_context();
+  const auto& shaderProgram = renderContext.solid_shader();
 
-  drawObjects.push_back(
-      {renderContext.solid_shader_vao(), shaderProgram, color, sqr});
+  drawObjects.push_back({renderContext.solid_shader_vao(), shaderProgram, color, sqr});
 }
 
 auto draw_solid_square(Rect<int> sqr, Color::RGBA color) -> void {
-  auto const& renderContext = get_opengl_render_context();
+  const auto& renderContext = get_opengl_render_context();
   auto normalized = to_normalized({
       static_cast<double>(sqr.x),
       static_cast<double>(sqr.y),
@@ -384,18 +362,16 @@ auto draw_solid_square(Rect<int> sqr, Color::RGBA color) -> void {
   });
   draw_solid_square_normalized(normalized, color);
 }
-auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color,
-                        int borderSize) -> void {}
-auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr,
-                                   Color::RGBA color, int borderSize) -> void {}
-auto draw_font_string(BackBuffer& buf, FontString const& fontString,
-                      Point<int> coords) -> void {}
-auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString,
+auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color, int borderSize) -> void {
+}
+auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA color,
+                                   int borderSize) -> void {}
+auto draw_font_string(BackBuffer& buf, const FontString& fontString, Point<int> coords) -> void {}
+auto draw_font_string_normalized(BackBuffer& buf, const FontString& fontString,
                                  Point<double> relativeCoords) -> void {}
-auto draw_text(BackBuffer& buf, std::string_view text, Point<int> coords,
-               double pixelHeight) -> void {}
-auto draw_text_normalized(BackBuffer& buf, std::string_view text,
-                          Point<double> relativeCoords, double pixelHeight)
+auto draw_text(BackBuffer& buf, std::string_view text, Point<int> coords, double pixelHeight)
     -> void {}
+auto draw_text_normalized(BackBuffer& buf, std::string_view text, Point<double> relativeCoords,
+                          double pixelHeight) -> void {}
 
 } // namespace OpenGLRender

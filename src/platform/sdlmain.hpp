@@ -21,6 +21,6 @@ auto change_window_scale(int) -> void;
 auto get_window_dimensions() -> Rect<int>::Size;
 auto get_event() -> Event;
 auto get_render_mode() -> RenderMode;
-auto get_opengl_render_context() -> OpenGLRender::Context const&;
+auto get_opengl_render_context() -> const OpenGLRender::Context&;
 
 } // namespace platform::SDL

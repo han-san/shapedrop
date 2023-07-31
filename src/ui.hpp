@@ -16,41 +16,37 @@ class WindowScale {
 public:
   WindowScale() noexcept = default;
   [[nodiscard]] constexpr explicit operator double() const { return value; }
-  constexpr WindowScale(double const from) noexcept : value {from} {}
+  constexpr WindowScale(const double from) noexcept : value {from} {}
 
-  auto constexpr operator+=(WindowScale const& rhs) -> WindowScale& {
+  constexpr auto operator+=(const WindowScale& rhs) -> WindowScale& {
     value += double {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator+(WindowScale lhs,
-                                                WindowScale const& rhs)
+  [[nodiscard]] friend constexpr auto operator+(WindowScale lhs, const WindowScale& rhs)
       -> WindowScale {
     return lhs += rhs;
   }
-  auto constexpr operator-=(WindowScale const& rhs) -> WindowScale& {
+  constexpr auto operator-=(const WindowScale& rhs) -> WindowScale& {
     value -= double {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator-(WindowScale lhs,
-                                                WindowScale const& rhs)
+  [[nodiscard]] friend constexpr auto operator-(WindowScale lhs, const WindowScale& rhs)
       -> WindowScale {
     return lhs -= rhs;
   }
-  auto constexpr operator*=(WindowScale const& rhs) -> WindowScale& {
+  constexpr auto operator*=(const WindowScale& rhs) -> WindowScale& {
     value *= double {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator*(WindowScale lhs,
-                                                WindowScale const& rhs)
+  [[nodiscard]] friend constexpr auto operator*(WindowScale lhs, const WindowScale& rhs)
       -> WindowScale {
     return lhs *= rhs;
   }
-  auto constexpr operator/=(WindowScale const& rhs) -> WindowScale& {
+  constexpr auto operator/=(const WindowScale& rhs) -> WindowScale& {
     value /= double {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator/(WindowScale lhs,
-                                                WindowScale const& rhs)
+  [[nodiscard]] friend constexpr auto operator/(WindowScale lhs, const WindowScale& rhs)
       -> WindowScale {
     return lhs /= rhs;
   }
@@ -63,41 +59,37 @@ class RelativeScale {
 public:
   RelativeScale() noexcept = default;
   [[nodiscard]] constexpr explicit operator double() const { return value; }
-  constexpr RelativeScale(double const from) noexcept : value {from} {}
+  constexpr RelativeScale(const double from) noexcept : value {from} {}
 
-  auto constexpr operator+=(RelativeScale const& rhs) -> RelativeScale& {
+  constexpr auto operator+=(const RelativeScale& rhs) -> RelativeScale& {
     value += double {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator+(RelativeScale lhs,
-                                                RelativeScale const& rhs)
+  [[nodiscard]] friend constexpr auto operator+(RelativeScale lhs, const RelativeScale& rhs)
       -> RelativeScale {
     return lhs += rhs;
   }
-  auto constexpr operator-=(RelativeScale const& rhs) -> RelativeScale& {
+  constexpr auto operator-=(const RelativeScale& rhs) -> RelativeScale& {
     value -= double {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator-(RelativeScale lhs,
-                                                RelativeScale const& rhs)
+  [[nodiscard]] friend constexpr auto operator-(RelativeScale lhs, const RelativeScale& rhs)
       -> RelativeScale {
     return lhs -= rhs;
   }
-  auto constexpr operator*=(RelativeScale const& rhs) -> RelativeScale& {
+  constexpr auto operator*=(const RelativeScale& rhs) -> RelativeScale& {
     value *= double {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator*(RelativeScale lhs,
-                                                RelativeScale const& rhs)
+  [[nodiscard]] friend constexpr auto operator*(RelativeScale lhs, const RelativeScale& rhs)
       -> RelativeScale {
     return lhs *= rhs;
   }
-  auto constexpr operator/=(RelativeScale const& rhs) -> RelativeScale& {
+  constexpr auto operator/=(const RelativeScale& rhs) -> RelativeScale& {
     value /= double {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator/(RelativeScale lhs,
-                                                RelativeScale const& rhs)
+  [[nodiscard]] friend constexpr auto operator/(RelativeScale lhs, const RelativeScale& rhs)
       -> RelativeScale {
     return lhs /= rhs;
   }
@@ -113,23 +105,18 @@ using RelativeScaleRect = Rect<RelativeScale>;
 
 enum class XAlignment { Left, Center, Right };
 
-auto label(std::string text, WindowScale fontHeight, RelativeScalePoint offset)
+auto label(std::string text, WindowScale fontHeight, RelativeScalePoint offset) -> void;
+auto label(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.)
     -> void;
-auto label(std::string text, WindowScale fontHeight, XAlignment xAlign,
-           RelativeScale yOffset = 0.) -> void;
-[[nodiscard]] auto button(std::string text, WindowScale fontHeight,
-                          RelativeScalePoint offset) -> bool;
-[[nodiscard]] auto button(std::string text, WindowScale fontHeight,
-                          XAlignment xAlign, RelativeScale yOffset = 0.)
+[[nodiscard]] auto button(std::string text, WindowScale fontHeight, RelativeScalePoint offset)
     -> bool;
-auto spinbox(std::string_view text, WindowScale fontHeight,
-             RelativeScalePoint offset, int& value, int minValue, int maxValue)
-    -> void;
+[[nodiscard]] auto button(std::string text, WindowScale fontHeight, XAlignment xAlign,
+                          RelativeScale yOffset = 0.) -> bool;
+auto spinbox(std::string_view text, WindowScale fontHeight, RelativeScalePoint offset, int& value,
+             int minValue, int maxValue) -> void;
 auto spinbox(std::string_view text, WindowScale fontHeight, XAlignment xAlign,
-             RelativeScale yOffset, int& value, int minValue, int maxValue)
-    -> void;
-auto begin_menu(RelativeScaleRect region,
-                Color::RGBA color = Color::transparent) -> void;
+             RelativeScale yOffset, int& value, int minValue, int maxValue) -> void;
+auto begin_menu(RelativeScaleRect region, Color::RGBA color = Color::transparent) -> void;
 auto end_menu() -> void;
 auto draw(BackBuffer bb) -> void;
 auto update_state(Event event) -> void;

@@ -30,7 +30,7 @@ struct {
 
 SDL_GLContext g_glContext {};
 
-OpenGLRender::Context static* context = nullptr;
+static OpenGLRender::Context* context = nullptr;
 
 RenderMode g_renderMode {RenderMode::software};
 
@@ -42,8 +42,7 @@ auto get_window_scale() -> int { return windowScale; }
 auto get_back_buffer() -> BackBuffer {
   auto bbuf = BackBuffer {};
   bbuf.memory = window.bbSurface->pixels;
-  bbuf.dimensions = {PositiveUInt {window.bbSurface->w},
-                     PositiveUInt {window.bbSurface->h}};
+  bbuf.dimensions = {PositiveUInt {window.bbSurface->w}, PositiveUInt {window.bbSurface->h}};
   bbuf.pitch = PositiveUInt {window.bbSurface->pitch};
   bbuf.bpp = window.bbSurface->format->BytesPerPixel;
 
@@ -52,16 +51,15 @@ auto get_back_buffer() -> BackBuffer {
 
 auto get_window_dimensions() -> Rect<int>::Size { return window.dimensions; }
 
-auto static resize_window(Rect<int>::Size const dimensions) {
+static auto resize_window(const Rect<int>::Size dimensions) {
   window.dimensions = dimensions;
   SDL_SetWindowSize(window.handle, dimensions.w, dimensions.h);
   window.surface = SDL_GetWindowSurface(window.handle);
   assert(window.surface);
   SDL_FreeSurface(window.bbSurface);
   window.bbSurface = SDL_CreateRGBSurface(
-      0, window.surface->w, window.surface->h,
-      window.surface->format->BitsPerPixel, window.surface->format->Rmask,
-      window.surface->format->Gmask, window.surface->format->Bmask,
+      0, window.surface->w, window.surface->h, window.surface->format->BitsPerPixel,
+      window.surface->format->Rmask, window.surface->format->Gmask, window.surface->format->Bmask,
       window.surface->format->Amask);
   assert(window.bbSurface);
 
@@ -78,8 +76,7 @@ auto change_window_scale(int newScale) -> void {
     return;
   }
   windowScale = newScale;
-  resize_window(
-      {gBaseWindowWidth * windowScale, gBaseWindowHeight * windowScale});
+  resize_window({gBaseWindowWidth * windowScale, gBaseWindowHeight * windowScale});
 }
 
 auto swap_buffer() -> void {
@@ -94,12 +91,11 @@ auto swap_buffer() -> void {
   }
 }
 
-auto static window_fits_on_screen(Rect<int>::Size windowDimensions) -> bool {
+static auto window_fits_on_screen(Rect<int>::Size windowDimensions) -> bool {
   SDL_Rect displayBounds {};
   SDL_GetDisplayUsableBounds(0, &displayBounds);
 
-  return windowDimensions.w < displayBounds.w and
-         windowDimensions.h < displayBounds.h;
+  return windowDimensions.w < displayBounds.w and windowDimensions.h < displayBounds.h;
 }
 
 auto get_event() -> Event {
@@ -173,12 +169,10 @@ auto init_window_opengl() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
   windowScale = 30;
-  window.dimensions = {gBaseWindowWidth * windowScale,
-                       gBaseWindowHeight * windowScale};
+  window.dimensions = {gBaseWindowWidth * windowScale, gBaseWindowHeight * windowScale};
 
-  window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED,
-                                   SDL_WINDOWPOS_UNDEFINED, window.dimensions.w,
-                                   window.dimensions.h,
+  window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                   window.dimensions.w, window.dimensions.h,
                                    SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
   assert(window.handle);
 
@@ -207,28 +201,26 @@ auto init_window_software() {
   }
   --newScale;
   windowScale = newScale;
-  auto const initialWindowWidth = gBaseWindowWidth * windowScale;
-  auto const initialWindowHeight = gBaseWindowHeight * windowScale;
+  const auto initialWindowWidth = gBaseWindowWidth * windowScale;
+  const auto initialWindowHeight = gBaseWindowHeight * windowScale;
   window.dimensions.w = initialWindowWidth;
   window.dimensions.h = initialWindowHeight;
 
-  window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED,
-                                   SDL_WINDOWPOS_UNDEFINED, initialWindowWidth,
-                                   initialWindowHeight, SDL_WINDOW_SHOWN);
+  window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                   initialWindowWidth, initialWindowHeight, SDL_WINDOW_SHOWN);
   assert(window.handle);
 
   window.surface = SDL_GetWindowSurface(window.handle);
   assert(window.surface);
 
   window.bbSurface = SDL_CreateRGBSurface(
-      0, window.surface->w, window.surface->h,
-      window.surface->format->BitsPerPixel, window.surface->format->Rmask,
-      window.surface->format->Gmask, window.surface->format->Bmask,
+      0, window.surface->w, window.surface->h, window.surface->format->BitsPerPixel,
+      window.surface->format->Rmask, window.surface->format->Gmask, window.surface->format->Bmask,
       window.surface->format->Amask);
   assert(window.bbSurface);
 }
 
-auto static init_window(RenderMode renderMode) {
+static auto init_window(RenderMode renderMode) {
   switch (renderMode) {
   case RenderMode::opengl: {
     init_window_opengl();
@@ -239,15 +231,13 @@ auto static init_window(RenderMode renderMode) {
   }
 }
 
-auto static destroy_window() {
+static auto destroy_window() {
   SDL_DestroyWindow(window.handle);
   window.handle = nullptr;
   SDL_Quit();
 }
 
-auto get_opengl_render_context() -> OpenGLRender::Context const& {
-  return *context;
-}
+auto get_opengl_render_context() -> const OpenGLRender::Context& { return *context; }
 
 } // namespace platform::SDL
 

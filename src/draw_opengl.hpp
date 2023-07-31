@@ -29,9 +29,9 @@ struct GLColor {
 
 class Shader {
 public:
-  Shader(GLenum shaderType, GLchar const* src);
-  Shader(Shader const&) = delete;
-  auto operator=(Shader const&) = delete;
+  Shader(GLenum shaderType, const GLchar* src);
+  Shader(const Shader&) = delete;
+  auto operator=(const Shader&) = delete;
   Shader(Shader&& other) noexcept {
     glDeleteShader(m_handle);
     m_handle = std::exchange(other.m_handle, 0);
@@ -55,7 +55,7 @@ public:
     projection,
   };
 
-  auto static constexpr to_string_view(Uniform const u) -> std::string_view {
+  static constexpr auto to_string_view(const Uniform u) -> std::string_view {
     switch (u) {
     case Uniform::color:
       return "color";
@@ -68,15 +68,13 @@ public:
     std::terminate();
   }
 
-  auto static to_string(Uniform const u) -> std::string {
-    return std::string(to_string_view(u));
-  }
+  static auto to_string(const Uniform u) -> std::string { return std::string(to_string_view(u)); }
 
   class Program {
   public:
-    Program(GLchar const* vertexSource, GLchar const* fragmentSource);
-    Program(Program const&) = delete;
-    auto operator=(Program const&) = delete;
+    Program(const GLchar* vertexSource, const GLchar* fragmentSource);
+    Program(const Program&) = delete;
+    auto operator=(const Program&) = delete;
     Program(Program&& other) noexcept {
       glDeleteProgram(m_handle);
       m_handle = std::exchange(other.m_handle, 0);
@@ -97,22 +95,22 @@ public:
 
     auto use() const -> void { glUseProgram(m_handle); }
 
-    auto set_matrix4(Uniform u, glm::mat4 const& mat) const -> void {
-      auto const name = to_string_view(u);
-      auto const uniformLoc = glGetUniformLocation(m_handle, name.data());
+    auto set_matrix4(Uniform u, const glm::mat4& mat) const -> void {
+      const auto name = to_string_view(u);
+      const auto uniformLoc = glGetUniformLocation(m_handle, name.data());
       glUniformMatrix4fv(uniformLoc, 1, GL_FALSE, glm::value_ptr(mat));
     }
 
     auto set_vec4(Uniform u, float x, float y, float z, float w) const -> void {
-      auto const name = to_string_view(u);
+      const auto name = to_string_view(u);
       auto uniformLoc = glGetUniformLocation(m_handle, name.data());
       glUniform4f(uniformLoc, x, y, z, w);
     }
 
-    auto set_vec4(Uniform u, GLColor const color) const -> void {
-      auto const name = to_string_view(u);
+    auto set_vec4(Uniform u, const GLColor color) const -> void {
+      const auto name = to_string_view(u);
       auto uniformLoc = glGetUniformLocation(m_handle, name.data());
-      auto const [r, g, b, a] = color;
+      const auto [r, g, b, a] = color;
       glUniform4f(uniformLoc, r, g, b, a);
     }
 
@@ -127,8 +125,8 @@ private:
 class Context {
 public:
   Context();
-  Context(Context const&) = delete;
-  auto operator=(Context const&) = delete;
+  Context(const Context&) = delete;
+  auto operator=(const Context&) = delete;
   Context(Context&& other) noexcept;
   auto operator=(Context&& other) noexcept -> Context&;
   ~Context() noexcept {
@@ -137,23 +135,13 @@ public:
     delete_font_shader_buffers();
   }
 
-  [[nodiscard]] auto solid_shader() const -> Shader::Program const& {
-    return m_solid;
-  }
-  [[nodiscard]] auto solid_shader_vao() const -> GLuint {
-    return m_solidShaderVAO;
-  }
+  [[nodiscard]] auto solid_shader() const -> const Shader::Program& { return m_solid; }
+  [[nodiscard]] auto solid_shader_vao() const -> GLuint { return m_solidShaderVAO; }
 
-  [[nodiscard]] auto rainbow_shader() const -> Shader::Program const& {
-    return m_rainbow;
-  }
-  [[nodiscard]] auto rainbow_shader_vao() const -> GLuint {
-    return m_rainbowShaderVAO;
-  }
+  [[nodiscard]] auto rainbow_shader() const -> const Shader::Program& { return m_rainbow; }
+  [[nodiscard]] auto rainbow_shader_vao() const -> GLuint { return m_rainbowShaderVAO; }
 
-  [[nodiscard]] auto font_shader_vao() const -> GLuint {
-    return m_fontShaderVAO;
-  }
+  [[nodiscard]] auto font_shader_vao() const -> GLuint { return m_fontShaderVAO; }
 
 private:
   auto delete_solid_shader_buffers() -> void {
@@ -233,19 +221,16 @@ auto draw(ProgramState& programState, GameState& gameState) -> void;
 
 auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void;
 auto draw_solid_square(Rect<int> sqr, Color::RGBA color) -> void;
-auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color,
-                        int borderSize = 1) -> void;
-auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr,
-                                   Color::RGBA color, int borderSize = 1)
+auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color, int borderSize = 1)
     -> void;
-auto draw_font_string(BackBuffer& buf, FontString const& fontString,
-                      Point<int> coords) -> void;
-auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString,
+auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA color,
+                                   int borderSize = 1) -> void;
+auto draw_font_string(BackBuffer& buf, const FontString& fontString, Point<int> coords) -> void;
+auto draw_font_string_normalized(BackBuffer& buf, const FontString& fontString,
                                  Point<double> relativeCoords) -> void;
-auto draw_text(BackBuffer& buf, std::string_view text, Point<int> coords,
-               double pixelHeight) -> void;
-auto draw_text_normalized(BackBuffer& buf, std::string_view text,
-                          Point<double> relativeCoords, double pixelHeight)
+auto draw_text(BackBuffer& buf, std::string_view text, Point<int> coords, double pixelHeight)
     -> void;
+auto draw_text_normalized(BackBuffer& buf, std::string_view text, Point<double> relativeCoords,
+                          double pixelHeight) -> void;
 
 } // namespace OpenGLRender

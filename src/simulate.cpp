@@ -56,19 +56,19 @@ enum class ClearType {
   Tspin_mini_double,
 };
 
-auto static clear_type_to_score(ClearType const c) -> int {
-  auto constexpr None = 0;
-  auto constexpr Single = 100;
-  auto constexpr Double = 300;
-  auto constexpr Triple = 500;
-  auto constexpr Tetris = 800;
-  auto constexpr Tspin = 400;
-  auto constexpr Tspin_single = 800;
-  auto constexpr Tspin_double = 1200;
-  auto constexpr Tspin_triple = 1600;
-  auto constexpr Tspin_mini = 100;
-  auto constexpr Tspin_mini_single = 200;
-  auto constexpr Tspin_mini_double = 1200;
+static auto clear_type_to_score(const ClearType c) -> int {
+  constexpr auto None = 0;
+  constexpr auto Single = 100;
+  constexpr auto Double = 300;
+  constexpr auto Triple = 500;
+  constexpr auto Tetris = 800;
+  constexpr auto Tspin = 400;
+  constexpr auto Tspin_single = 800;
+  constexpr auto Tspin_double = 1200;
+  constexpr auto Tspin_triple = 1600;
+  constexpr auto Tspin_mini = 100;
+  constexpr auto Tspin_mini_single = 200;
+  constexpr auto Tspin_mini_double = 1200;
 
   switch (c) {
   case ClearType::None:
@@ -100,7 +100,7 @@ auto static clear_type_to_score(ClearType const c) -> int {
   std::terminate();
 }
 
-auto static to_string_view(ClearType const c) -> std::string_view {
+static auto to_string_view(const ClearType c) -> std::string_view {
   switch (c) {
   case ClearType::None:
     return "";
@@ -131,8 +131,8 @@ auto static to_string_view(ClearType const c) -> std::string_view {
   std::terminate();
 }
 
-[[nodiscard]] auto static get_clear_type(int const rowsCleared,
-                                         std::optional<TspinType> const tspin) {
+[[nodiscard]] static auto get_clear_type(const int rowsCleared,
+                                         const std::optional<TspinType> tspin) {
   auto bad_row_count_msg = [rowsCleared](std::size_t min, std::size_t max) {
     return fmt::format("The amount of rows cleared should be between {} and "
                        "{}, but is currently {}",
@@ -152,7 +152,7 @@ auto static to_string_view(ClearType const c) -> std::string_view {
     case 4:
       return ClearType::Tetris;
     default:
-      auto const errMsg = bad_row_count_msg(0, 4);
+      const auto errMsg = bad_row_count_msg(0, 4);
       throw std::invalid_argument(errMsg);
     }
   }
@@ -191,38 +191,33 @@ auto static to_string_view(ClearType const c) -> std::string_view {
   }
 }
 
-[[nodiscard]] auto static calculate_score(ClearType const clearType,
-                                          int const level) {
+[[nodiscard]] static auto calculate_score(const ClearType clearType, const int level) {
   return clear_type_to_score(clearType) * level;
 }
 
-auto static lock_current_shape(GameState& gameState, ProgramState& programState)
-    -> void {
+static auto lock_current_shape(GameState& gameState, ProgramState& programState) -> void {
   // game over if entire piece is above visible portion
   // of board
-  auto const shapePositions =
-      gameState.currentShape.get_absolute_block_positions();
-  auto gameOver = std::ranges::all_of(shapePositions, [](auto const& pos) {
-    return pos.y < (Board::rows - Board::visibleRows);
-  });
+  const auto shapePositions = gameState.currentShape.get_absolute_block_positions();
+  auto gameOver = std::ranges::all_of(
+      shapePositions, [](const auto& pos) { return pos.y < (Board::rows - Board::visibleRows); });
 
   // fix currentBlocks position on board
-  for (auto const position : shapePositions) {
+  for (const auto position : shapePositions) {
     assert(gameState.board.is_valid_spot(position));
     gsl::index index {position.y * gameState.board.columns + position.x};
     gameState.board.block_at(index) = {gameState.currentShape.color, true};
   }
 
-  auto const tspin =
+  const auto tspin =
       gameState.currentRotationType
-          ? gameState.board.check_for_tspin(gameState.currentShape,
-                                            *gameState.currentRotationType)
+          ? gameState.board.check_for_tspin(gameState.currentShape, *gameState.currentRotationType)
           : std::nullopt;
 
-  auto const rowsCleared = gameState.board.remove_full_rows();
+  const auto rowsCleared = gameState.board.remove_full_rows();
   gameState.linesCleared += rowsCleared;
-  auto const clearType = get_clear_type(rowsCleared, tspin);
-  auto const clearName = to_string_view(clearType);
+  const auto clearType = get_clear_type(rowsCleared, tspin);
+  const auto clearName = to_string_view(clearType);
   if (not clearName.empty()) {
     std::cout << clearName << std::endl;
   }
@@ -253,11 +248,10 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   case ClearType::Tspin_mini_single:
   case ClearType::Tspin_mini_double: {
     ++gameState.comboCounter;
-    auto const comboScore = 50 * gameState.comboCounter * gameState.level;
+    const auto comboScore = 50 * gameState.comboCounter * gameState.level;
     gameState.score += comboScore;
     if (comboScore) {
-      fmt::print(stderr, "Combo {}! {} pts.\n", gameState.comboCounter,
-                 comboScore);
+      fmt::print(stderr, "Combo {}! {} pts.\n", gameState.comboCounter, comboScore);
     }
   } break;
     // These aren't technically clears and will reset your combo
@@ -301,16 +295,15 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   } break;
   }
 
-  auto clearScore = static_cast<int>(
-      calculate_score(clearType, gameState.level) * backToBackModifier);
+  auto clearScore =
+      static_cast<int>(calculate_score(clearType, gameState.level) * backToBackModifier);
   gameState.score += clearScore;
 
   gameState.level = gameState.linesCleared / 10 + gameState.startingLevel;
 
   gameState.currentShape = gameState.shapePool.next_shape();
   // update shape shadow
-  gameState.currentShapeShadow =
-      gameState.board.get_shadow(gameState.currentShape);
+  gameState.currentShapeShadow = gameState.board.get_shadow(gameState.currentShape);
 
   gameState.lockClock = programState.frameStartClock;
 
@@ -330,12 +323,10 @@ auto static lock_current_shape(GameState& gameState, ProgramState& programState)
   }
 }
 
-auto static simulate_game(ProgramState& programState, GameState& gameState)
-    -> void {
-  auto const dropDelay = [&]() {
-    auto const levelDropDelay = gameState.drop_delay_for_level();
-    if (gameState.isSoftDropping and
-        (GameState::softDropDelay < levelDropDelay)) {
+static auto simulate_game(ProgramState& programState, GameState& gameState) -> void {
+  const auto dropDelay = [&]() {
+    const auto levelDropDelay = gameState.drop_delay_for_level();
+    if (gameState.isSoftDropping and (GameState::softDropDelay < levelDropDelay)) {
       return GameState::softDropDelay;
     } else {
       return levelDropDelay;
@@ -346,7 +337,7 @@ auto static simulate_game(ProgramState& programState, GameState& gameState)
     // TODO: make it possible for shapes to drop more than one block
     // (e.g. at max drop speed it should drop all the way to the bottom
     // instantly)
-    auto const nextdropClock = gameState.dropClock + dropDelay;
+    const auto nextdropClock = gameState.dropClock + dropDelay;
     if (programState.frameStartClock > nextdropClock) {
       gameState.dropClock = programState.frameStartClock;
       if (gameState.board.try_move(gameState.currentShape, V2::down())) {
@@ -361,28 +352,24 @@ auto static simulate_game(ProgramState& programState, GameState& gameState)
       }
     }
 
-    if (programState.frameStartClock >
-        gameState.lockClock + GameState::lockDelay) {
+    if (programState.frameStartClock > gameState.lockClock + GameState::lockDelay) {
       // only care about locking if currentShape is on top of a block
-      if (not gameState.board.is_valid_move(gameState.currentShape,
-                                            V2::down())) {
+      if (not gameState.board.is_valid_move(gameState.currentShape, V2::down())) {
         lock_current_shape(gameState, programState);
       }
     }
   }
 
   {
-    auto const fontSize = 0.048;
-    UI::label(fmt::format("Score: {}", gameState.score), fontSize,
-              UI::XAlignment::Right);
+    const auto fontSize = 0.048;
+    UI::label(fmt::format("Score: {}", gameState.score), fontSize, UI::XAlignment::Right);
 
     // Round up linesCleared to nearest 10
-    auto const linesRequired = (gameState.linesCleared / 10 + 1) * 10;
+    const auto linesRequired = (gameState.linesCleared / 10 + 1) * 10;
     // Not const since it's later moved
-    auto levelString = fmt::format("Level: {} ({}/{})", gameState.level,
-                                   gameState.linesCleared, linesRequired);
-    UI::label(std::move(levelString), fontSize, UI::XAlignment::Right,
-              fontSize);
+    auto levelString =
+        fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired);
+    UI::label(std::move(levelString), fontSize, UI::XAlignment::Right, fontSize);
   }
 
   if (gameState.paused) {
@@ -407,14 +394,14 @@ auto static simulate_game(ProgramState& programState, GameState& gameState)
   }
 }
 
-auto static simulate_menu(ProgramState& programState, GameState& gameState,
-                          MenuState& menuState) -> void {
-  auto const highScoreFontSize = 0.048;
-  UI::label(fmt::format("High Score: {}", programState.highScore),
-            highScoreFontSize, UI::XAlignment::Right);
+static auto simulate_menu(ProgramState& programState, GameState& gameState, MenuState& menuState)
+    -> void {
+  const auto highScoreFontSize = 0.048;
+  UI::label(fmt::format("High Score: {}", programState.highScore), highScoreFontSize,
+            UI::XAlignment::Right);
 
-  auto const menuY = 1. / 10.;
-  auto const menuFontSize = 1. / 10.;
+  const auto menuY = 1. / 10.;
+  const auto menuFontSize = 1. / 10.;
   UI::begin_menu({0., menuY, 1., 1. - menuY});
   UI::label("ShapeDrop", menuFontSize, UI::XAlignment::Center);
   if (UI::button("Play", menuFontSize, UI::XAlignment::Center)) {
@@ -425,13 +412,12 @@ auto static simulate_menu(ProgramState& programState, GameState& gameState,
     programState.levelType = ProgramState::LevelType::Game;
     gameState = GameState {menuState.level};
   }
-  UI::spinbox("Level", menuFontSize / 2., UI::XAlignment::Center, 0.,
-              menuState.level, gMinLevel, gMaxLevel);
+  UI::spinbox("Level", menuFontSize / 2., UI::XAlignment::Center, 0., menuState.level, gMinLevel,
+              gMaxLevel);
   UI::end_menu();
 }
 
-auto simulate(ProgramState& programState, GameState& gameState,
-              MenuState& menuState) -> void {
+auto simulate(ProgramState& programState, GameState& gameState, MenuState& menuState) -> void {
   switch (programState.levelType) {
   case ProgramState::LevelType::Game:
     simulate_game(programState, gameState);

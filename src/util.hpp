@@ -18,12 +18,10 @@ public:
   PositiveGeneric() = default;
 
   template <std::integral FromIntType>
-  constexpr explicit(std::is_signed_v<FromIntType>)
-      PositiveGeneric(const FromIntType i)
+  constexpr explicit(std::is_signed_v<FromIntType>) PositiveGeneric(const FromIntType i)
       : m_value {gsl::narrow_cast<T>(i)} {
     static_assert(std::numeric_limits<T>::min() == 0);
-    constexpr auto lowerBoundIsUnsafe =
-        std::numeric_limits<FromIntType>::min() < 0;
+    constexpr auto lowerBoundIsUnsafe = std::numeric_limits<FromIntType>::min() < 0;
     if constexpr (lowerBoundIsUnsafe) {
       if (i < 0) {
         throw gsl::narrowing_error();
@@ -40,17 +38,14 @@ public:
   }
 
   template <std::floating_point Float>
-  constexpr explicit PositiveGeneric(const Float i)
-      : m_value {gsl::narrow_cast<T>(i)} {
+  constexpr explicit PositiveGeneric(const Float i) : m_value {gsl::narrow_cast<T>(i)} {
     // FIXME: Rounding error could cause an unintended exception.
     if (i < 0 || i > static_cast<Float>(std::numeric_limits<T>::max())) {
       throw gsl::narrowing_error();
     }
   }
 
-  [[nodiscard]] constexpr explicit operator T() const noexcept {
-    return m_value;
-  }
+  [[nodiscard]] constexpr explicit operator T() const noexcept { return m_value; }
 
   template <typename U>
   operator PositiveGeneric<U>() const noexcept {
@@ -59,7 +54,7 @@ public:
 
   [[nodiscard]] explicit operator bool() const noexcept { return m_value; }
 
-  auto constexpr operator-=(ThisType const& rhs) -> ThisType& {
+  constexpr auto operator-=(const ThisType& rhs) -> ThisType& {
     if (rhs > *this) {
       throw std::underflow_error("Subtraction of PositiveGeneric underflowed");
     }
@@ -67,41 +62,32 @@ public:
     m_value -= T {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator-(ThisType lhs,
-                                                ThisType const& rhs)
-      -> ThisType {
+  [[nodiscard]] friend constexpr auto operator-(ThisType lhs, const ThisType& rhs) -> ThisType {
     return lhs -= rhs;
   }
-  auto constexpr operator+=(ThisType const& rhs) -> ThisType& {
+  constexpr auto operator+=(const ThisType& rhs) -> ThisType& {
     m_value += T {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator+(ThisType lhs,
-                                                ThisType const& rhs)
-      -> ThisType {
+  [[nodiscard]] friend constexpr auto operator+(ThisType lhs, const ThisType& rhs) -> ThisType {
     return lhs += rhs;
   }
-  auto constexpr operator*=(ThisType const& rhs) -> ThisType& {
+  constexpr auto operator*=(const ThisType& rhs) -> ThisType& {
     m_value *= T {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator*(ThisType lhs,
-                                                ThisType const& rhs)
-      -> ThisType {
+  [[nodiscard]] friend constexpr auto operator*(ThisType lhs, const ThisType& rhs) -> ThisType {
     return lhs *= rhs;
   }
-  auto constexpr operator/=(ThisType const& rhs) -> ThisType& {
+  constexpr auto operator/=(const ThisType& rhs) -> ThisType& {
     m_value /= T {rhs};
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator/(ThisType lhs,
-                                                ThisType const& rhs)
-      -> ThisType {
+  [[nodiscard]] friend constexpr auto operator/(ThisType lhs, const ThisType& rhs) -> ThisType {
     return lhs /= rhs;
   }
 
-  friend constexpr auto operator<=>(const ThisType& lhs,
-                                    const ThisType& rhs) = default;
+  friend constexpr auto operator<=>(const ThisType& lhs, const ThisType& rhs) = default;
 
 private:
   T m_value {};
@@ -125,21 +111,19 @@ struct V2Generic {
 
   using ThisType = V2Generic<T>;
 
-  auto constexpr operator+=(ThisType const& rhs) -> ThisType& {
+  constexpr auto operator+=(const ThisType& rhs) -> ThisType& {
     x += rhs.x;
     y += rhs.y;
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator+(ThisType lhs,
-                                                ThisType const& rhs)
-      -> ThisType {
+  [[nodiscard]] friend constexpr auto operator+(ThisType lhs, const ThisType& rhs) -> ThisType {
     return lhs += rhs;
   }
 
-  [[nodiscard]] auto static constexpr right() -> ThisType { return {1, 0}; }
-  [[nodiscard]] auto static constexpr left() -> ThisType { return {-1, 0}; }
-  [[nodiscard]] auto static constexpr up() -> ThisType { return {0, -1}; }
-  [[nodiscard]] auto static constexpr down() -> ThisType { return {0, 1}; }
+  [[nodiscard]] static constexpr auto right() -> ThisType { return {1, 0}; }
+  [[nodiscard]] static constexpr auto left() -> ThisType { return {-1, 0}; }
+  [[nodiscard]] static constexpr auto up() -> ThisType { return {0, -1}; }
+  [[nodiscard]] static constexpr auto down() -> ThisType { return {0, 1}; }
 };
 
 using V2 = V2Generic<int>;
@@ -147,10 +131,10 @@ using V2f = V2Generic<double>;
 
 namespace Color {
 struct RGBA {
-  u8 static constexpr maxChannelValue {0xFF};
+  static constexpr u8 maxChannelValue {0xFF};
   struct Alpha {
-    u8 static constexpr opaque {maxChannelValue};
-    u8 static constexpr transparent {0};
+    static constexpr u8 opaque {maxChannelValue};
+    static constexpr u8 transparent {0};
   };
 
   PositiveU8 r {0U};
@@ -159,28 +143,27 @@ struct RGBA {
   PositiveU8 a {Alpha::opaque};
 };
 
-RGBA static constexpr red {RGBA::maxChannelValue, 0U, 0U};
-RGBA static constexpr green {0U, RGBA::maxChannelValue, 0U};
-RGBA static constexpr blue {0U, 0U, RGBA::maxChannelValue};
-RGBA static constexpr cyan {0U, RGBA::maxChannelValue, RGBA::maxChannelValue};
-RGBA static constexpr white {RGBA::maxChannelValue, RGBA::maxChannelValue,
-                             RGBA::maxChannelValue};
-RGBA static constexpr black {0U, 0U, 0U};
-RGBA static constexpr transparent {0U, 0U, 0U, RGBA::Alpha::transparent};
+static constexpr RGBA red {RGBA::maxChannelValue, 0U, 0U};
+static constexpr RGBA green {0U, RGBA::maxChannelValue, 0U};
+static constexpr RGBA blue {0U, 0U, RGBA::maxChannelValue};
+static constexpr RGBA cyan {0U, RGBA::maxChannelValue, RGBA::maxChannelValue};
+static constexpr RGBA white {RGBA::maxChannelValue, RGBA::maxChannelValue, RGBA::maxChannelValue};
+static constexpr RGBA black {0U, 0U, 0U};
+static constexpr RGBA transparent {0U, 0U, 0U, RGBA::Alpha::transparent};
 
 // An invalid color to give some visual feedback when a color hasn't been
 // properly initialized. White isn't really used otherwise in the game, so
 // hopefully it will be obvious that something is wrong.
-RGBA static constexpr invalid {white};
+static constexpr RGBA invalid {white};
 
 struct Shape {
-  RGBA static constexpr I {0U, 0xF0U, 0xF0U};
-  RGBA static constexpr O {0xF0U, 0xF0U, 0U};
-  RGBA static constexpr L {0xF0U, 0xA0U, 0U};
-  RGBA static constexpr J {0U, 0U, 0xF0U};
-  RGBA static constexpr S {0U, 0xF0U, 0U};
-  RGBA static constexpr Z {0xF0U, 0U, 0U};
-  RGBA static constexpr T {0xA0U, 0U, 0xF0U};
+  static constexpr RGBA I {0U, 0xF0U, 0xF0U};
+  static constexpr RGBA O {0xF0U, 0xF0U, 0U};
+  static constexpr RGBA L {0xF0U, 0xA0U, 0U};
+  static constexpr RGBA J {0U, 0U, 0xF0U};
+  static constexpr RGBA S {0U, 0xF0U, 0U};
+  static constexpr RGBA Z {0xF0U, 0U, 0U};
+  static constexpr RGBA T {0xA0U, 0U, 0xF0U};
 };
 } // namespace Color
 
@@ -196,16 +179,14 @@ struct Rect {
     T h {};
   };
 
-  auto constexpr operator*=(T const& rhs) {
+  constexpr auto operator*=(const T& rhs) {
     x *= rhs;
     y *= rhs;
     w *= rhs;
     h *= rhs;
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator*(Rect<T> lhs, T const& rhs) {
-    return lhs *= rhs;
-  }
+  [[nodiscard]] friend constexpr auto operator*(Rect<T> lhs, const T& rhs) { return lhs *= rhs; }
 };
 
 template <typename T>
@@ -213,13 +194,12 @@ struct Point {
   T x {};
   T y {};
 
-  auto constexpr operator+=(V2Generic<T> const& rhs) {
+  constexpr auto operator+=(const V2Generic<T>& rhs) {
     x += rhs.x;
     y += rhs.y;
     return *this;
   }
-  [[nodiscard]] auto constexpr friend operator+(Point<T> lhs,
-                                                V2Generic<T> const& rhs) {
+  [[nodiscard]] friend constexpr auto operator+(Point<T> lhs, const V2Generic<T>& rhs) {
     return lhs += rhs;
   }
 };
@@ -239,50 +219,26 @@ public:
   using size_type = typename ArrayType::size_type;
   using difference_type = typename ArrayType::difference_type;
 
-  [[nodiscard]] auto constexpr begin() noexcept -> iterator {
-    return m_data.begin();
-  }
-  [[nodiscard]] auto constexpr begin() const noexcept -> const_iterator {
-    return m_data.begin();
-  }
-  [[nodiscard]] auto constexpr end() noexcept -> iterator {
+  [[nodiscard]] constexpr auto begin() noexcept -> iterator { return m_data.begin(); }
+  [[nodiscard]] constexpr auto begin() const noexcept -> const_iterator { return m_data.begin(); }
+  [[nodiscard]] constexpr auto end() noexcept -> iterator { return std::next(begin(), m_size); }
+  [[nodiscard]] constexpr auto end() const noexcept -> const_iterator {
     return std::next(begin(), m_size);
   }
-  [[nodiscard]] auto constexpr end() const noexcept -> const_iterator {
-    return std::next(begin(), m_size);
-  }
-  [[nodiscard]] auto constexpr cbegin() const noexcept -> const_iterator {
-    return m_data.cbegin();
-  }
-  [[nodiscard]] auto constexpr cend() const noexcept -> const_iterator {
+  [[nodiscard]] constexpr auto cbegin() const noexcept -> const_iterator { return m_data.cbegin(); }
+  [[nodiscard]] constexpr auto cend() const noexcept -> const_iterator {
     return std::next(cbegin(), m_size);
   }
-  [[nodiscard]] auto constexpr front() -> reference { return m_data.front(); }
-  [[nodiscard]] auto constexpr front() const -> const_reference {
-    return m_data.front();
-  }
-  [[nodiscard]] auto constexpr back() -> reference {
-    return m_data[m_size - 1];
-  }
-  [[nodiscard]] auto constexpr back() const -> const_reference {
-    return m_data[m_size - 1];
-  }
-  [[nodiscard]] auto constexpr size() const noexcept -> size_type {
-    return m_size;
-  }
-  [[nodiscard]] auto constexpr max_size() const noexcept -> size_type {
-    return maxSize;
-  }
-  [[nodiscard]] auto constexpr empty() const noexcept -> bool {
-    return m_size == 0;
-  }
-  auto constexpr push_back(const_reference i) -> void {
-    m_data.at(m_size++) = i;
-  }
-  auto constexpr push_back(value_type&& i) -> void {
-    m_data.at(m_size++) = std::move(i);
-  }
-  auto constexpr pop_back() -> void {
+  [[nodiscard]] constexpr auto front() -> reference { return m_data.front(); }
+  [[nodiscard]] constexpr auto front() const -> const_reference { return m_data.front(); }
+  [[nodiscard]] constexpr auto back() -> reference { return m_data[m_size - 1]; }
+  [[nodiscard]] constexpr auto back() const -> const_reference { return m_data[m_size - 1]; }
+  [[nodiscard]] constexpr auto size() const noexcept -> size_type { return m_size; }
+  [[nodiscard]] constexpr auto max_size() const noexcept -> size_type { return maxSize; }
+  [[nodiscard]] constexpr auto empty() const noexcept -> bool { return m_size == 0; }
+  constexpr auto push_back(const_reference i) -> void { m_data.at(m_size++) = i; }
+  constexpr auto push_back(value_type&& i) -> void { m_data.at(m_size++) = std::move(i); }
+  constexpr auto pop_back() -> void {
     assert(m_size > 0);
     m_data[--m_size].~T();
   }
@@ -293,17 +249,16 @@ private:
 };
 
 template <typename T>
-[[nodiscard]] auto point_is_in_rect(Point<T> const& point,
-                                    Rect<T> const& rect) {
-  return (point.x >= rect.x) and (point.x < rect.x + rect.w) and
-         (point.y >= rect.y) and (point.y < rect.y + rect.h);
+[[nodiscard]] auto point_is_in_rect(const Point<T>& point, const Rect<T>& rect) {
+  return (point.x >= rect.x) and (point.x < rect.x + rect.w) and (point.y >= rect.y) and
+         (point.y < rect.y + rect.h);
 }
 
 // This won't work if T doesn't have a default constructor. If it does have
 // one, there's a potential performance hit from default constructing every
 // element and then immediately reassigning all of them.
 template <typename T, std::size_t N>
-[[nodiscard]] auto constexpr make_filled_array(T const& val) {
+[[nodiscard]] constexpr auto make_filled_array(const T& val) {
   std::array<T, N> arr;
   arr.fill(val);
   return arr;

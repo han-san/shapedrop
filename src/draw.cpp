@@ -7,8 +7,7 @@
 
 #include <string_view>
 
-auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr,
-                                  Color::RGBA color) -> void {
+auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA color) -> void {
   switch (get_render_mode()) {
   case RenderMode::opengl: {
     OpenGLRender::draw_solid_square_normalized(sqr, color);
@@ -18,8 +17,7 @@ auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr,
   } break;
   }
 }
-auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color)
-    -> void {
+auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color) -> void {
   switch (get_render_mode()) {
   case RenderMode::opengl: {
     OpenGLRender::draw_solid_square(sqr, color);
@@ -29,8 +27,7 @@ auto draw_solid_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color)
   } break;
   }
 }
-auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color,
-                        int borderSize) -> void {
+auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color, int borderSize) -> void {
   switch (get_render_mode()) {
   case RenderMode::opengl: {
     OpenGLRender::draw_hollow_square(buf, sqr, color, borderSize);
@@ -40,8 +37,8 @@ auto draw_hollow_square(BackBuffer& buf, Rect<int> sqr, Color::RGBA color,
   } break;
   }
 }
-auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr,
-                                   Color::RGBA color, int borderSize) -> void {
+auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, Color::RGBA color,
+                                   int borderSize) -> void {
   switch (get_render_mode()) {
   case RenderMode::opengl: {
     OpenGLRender::draw_hollow_square_normalized(buf, sqr, color, borderSize);
@@ -51,8 +48,7 @@ auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr,
   } break;
   }
 }
-auto draw_font_string(BackBuffer& buf, FontString const& fontString,
-                      Point<int> coords) -> void {
+auto draw_font_string(BackBuffer& buf, const FontString& fontString, Point<int> coords) -> void {
   switch (get_render_mode()) {
   case RenderMode::opengl: {
     OpenGLRender::draw_font_string(buf, fontString, coords);
@@ -62,20 +58,19 @@ auto draw_font_string(BackBuffer& buf, FontString const& fontString,
   } break;
   }
 }
-auto draw_font_string_normalized(BackBuffer& buf, FontString const& fontString,
+auto draw_font_string_normalized(BackBuffer& buf, const FontString& fontString,
                                  Point<double> relativeCoords) -> void {
   switch (get_render_mode()) {
   case RenderMode::opengl: {
     OpenGLRender::draw_font_string_normalized(buf, fontString, relativeCoords);
   } break;
   case RenderMode::software: {
-    SoftwareRender::draw_font_string_normalized(buf, fontString,
-                                                relativeCoords);
+    SoftwareRender::draw_font_string_normalized(buf, fontString, relativeCoords);
   } break;
   }
 }
-auto draw_text(BackBuffer& buf, std::string_view text, Point<int> coords,
-               double pixelHeight) -> void {
+auto draw_text(BackBuffer& buf, std::string_view text, Point<int> coords, double pixelHeight)
+    -> void {
   switch (get_render_mode()) {
   case RenderMode::opengl: {
     OpenGLRender::draw_text(buf, text, coords, pixelHeight);
@@ -85,16 +80,14 @@ auto draw_text(BackBuffer& buf, std::string_view text, Point<int> coords,
   } break;
   }
 }
-auto draw_text_normalized(BackBuffer& buf, std::string_view text,
-                          Point<double> relativeCoords, double pixelHeight)
-    -> void {
+auto draw_text_normalized(BackBuffer& buf, std::string_view text, Point<double> relativeCoords,
+                          double pixelHeight) -> void {
   switch (get_render_mode()) {
   case RenderMode::opengl: {
     OpenGLRender::draw_text_normalized(buf, text, relativeCoords, pixelHeight);
   } break;
   case RenderMode::software: {
-    SoftwareRender::draw_text_normalized(buf, text, relativeCoords,
-                                         pixelHeight);
+    SoftwareRender::draw_text_normalized(buf, text, relativeCoords, pixelHeight);
   } break;
   }
 }

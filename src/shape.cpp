@@ -11,11 +11,10 @@
 
 using namespace std::string_literals;
 
-Shape::Shape(Type const type) noexcept
+Shape::Shape(const Type type) noexcept
     : m_type {type}, color {to_color(type)}, pos {Board::columns / 2 - 2, 0} {}
 
-ShapePool::ShapePool(ShapePool::DataType const& shapes)
-    : shapePool {shapes}, previewPool {shapes} {
+ShapePool::ShapePool(const ShapePool::DataType& shapes) : shapePool {shapes}, previewPool {shapes} {
   reshuffle();
 }
 
@@ -35,9 +34,7 @@ auto ShapePool::next_shape() -> Shape {
   return Shape {shapePool[currentShapeIndex]};
 }
 
-auto ShapePool::current_shape() const -> Shape {
-  return Shape {shapePool[currentShapeIndex]};
-}
+auto ShapePool::current_shape() const -> Shape { return Shape {shapePool[currentShapeIndex]}; }
 
 auto ShapePool::get_preview_shapes_array() const -> PreviewStack {
   using namespace std::views;

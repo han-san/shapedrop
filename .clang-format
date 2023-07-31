@@ -1,5 +1,8 @@
 BasedOnStyle: llvm
+ColumnLimit: 100
 DerivePointerAlignment: false
 PointerAlignment: Left
 SpaceBeforeCpp11BracedList: true
 AlwaysBreakTemplateDeclarations: Yes
+QualifierAlignment: Custom
+QualifierOrder: [ 'friend', 'static', 'inline', 'constexpr', 'const', 'volatile', 'type' ]

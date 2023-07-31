@@ -10,27 +10,43 @@ auto remove_full_rows() -> void {
   /* Block const n {Color::invalid, false}; */
   /* Board boardStart; */
   /* boardStart.data = { */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, y, y, y, n, n, n, */
-  /*     n, n, n, y, y, n, y, n, n, n, n, y, y, y, y, n, n, n, n, n, n, y, n, n, y, */
-  /*     n, n, n, n, n, y, y, y, y, y, y, y, y, y, y, y, n, y, n, y, n, y, n, y, n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, y, y, y, n, n,
+   * n, */
+  /*     n, n, n, y, y, n, y, n, n, n, n, y, y, y, y, n, n, n, n, n, n, y, n, n,
+   * y, */
+  /*     n, n, n, n, n, y, y, y, y, y, y, y, y, y, y, y, n, y, n, y, n, y, n, y,
+   * n, */
   /*     n, y, n, y, n, y, n, y, n, y, y, y, y, y, y, y, y, y, y, y, */
   /* }; */
 
   /* Board boardEnd; */
   /* boardEnd.data = { */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, */
-  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, y, y, y, n, n, n, n, n, n, y, y, */
-  /*     n, y, n, n, n, n, y, y, y, y, n, n, n, n, n, n, y, n, n, y, n, n, n, n, n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n, n,
+   * n, */
+  /*     n, n, n, n, n, n, n, n, n, n, n, n, n, n, y, y, y, n, n, n, n, n, n, y,
+   * y, */
+  /*     n, y, n, n, n, n, y, y, y, y, n, n, n, n, n, n, y, n, n, y, n, n, n, n,
+   * n, */
   /*     y, n, y, n, y, n, y, n, y, n, n, y, n, y, n, y, n, y, n, y, */
   /* }; */
 

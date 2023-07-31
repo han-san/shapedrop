@@ -9,7 +9,7 @@
 #include <ranges>
 #include <span>
 
-auto Board::get_shadow(Shape const& shape) const -> Shape {
+auto Board::get_shadow(const Shape& shape) const -> Shape {
   auto shapeShadow = shape;
   while (try_move(shapeShadow, V2::down())) {
     // Intentionally empty body.
@@ -18,7 +18,7 @@ auto Board::get_shadow(Shape const& shape) const -> Shape {
   return shapeShadow;
 }
 
-auto Board::try_move(Shape& shape, V2 const move) const -> bool {
+auto Board::try_move(Shape& shape, const V2 move) const -> bool {
   if (is_valid_move(shape, move)) {
     shape.translate(move);
     return true;
@@ -26,7 +26,7 @@ auto Board::try_move(Shape& shape, V2 const move) const -> bool {
   return false;
 }
 
-auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
+auto Board::rotate_shape(Shape& shape, const Shape::RotationDirection dir) const
     -> std::optional<Shape::RotationType> {
   auto rotatingShape = shape;
   rotatingShape.rotate(dir);
@@ -37,7 +37,7 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
 
   // Something is blocking the shape after just rotating it, so it has to be
   // kicked into a valid position if possible.
-  for (auto const kickMove : shape.get_wallkicks(dir)) {
+  for (const auto kickMove : shape.get_wallkicks(dir)) {
     // rotatingShape already has the new rotation, but has to reset its
     // position every time it checks a new kick.
     rotatingShape.pos = shape.pos;
@@ -52,51 +52,45 @@ auto Board::rotate_shape(Shape& shape, Shape::RotationDirection const dir) const
   return std::nullopt;
 }
 
-auto Board::is_valid_spot(Point<int> const pos) const -> bool {
+auto Board::is_valid_spot(const Point<int> pos) const -> bool {
   if (point_is_in_rect(pos, {0, 0, columns, rows})) {
-    gsl::index const index {pos.y * columns + pos.x};
+    const gsl::index index {pos.y * columns + pos.x};
     return not block_at(index).isActive;
   }
   return false;
 }
 
-auto Board::is_valid_move(Shape shape, V2 const move) const -> bool {
+auto Board::is_valid_move(Shape shape, const V2 move) const -> bool {
   shape.translate(move);
   return is_valid_shape(shape);
 }
 
-auto Board::is_valid_shape(Shape const& shape) const -> bool {
-  auto const blockPositions = shape.get_absolute_block_positions();
-  return std::ranges::all_of(blockPositions, [this](auto const& position) {
-    return is_valid_spot(position);
-  });
+auto Board::is_valid_shape(const Shape& shape) const -> bool {
+  const auto blockPositions = shape.get_absolute_block_positions();
+  return std::ranges::all_of(blockPositions,
+                             [this](const auto& position) { return is_valid_spot(position); });
 }
 
 // If the shape is a T, its last movement was a rotation, and 3 or more of its
 // corners are occupied by other pieces it counts as a T-spin. If the rotation
 // was a wallkick it only counts as a T-spin mini.
-auto Board::check_for_tspin(Shape const& shape,
-                            Shape::RotationType const rotationType) const
+auto Board::check_for_tspin(const Shape& shape, const Shape::RotationType rotationType) const
     -> std::optional<TspinType> {
   if (shape.type() == Shape::Type::T) {
-    std::array<V2, 4> static constexpr cornerOffsets {
-        V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
-    auto const cornersOccupied = std::ranges::count_if(
-        cornerOffsets, [this, &shape](auto const& offset) {
+    static constexpr std::array<V2, 4> cornerOffsets {V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
+    const auto cornersOccupied =
+        std::ranges::count_if(cornerOffsets, [this, &shape](const auto& offset) {
           return not is_valid_spot(shape.pos + offset);
         });
     if (cornersOccupied >= 3) {
-      return (rotationType == Shape::RotationType::Wallkick)
-                 ? TspinType::Mini
-                 : TspinType::Regular;
+      return (rotationType == Shape::RotationType::Wallkick) ? TspinType::Mini : TspinType::Regular;
     }
   }
   return std::nullopt;
 }
 
 auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
-  using std::ranges::copy_if, std::ranges::all_of, std::views::iota,
-      std::back_inserter, std::span;
+  using std::ranges::copy_if, std::ranges::all_of, std::views::iota, std::back_inserter, std::span;
 
   ArrayStack<u8, Shape::maxHeight> rowsCleared;
 
@@ -113,21 +107,19 @@ auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
 }
 
 auto Board::remove_full_rows() -> u8 {
-  auto const rowsCleared = get_cleared_rows();
+  const auto rowsCleared = get_cleared_rows();
 
   if (rowsCleared.empty()) {
     return 0;
   }
 
-  auto move_row_down = [this](PositiveSize_t const rowNumber,
-                              PositiveSize_t const distance) {
+  auto move_row_down = [this](const PositiveSize_t rowNumber, const PositiveSize_t distance) {
     assert(std::size_t {distance} != 0);
     assert(std::size_t {rowNumber} + std::size_t {distance} < rows);
     for (u8 x {0}; x < columns; ++x) {
-      auto const index =
-          gsl::narrow_cast<gsl::index>(std::size_t {rowNumber * columns + x});
-      auto const newIndex = gsl::narrow_cast<gsl::index>(
-          std::size_t {(rowNumber + distance) * columns + x});
+      const auto index = gsl::narrow_cast<gsl::index>(std::size_t {rowNumber * columns + x});
+      const auto newIndex =
+          gsl::narrow_cast<gsl::index>(std::size_t {(rowNumber + distance) * columns + x});
       auto& oldBlock = block_at(index);
       auto& newBlock = block_at(newIndex);
       newBlock = oldBlock;
@@ -141,16 +133,16 @@ auto Board::remove_full_rows() -> u8 {
 
   // first move any potential rows between the cleared ones
   if (rowsCleared.size() == 2 or rowsCleared.size() == 3) {
-    auto const topRow = rowsCleared.front();
-    auto const botRow = rowsCleared.back();
+    const auto topRow = rowsCleared.front();
+    const auto botRow = rowsCleared.back();
     assert(topRow < rows);
     assert(botRow < rows);
     assert(botRow >= topRow);
 
     u8 emptyRowsPassed {0};
     for (auto y = botRow; y != topRow; --y) {
-      auto const found = std::ranges::any_of(
-          rowsCleared, [y](auto const& row) { return row == y; });
+      const auto found =
+          std::ranges::any_of(rowsCleared, [y](const auto& row) { return row == y; });
       if (not found) {
         // a non-full row between full rows
         // move down the amount of empty rows that have been passed
@@ -162,7 +154,7 @@ auto Board::remove_full_rows() -> u8 {
   }
 
   // then move all rows above removed rows
-  PositiveSize_t const rowAboveRemovedRows {rowsCleared.front() - 1U};
+  const PositiveSize_t rowAboveRemovedRows {rowsCleared.front() - 1U};
   for (std::size_t y {0}; y <= rowAboveRemovedRows; ++y) {
     move_row_down(rowAboveRemovedRows - y, rowsCleared.size());
   }

@@ -3,7 +3,7 @@ pkgs.mkShell {
   nativeBuildInputs = with pkgs; [
     cmake
     ninja
-    clang_15
+    clang_16
     pkg-config
   ];
 

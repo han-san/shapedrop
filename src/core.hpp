@@ -15,30 +15,28 @@ struct BackBuffer {
   PositiveU8 bpp {};
 };
 
-auto constexpr gBorderSize = 1;
+constexpr auto gBorderSize = 1;
 
-Rect<int> constexpr gHoldShapeDim {gBorderSize, gBorderSize, 5, 3};
-Rect<int> constexpr gPlayAreaDim {gBorderSize,
-                                  (gBorderSize + gHoldShapeDim.h + gBorderSize),
+constexpr Rect<int> gHoldShapeDim {gBorderSize, gBorderSize, 5, 3};
+constexpr Rect<int> gPlayAreaDim {gBorderSize, (gBorderSize + gHoldShapeDim.h + gBorderSize),
                                   Board::columns, Board::visibleRows};
-Rect<int> constexpr gSidebarDim {
-    (gBorderSize + gPlayAreaDim.w + gBorderSize), gBorderSize, 4,
-    (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)};
+constexpr Rect<int> gSidebarDim {(gBorderSize + gPlayAreaDim.w + gBorderSize), gBorderSize, 4,
+                                 (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)};
 
-auto constexpr gBaseWindowWidth =
+constexpr auto gBaseWindowWidth =
     gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize;
-auto constexpr gBaseWindowHeight =
+constexpr auto gBaseWindowHeight =
     gBorderSize + gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h + gBorderSize;
 
-ShapePool::DataType static constexpr initialShapes {
+static constexpr ShapePool::DataType initialShapes {
     Shape::Type::I, Shape::Type::L, Shape::Type::J, Shape::Type::O,
     Shape::Type::S, Shape::Type::Z, Shape::Type::T,
 };
 
 enum class BackToBackType { Tetris, Tspin };
 
-auto constexpr gMinLevel = 1;
-auto constexpr gMaxLevel = 99;
+constexpr auto gMinLevel = 1;
+constexpr auto gMaxLevel = 99;
 
 struct MenuState {
   int level {gMinLevel};
@@ -53,8 +51,8 @@ struct ProgramState {
   using HiResClock = std::chrono::high_resolution_clock;
   HiResClock::time_point frameStartClock {HiResClock::now()};
   HiResClock::duration frameTime {0};
-  uint static constexpr targetFPS {60};
-  HiResClock::duration static constexpr targetFrameTime {
+  static constexpr uint targetFPS {60};
+  static constexpr HiResClock::duration targetFrameTime {
       std::chrono::duration_cast<HiResClock::duration>(
           std::chrono::duration<double> {1. / targetFPS})};
 
@@ -77,9 +75,9 @@ struct GameState {
   int softDropRowCount {0};
 
   // shared for all shapes
-  std::chrono::milliseconds static constexpr lockDelay {500};
-  std::chrono::milliseconds static constexpr softDropDelay {100};
-  std::chrono::seconds static constexpr initialDropDelay {1};
+  static constexpr std::chrono::milliseconds lockDelay {500};
+  static constexpr std::chrono::milliseconds softDropDelay {100};
+  static constexpr std::chrono::seconds initialDropDelay {1};
 
   bool isSoftDropping {false};
   int linesCleared {0};
@@ -103,7 +101,7 @@ struct GameState {
 
   [[nodiscard]] auto drop_delay_for_level() const {
     using namespace std::chrono_literals;
-    auto const dropDelay = initialDropDelay - (this->level * 100ms);
+    const auto dropDelay = initialDropDelay - (this->level * 100ms);
     // dropDelay can't be negative
     return dropDelay > 0s ? dropDelay : 0s;
   }

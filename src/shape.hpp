@@ -19,7 +19,7 @@ public:
   enum class Type { I, O, L, J, S, Z, T };
 
   // The shape with the maximum height is the I shape (4 blocks tall).
-  u8 static constexpr maxHeight {4};
+  static constexpr u8 maxHeight {4};
 
   enum class RotationDirection { Left, Right };
 
@@ -29,15 +29,14 @@ public:
   Point<int> pos;
 
   // All shapes are composed of 4 blocks.
-  std::size_t static constexpr blockCount {4};
+  static constexpr std::size_t blockCount {4};
   using BlockStack = ArrayStack<Point<int>, blockCount>;
 
   explicit Shape(Type type) noexcept;
 
   // Returns the positions of the blocks relative to the top left corner of the
   // play area
-  [[nodiscard]] auto constexpr get_absolute_block_positions() const
-      -> BlockStack {
+  [[nodiscard]] constexpr auto get_absolute_block_positions() const -> BlockStack {
     auto positions = get_local_block_positions();
     for (auto& localPosition : positions) {
       localPosition.x += pos.x;
@@ -46,10 +45,10 @@ public:
     return positions;
   }
 
-  [[nodiscard]] auto constexpr get_wallkicks(
-      Shape::RotationDirection const dir) const -> std::array<V2, 4> {
-    auto const i = static_cast<gsl::index>(m_rotation);
-    auto const j = static_cast<gsl::index>(dir);
+  [[nodiscard]] constexpr auto get_wallkicks(const Shape::RotationDirection dir) const
+      -> std::array<V2, 4> {
+    const auto i = static_cast<gsl::index>(m_rotation);
+    const auto j = static_cast<gsl::index>(dir);
 
     using gsl::at;
 
@@ -71,7 +70,7 @@ public:
     std::terminate();
   }
 
-  [[nodiscard]] auto constexpr dimensions() const -> Rect<int>::Size {
+  [[nodiscard]] constexpr auto dimensions() const -> Rect<int>::Size {
     switch (m_type) {
     case Type::I:
       return {4, 1};
@@ -88,8 +87,7 @@ public:
     std::terminate();
   }
 
-  auto constexpr friend operator+=(Rotation& rotation,
-                                   RotationDirection const& direction) noexcept
+  friend constexpr auto operator+=(Rotation& rotation, const RotationDirection& direction) noexcept
       -> Rotation& {
     switch (direction) {
     case RotationDirection::Left:
@@ -131,30 +129,29 @@ public:
 
   [[nodiscard]] auto type() const noexcept -> Type { return m_type; }
 
-  auto rotate(RotationDirection const dir) -> Shape& {
+  auto rotate(const RotationDirection dir) -> Shape& {
     m_rotation += dir;
     return *this;
   }
 
-  auto translate(V2 const dir) -> Shape& {
+  auto translate(const V2 dir) -> Shape& {
     pos += dir;
     return *this;
   }
 
 private:
-  Rect<std::size_t>::Size static constexpr layoutDimensions {4, 4};
+  static constexpr Rect<std::size_t>::Size layoutDimensions {4, 4};
   using Layout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
   using RotationMap = std::array<Layout, 4>;
 
   // Returns the positions of the blocks relative to the top left corner of its
   // 4x4 rotation map
-  [[nodiscard]] auto constexpr get_local_block_positions() const -> BlockStack {
+  [[nodiscard]] constexpr auto get_local_block_positions() const -> BlockStack {
     BlockStack positions {};
-    auto const& layout = get_layout();
+    const auto& layout = get_layout();
     for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
       for (std::size_t x {0}; x < layoutDimensions.w; ++x) {
-        auto const index =
-            gsl::narrow_cast<gsl::index>(y * layoutDimensions.w + x);
+        const auto index = gsl::narrow_cast<gsl::index>(y * layoutDimensions.w + x);
         if (gsl::at(layout, index)) {
           positions.push_back({static_cast<int>(x), static_cast<int>(y)});
           if (positions.size() == positions.max_size()) {
@@ -163,12 +160,12 @@ private:
         }
       }
     }
-    throw std::logic_error(fmt::format(
-        "Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.",
-        static_cast<int>(m_type), static_cast<int>(m_rotation)));
+    throw std::logic_error(
+        fmt::format("Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.",
+                    static_cast<int>(m_type), static_cast<int>(m_rotation)));
   }
 
-  [[nodiscard]] auto static constexpr to_color(Type const type) -> Color::RGBA {
+  [[nodiscard]] static constexpr auto to_color(const Type type) -> Color::RGBA {
     switch (type) {
     case Type::I:
       return Color::Shape::I;
@@ -189,8 +186,8 @@ private:
     std::terminate();
   }
 
-  [[nodiscard]] auto constexpr get_layout() const -> Layout const& {
-    auto const index = static_cast<RotationMap::size_type>(m_rotation);
+  [[nodiscard]] constexpr auto get_layout() const -> const Layout& {
+    const auto index = static_cast<RotationMap::size_type>(m_rotation);
     switch (m_type) {
     case Shape::Type::I:
       return RotationMaps::I[index];
@@ -215,7 +212,7 @@ private:
     // Shapes J, L, S, T, and Z all have the same wall kicks while I has its
     // own and O can't kick since it doesn't rotate at all.
 
-    std::array static constexpr JLSTZ {
+    static constexpr std::array JLSTZ {
         // r0
         std::array {
             // left
@@ -241,7 +238,7 @@ private:
             std::array {V2 {-1, 0}, V2 {-1, -1}, V2 {0, 2}, V2 {-1, 2}},
         }};
 
-    std::array static constexpr I {
+    static constexpr std::array I {
         std::array {
             std::array {V2 {-1, 0}, V2 {2, 0}, V2 {-1, 2}, V2 {2, -1}},
             std::array {V2 {-2, 0}, V2 {1, 0}, V2 {-2, -1}, V2 {1, 2}},
@@ -262,10 +259,10 @@ private:
   };
 
   struct RotationMaps {
-    auto static constexpr o = false;
-    auto static constexpr X = true;
+    static constexpr auto o = false;
+    static constexpr auto X = true;
 
-    RotationMap static constexpr I {
+    static constexpr RotationMap I {
         Layout {
             o, o, o, o, //
             X, X, X, X, //
@@ -291,7 +288,7 @@ private:
             o, X, o, o, //
         },
     };
-    RotationMap static constexpr L {
+    static constexpr RotationMap L {
         Layout {
             o, o, X, o, //
             X, X, X, o, //
@@ -317,7 +314,7 @@ private:
             o, o, o, o, //
         },
     };
-    RotationMap static constexpr J {
+    static constexpr RotationMap J {
         Layout {
             X, o, o, o, //
             X, X, X, o, //
@@ -343,7 +340,7 @@ private:
             o, o, o, o, //
         },
     };
-    RotationMap static constexpr O {
+    static constexpr RotationMap O {
         Layout {
             o, X, X, o, //
             o, X, X, o, //
@@ -369,7 +366,7 @@ private:
             o, o, o, o, //
         },
     };
-    RotationMap static constexpr S {
+    static constexpr RotationMap S {
         Layout {
             o, X, X, o, //
             X, X, o, o, //
@@ -395,7 +392,7 @@ private:
             o, o, o, o, //
         },
     };
-    RotationMap static constexpr Z {
+    static constexpr RotationMap Z {
         Layout {
             X, X, o, o, //
             o, X, X, o, //
@@ -421,7 +418,7 @@ private:
             o, o, o, o, //
         },
     };
-    RotationMap static constexpr T {
+    static constexpr RotationMap T {
         Layout {
             o, X, o, o, //
             X, X, X, o, //
@@ -455,11 +452,11 @@ private:
 
 class ShapePool {
 public:
-  std::size_t static constexpr size {7};
+  static constexpr std::size_t size {7};
   using DataType = std::array<Shape::Type, size>;
   using PreviewStack = ArrayStack<Shape::Type, size * 2>;
 
-  explicit ShapePool(DataType const& shapes);
+  explicit ShapePool(const DataType& shapes);
 
   auto reshuffle() -> void;
   auto next_shape() -> Shape;
