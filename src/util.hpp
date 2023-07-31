@@ -8,6 +8,7 @@
 #include <cassert>
 #include <concepts>
 #include <limits>
+#include <stdexcept>
 
 template <std::unsigned_integral T>
 class PositiveGeneric {
@@ -59,7 +60,10 @@ public:
   [[nodiscard]] explicit operator bool() const noexcept { return m_value; }
 
   auto constexpr operator-=(ThisType const& rhs) -> ThisType& {
-    assert(m_value >= T {rhs});
+    if (rhs > *this) {
+      throw std::underflow_error("Subtraction of PositiveGeneric underflowed");
+    }
+
     m_value -= T {rhs};
     return *this;
   }
