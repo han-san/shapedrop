@@ -39,6 +39,6 @@ public:
 private:
   [[nodiscard]] auto get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight>;
 
-  std::array<Block, rows * columns> m_data {
+  std::array<Block, std::size_t {rows} * columns> m_data {
       make_filled_array<Block, rows * columns>({Color::black, false})};
 };
