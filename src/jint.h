@@ -1,36 +1,31 @@
 #pragma once
 
-#include <stdint.h>
-
-#ifdef __cplusplus
 #include <cstddef>
-#endif
+#include <cstdint>
 
-typedef int8_t s8;
-typedef int16_t s16;
-typedef int32_t s32;
-typedef int64_t s64;
+using s8 = int8_t;
+using s16 = int16_t;
+using s32 = int32_t;
+using s64 = int64_t;
 
-typedef uint8_t u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-typedef uint64_t u64;
+using u8 = uint8_t;
+using u16 = uint16_t;
+using u32 = uint32_t;
+using u64 = uint64_t;
 
-typedef long long llong;
+using llong = long long;
 
-typedef unsigned char uchar;
-typedef unsigned short ushort;
-typedef unsigned int uint;
-typedef unsigned long ulong;
-typedef unsigned long long ullong;
+using uchar = unsigned char;
+using ushort = unsigned short;
+using uint = unsigned int;
+using ulong = unsigned long;
+using ullong = unsigned long long;
 
-typedef signed char schar;
-typedef signed short sshort;
-typedef signed int sint;
-typedef signed long slong;
-typedef signed long long sllong;
-
-#ifdef __cplusplus
+using schar = signed char;
+using sshort = signed short;
+using sint = signed int;
+using slong = signed long;
+using sllong = signed long long;
 
 [[nodiscard]] constexpr auto operator"" _s8(ullong n) -> s8 { return static_cast<s8>(n); }
 [[nodiscard]] constexpr auto operator"" _s16(ullong n) -> s16 { return static_cast<s16>(n); }
@@ -45,5 +40,3 @@ typedef signed long long sllong;
 [[nodiscard]] constexpr auto operator"" _zu(ullong n) -> std::size_t {
   return static_cast<std::size_t>(n);
 }
-
-#endif
