@@ -41,9 +41,10 @@ public:
   template <std::floating_point Float>
   constexpr explicit PositiveGeneric(const Float i)
       : m_value {gsl::narrow_cast<T>(i)} {
-    // make sure it fits the type's range
-    assert(i >= 0);
-    assert(i <= static_cast<Float>(std::numeric_limits<T>::max()));
+    // FIXME: Rounding error could cause an unintended exception.
+    if (i < 0 || i > static_cast<Float>(std::numeric_limits<T>::max())) {
+      throw gsl::narrowing_error();
+    }
   }
 
   [[nodiscard]] constexpr explicit operator T() const noexcept {
