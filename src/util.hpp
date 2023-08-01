@@ -10,17 +10,17 @@
 #include <limits>
 #include <stdexcept>
 
-template <std::unsigned_integral T>
+template <std::unsigned_integral BackingType>
 class PositiveGeneric {
-  using ThisType = PositiveGeneric<T>;
+  using ThisType = PositiveGeneric<BackingType>;
 
 public:
   PositiveGeneric() = default;
 
   template <std::integral FromIntType>
   constexpr explicit(std::is_signed_v<FromIntType>) PositiveGeneric(const FromIntType i)
-      : m_value {gsl::narrow_cast<T>(i)} {
-    static_assert(std::numeric_limits<T>::min() == 0);
+      : m_value {gsl::narrow_cast<BackingType>(i)} {
+    static_assert(std::numeric_limits<BackingType>::min() == 0);
     constexpr auto lowerBoundIsUnsafe = std::numeric_limits<FromIntType>::min() < 0;
     if constexpr (lowerBoundIsUnsafe) {
       if (i < 0) {
@@ -29,23 +29,23 @@ public:
     }
 
     constexpr auto upperBoundIsUnsafe =
-        std::numeric_limits<FromIntType>::max() > std::numeric_limits<T>::max();
+        std::numeric_limits<FromIntType>::max() > std::numeric_limits<BackingType>::max();
     if constexpr (upperBoundIsUnsafe) {
-      if (std::numeric_limits<T>::max() < i) {
+      if (std::numeric_limits<BackingType>::max() < i) {
         throw gsl::narrowing_error();
       }
     }
   }
 
   template <std::floating_point Float>
-  constexpr explicit PositiveGeneric(const Float i) : m_value {gsl::narrow_cast<T>(i)} {
+  constexpr explicit PositiveGeneric(const Float i) : m_value {gsl::narrow_cast<BackingType>(i)} {
     // FIXME: Rounding error could cause an unintended exception.
-    if (i < 0 || i > static_cast<Float>(std::numeric_limits<T>::max())) {
+    if (i < 0 or i > static_cast<Float>(std::numeric_limits<BackingType>::max())) {
       throw gsl::narrowing_error();
     }
   }
 
-  [[nodiscard]] constexpr explicit operator T() const noexcept { return m_value; }
+  [[nodiscard]] constexpr explicit operator BackingType() const noexcept { return m_value; }
 
   template <typename U>
   operator PositiveGeneric<U>() const noexcept {
@@ -59,28 +59,28 @@ public:
       throw std::underflow_error("Subtraction of PositiveGeneric underflowed");
     }
 
-    m_value -= T {rhs};
+    m_value -= BackingType {rhs};
     return *this;
   }
   [[nodiscard]] friend constexpr auto operator-(ThisType lhs, const ThisType& rhs) -> ThisType {
     return lhs -= rhs;
   }
   constexpr auto operator+=(const ThisType& rhs) -> ThisType& {
-    m_value += T {rhs};
+    m_value += BackingType {rhs};
     return *this;
   }
   [[nodiscard]] friend constexpr auto operator+(ThisType lhs, const ThisType& rhs) -> ThisType {
     return lhs += rhs;
   }
   constexpr auto operator*=(const ThisType& rhs) -> ThisType& {
-    m_value *= T {rhs};
+    m_value *= BackingType {rhs};
     return *this;
   }
   [[nodiscard]] friend constexpr auto operator*(ThisType lhs, const ThisType& rhs) -> ThisType {
     return lhs *= rhs;
   }
   constexpr auto operator/=(const ThisType& rhs) -> ThisType& {
-    m_value /= T {rhs};
+    m_value /= BackingType {rhs};
     return *this;
   }
   [[nodiscard]] friend constexpr auto operator/(ThisType lhs, const ThisType& rhs) -> ThisType {
@@ -90,7 +90,7 @@ public:
   friend constexpr auto operator<=>(const ThisType& lhs, const ThisType& rhs) = default;
 
 private:
-  T m_value {};
+  BackingType m_value {};
 };
 
 using PositiveUChar = PositiveGeneric<uchar>;
