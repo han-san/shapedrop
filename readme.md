@@ -16,4 +16,9 @@ Controls
 Dependencies
 ------------
 
-* SDL2
+* [SDL2](https://www.libsdl.org)
+* [GSL](https://github.com/microsoft/GSL)
+* [{fmt}](https://fmt.dev)
+* [OpenGL](https://www.opengl.org)
+* [Glad](https://glad.dav1d.de)
+* [GLM](https://glm.g-truc.net)
