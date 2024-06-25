@@ -12,7 +12,7 @@
 using namespace std::string_literals;
 
 Shape::Shape(const Type type) noexcept
-    : m_type {type}, color {to_color(type)}, pos {Board::columns / 2 - 2, 0} {}
+    : color {to_color(type)}, pos {Board::columns / 2 - 2, 0}, m_type {type} {}
 
 ShapePool::ShapePool(const ShapePool::DataType& shapes) : shapePool {shapes}, previewPool {shapes} {
   reshuffle();
