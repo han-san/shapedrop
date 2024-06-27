@@ -7,15 +7,15 @@
 
 #include <thread>
 
-namespace SoftwareRender {
+namespace {
 
-[[nodiscard]] static auto alpha_blend_channel(const PositiveU8 bg, const PositiveU8 fg,
-                                              const PositiveU8 alpha) -> PositiveU8 {
+[[nodiscard]] auto alpha_blend_channel(const PositiveU8 bg, const PositiveU8 fg,
+                                       const PositiveU8 alpha) -> PositiveU8 {
   const auto alphaRatio = u8 {alpha} / 255.;
   return static_cast<PositiveU8>(u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio));
 }
 
-static auto draw_pixel(void* data, const Color::RGBA color) -> void {
+auto draw_pixel(void* data, const Color::RGBA color) -> void {
   auto* byte {static_cast<u8*>(data)};
   *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.b, color.a)};
   ++byte;
@@ -24,8 +24,8 @@ static auto draw_pixel(void* data, const Color::RGBA color) -> void {
   *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.r, color.a)};
 }
 
-static auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharacter,
-                                const Point<int> characterCoords) -> void {
+auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharacter,
+                         const Point<int> characterCoords) -> void {
   for (int y {0}; y < fontCharacter.dimensions.h; ++y) {
     const auto currY = characterCoords.y + y + fontCharacter.yoff +
                        static_cast<int>(fontCharacter.ascent * fontCharacter.scale);
@@ -49,6 +49,46 @@ static auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharac
     }
   }
 }
+
+auto draw_background_rows(BackBuffer bb, const PositiveSize_t startRow,
+                          const PositiveSize_t endRow) {
+  for (std::size_t y {startRow}; y < endRow; ++y) {
+    for (std::size_t x {0}; x < uint {bb.dimensions.w}; ++x) {
+      const Color::RGBA color {
+          static_cast<u8>(Color::RGBA::maxChannelValue *
+                          (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w}))),
+          static_cast<u8>(
+              Color::RGBA::maxChannelValue *
+              (1 - (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w})) *
+                       (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h})))),
+          static_cast<u8>(Color::RGBA::maxChannelValue *
+                          (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h}))),
+      };
+      SoftwareRender::draw_solid_square(bb, {static_cast<int>(x), static_cast<int>(y), 1, 1},
+                                        color);
+    }
+  }
+}
+
+auto draw_playarea_rows(BackBuffer bb, const PositiveSize_t startRow, const PositiveSize_t endRow,
+                        const Board& board, const PositiveUInt positiveScale) {
+  const uint scale {positiveScale};
+  for (std::size_t y {startRow}; y < endRow; ++y) {
+    for (std::size_t x {0}; x < Board::columns; ++x) {
+      auto currindex = gsl::narrow_cast<gsl::index>(y * Board::columns + x);
+      const auto& block = board.block_at(currindex);
+      auto color = block.isActive ? block.color : Color::black;
+      Rect<int> square {static_cast<int>((x + gPlayAreaDim.x) * scale),
+                        static_cast<int>((y - 2 + gPlayAreaDim.y) * scale), static_cast<int>(scale),
+                        static_cast<int>(scale)};
+      SoftwareRender::draw_solid_square(bb, square, color);
+    }
+  }
+}
+
+} // namespace
+
+namespace SoftwareRender {
 
 auto draw_font_string(BackBuffer& buf, const FontString& fontString, Point<int> coords) -> void {
   for (const auto& fontCharacter : fontString.data) {
@@ -179,42 +219,6 @@ auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, const Colo
 /*         } */
 /*     } */
 /* } */
-
-static auto draw_background_rows(BackBuffer bb, const PositiveSize_t startRow,
-                                 const PositiveSize_t endRow) {
-  for (std::size_t y {startRow}; y < endRow; ++y) {
-    for (std::size_t x {0}; x < uint {bb.dimensions.w}; ++x) {
-      const Color::RGBA color {
-          static_cast<u8>(Color::RGBA::maxChannelValue *
-                          (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w}))),
-          static_cast<u8>(
-              Color::RGBA::maxChannelValue *
-              (1 - (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w})) *
-                       (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h})))),
-          static_cast<u8>(Color::RGBA::maxChannelValue *
-                          (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h}))),
-      };
-      draw_solid_square(bb, {static_cast<int>(x), static_cast<int>(y), 1, 1}, color);
-    }
-  }
-}
-
-static auto draw_playarea_rows(BackBuffer bb, const PositiveSize_t startRow,
-                               const PositiveSize_t endRow, const Board& board,
-                               const PositiveUInt positiveScale) {
-  const uint scale {positiveScale};
-  for (std::size_t y {startRow}; y < endRow; ++y) {
-    for (std::size_t x {0}; x < Board::columns; ++x) {
-      auto currindex = gsl::narrow_cast<gsl::index>(y * Board::columns + x);
-      const auto& block = board.block_at(currindex);
-      auto color = block.isActive ? block.color : Color::black;
-      Rect<int> square {static_cast<int>((x + gPlayAreaDim.x) * scale),
-                        static_cast<int>((y - 2 + gPlayAreaDim.y) * scale), static_cast<int>(scale),
-                        static_cast<int>(scale)};
-      draw_solid_square(bb, square, color);
-    }
-  }
-}
 
 auto draw(ProgramState& programState, GameState& gameState) -> void {
   auto bb = get_back_buffer();
