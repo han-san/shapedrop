@@ -111,20 +111,23 @@ struct V2Generic {
 
   using ThisType = V2Generic<T>;
 
-  constexpr auto operator+=(const ThisType& rhs) -> ThisType& {
-    x += rhs.x;
-    y += rhs.y;
-    return *this;
-  }
-  [[nodiscard]] friend constexpr auto operator+(ThisType lhs, const ThisType& rhs) -> ThisType {
-    return lhs += rhs;
-  }
-
   [[nodiscard]] static constexpr auto right() -> ThisType { return {1, 0}; }
   [[nodiscard]] static constexpr auto left() -> ThisType { return {-1, 0}; }
   [[nodiscard]] static constexpr auto up() -> ThisType { return {0, -1}; }
   [[nodiscard]] static constexpr auto down() -> ThisType { return {0, 1}; }
 };
+
+template <typename T>
+constexpr auto operator+=(V2Generic<T>& lhs, const V2Generic<T>& rhs) -> V2Generic<T>& {
+  lhs.x += rhs.x;
+  lhs.y += rhs.y;
+  return lhs;
+}
+
+template <typename T>
+[[nodiscard]] constexpr auto operator+(V2Generic<T> lhs, const V2Generic<T>& rhs) -> V2Generic<T> {
+  return lhs += rhs;
+}
 
 using V2 = V2Generic<int>;
 using V2f = V2Generic<double>;
@@ -178,31 +181,39 @@ struct Rect {
     T w {};
     T h {};
   };
-
-  constexpr auto operator*=(const T& rhs) {
-    x *= rhs;
-    y *= rhs;
-    w *= rhs;
-    h *= rhs;
-    return *this;
-  }
-  [[nodiscard]] friend constexpr auto operator*(Rect<T> lhs, const T& rhs) { return lhs *= rhs; }
 };
+
+template <typename T>
+constexpr auto operator*=(Rect<T>& lhs, const T& rhs) -> Rect<T>& {
+  lhs.x *= rhs;
+  lhs.y *= rhs;
+  lhs.w *= rhs;
+  lhs.h *= rhs;
+  return lhs;
+}
+
+template <typename T>
+[[nodiscard]] constexpr auto operator*(Rect<T> lhs, const T& rhs) -> Rect<T> {
+  return lhs *= rhs;
+}
 
 template <typename T>
 struct Point {
   T x {};
   T y {};
-
-  constexpr auto operator+=(const V2Generic<T>& rhs) {
-    x += rhs.x;
-    y += rhs.y;
-    return *this;
-  }
-  [[nodiscard]] friend constexpr auto operator+(Point<T> lhs, const V2Generic<T>& rhs) {
-    return lhs += rhs;
-  }
 };
+
+template <typename T>
+constexpr auto operator+=(Point<T>& lhs, const V2Generic<T>& rhs) -> Point<T>& {
+  lhs.x += rhs.x;
+  lhs.y += rhs.y;
+  return lhs;
+}
+
+template <typename T>
+[[nodiscard]] constexpr auto operator+(Point<T> lhs, const V2Generic<T>& rhs) -> Point<T> {
+  return lhs += rhs;
+}
 
 template <typename T, std::size_t maxSize>
 class ArrayStack {
