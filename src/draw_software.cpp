@@ -40,7 +40,7 @@ static auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharac
 
       const auto currbyteindex =
           static_cast<uint>(currY) * uint {buf.dimensions.w} + static_cast<uint>(currX);
-      auto* currbyte = static_cast<u8*>(buf.memory) + (currbyteindex* u8 {buf.bpp});
+      auto* currbyte = static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp});
 
       const auto relativeIndex = static_cast<std::size_t>(y * fontCharacter.dimensions.w + x);
       const auto a = fontCharacter.bitmap[relativeIndex];
@@ -60,8 +60,8 @@ auto draw_font_string(BackBuffer& buf, const FontString& fontString, Point<int> 
 auto draw_font_string_normalized(BackBuffer& buf, const FontString& fontString,
                                  const Point<double> relativeCoords) -> void {
   const Point<int> realCoords {
-      static_cast<int>(relativeCoords.x* uint {buf.dimensions.w}),
-      static_cast<int>(relativeCoords.y* uint {buf.dimensions.h}),
+      static_cast<int>(relativeCoords.x * uint {buf.dimensions.w}),
+      static_cast<int>(relativeCoords.y * uint {buf.dimensions.h}),
   };
   draw_font_string(buf, fontString, realCoords);
 }
@@ -75,10 +75,10 @@ auto draw_text(BackBuffer& buf, const std::string_view text, const Point<int> co
 auto draw_text_normalized(BackBuffer& buf, const std::string_view text,
                           const Point<double> relativeCoords, const double pixelHeight) -> void {
   const Point<int> realCoords {
-      static_cast<int>(relativeCoords.x* uint {buf.dimensions.w}),
-      static_cast<int>(relativeCoords.y* uint {buf.dimensions.h}),
+      static_cast<int>(relativeCoords.x * uint {buf.dimensions.w}),
+      static_cast<int>(relativeCoords.y * uint {buf.dimensions.h}),
   };
-  draw_text(buf, text, realCoords, pixelHeight* uint {buf.dimensions.h});
+  draw_text(buf, text, realCoords, pixelHeight * uint {buf.dimensions.h});
 }
 
 auto draw_solid_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA color) -> void {
@@ -93,8 +93,8 @@ auto draw_solid_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA c
         continue;
       }
 
-      const auto currbyteindex = pixely* uint {buf.dimensions.w} + pixelx;
-      auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex* u8 {buf.bpp})};
+      const auto currbyteindex = pixely * uint {buf.dimensions.w} + pixelx;
+      auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
       draw_pixel(currbyte, color);
     }
@@ -103,10 +103,10 @@ auto draw_solid_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA c
 
 auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, const Color::RGBA color)
     -> void {
-  Rect<int> newSqr {static_cast<int>(sqr.x* uint {buf.dimensions.w}),
-                    static_cast<int>(sqr.y* uint {buf.dimensions.h}),
-                    static_cast<int>(sqr.w* uint {buf.dimensions.w}),
-                    static_cast<int>(sqr.h* uint {buf.dimensions.h})};
+  Rect<int> newSqr {static_cast<int>(sqr.x * uint {buf.dimensions.w}),
+                    static_cast<int>(sqr.y * uint {buf.dimensions.h}),
+                    static_cast<int>(sqr.w * uint {buf.dimensions.w}),
+                    static_cast<int>(sqr.h * uint {buf.dimensions.h})};
 
   draw_solid_square(buf, newSqr, color);
 }
@@ -131,8 +131,8 @@ auto draw_hollow_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA 
         continue;
       }
 
-      const auto currbyteindex = pixely* uint {buf.dimensions.w} + pixelx;
-      auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex* u8 {buf.bpp})};
+      const auto currbyteindex = pixely * uint {buf.dimensions.w} + pixelx;
+      auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
       draw_pixel(currbyte, color);
     }
@@ -141,10 +141,10 @@ auto draw_hollow_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA 
 
 auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, const Color::RGBA color,
                                    const int borderSize) -> void {
-  Rect<int> newSqr {static_cast<int>(sqr.x* uint {buf.dimensions.w}),
-                    static_cast<int>(sqr.y* uint {buf.dimensions.h}),
-                    static_cast<int>(sqr.w* uint {buf.dimensions.w}),
-                    static_cast<int>(sqr.h* uint {buf.dimensions.h})};
+  Rect<int> newSqr {static_cast<int>(sqr.x * uint {buf.dimensions.w}),
+                    static_cast<int>(sqr.y * uint {buf.dimensions.h}),
+                    static_cast<int>(sqr.w * uint {buf.dimensions.w}),
+                    static_cast<int>(sqr.h * uint {buf.dimensions.h})};
 
   draw_hollow_square(buf, newSqr, color, borderSize);
 }
