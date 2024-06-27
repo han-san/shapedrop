@@ -1,6 +1,7 @@
 #include "draw_software.hpp"
 
 #include "font.hpp"
+#include "geometry.hpp"
 #include "platform.hpp"
 #include "ui.hpp"
 

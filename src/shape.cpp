@@ -1,6 +1,7 @@
 #include "shape.hpp"
 
 #include "board.hpp"
+#include "geometry.hpp"
 #include "util.hpp"
 
 #include <cassert>

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "geometry.hpp"
 #include "util.hpp"
 
 #include "jint.h"

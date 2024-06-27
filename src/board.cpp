@@ -1,5 +1,6 @@
 #include "board.hpp"
 
+#include "geometry.hpp"
 #include "jint.h"
 
 #include <algorithm>

@@ -3,6 +3,7 @@
 #include "core.hpp"
 #include "draw.hpp"
 #include "font.hpp"
+#include "geometry.hpp"
 #include "util.hpp"
 
 #include "fmt/core.h"

@@ -2,6 +2,7 @@
 
 #include "core.hpp"
 #include "font.hpp"
+#include "geometry.hpp"
 #include "platform.hpp"
 #include "util.hpp"
 
