@@ -12,16 +12,16 @@ namespace {
 [[nodiscard]] auto alpha_blend_channel(const PositiveU8 bg, const PositiveU8 fg,
                                        const PositiveU8 alpha) -> PositiveU8 {
   const auto alphaRatio = u8 {alpha} / 255.;
-  return static_cast<PositiveU8>(u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio));
+  return PositiveU8 {u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio)};
 }
 
 auto draw_pixel(void* data, const Color::RGBA color) -> void {
   auto* byte {static_cast<u8*>(data)};
-  *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.b, color.a)};
+  *byte = u8 {alpha_blend_channel(*byte, color.b, color.a)};
   ++byte;
-  *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.g, color.a)};
+  *byte = u8 {alpha_blend_channel(*byte, color.g, color.a)};
   ++byte;
-  *byte = u8 {alpha_blend_channel(PositiveU8 {*byte}, color.r, color.a)};
+  *byte = u8 {alpha_blend_channel(*byte, color.r, color.a)};
 }
 
 auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharacter,
@@ -238,11 +238,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
   {
     const auto rowsPerThread = uint {bb.dimensions.h} / threadCount;
     for (std::size_t i {0}; i < threadCount - 1; ++i) {
-      threads.emplace_back(&draw_background_rows, bb, PositiveSize_t {rowsPerThread * i},
-                           PositiveSize_t {rowsPerThread * (i + 1)});
+      threads.emplace_back(&draw_background_rows, bb, rowsPerThread * i, rowsPerThread * (i + 1));
     }
-    threads.emplace_back(&draw_background_rows, bb,
-                         PositiveSize_t {rowsPerThread * (threadCount - 1)}, bb.dimensions.h);
+    threads.emplace_back(&draw_background_rows, bb, rowsPerThread * (threadCount - 1),
+                         bb.dimensions.h);
     join_all(threads);
   }
 
@@ -255,13 +254,11 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
       const PositiveUInt positiveScale {scale};
       const auto rowsPerThread = (Board::rows - 2) / threadCount;
       for (std::size_t i {0}; i < threadCount - 1; ++i) {
-        threads.emplace_back(&draw_playarea_rows, bb, PositiveSize_t {2 + (rowsPerThread * i)},
-                             PositiveSize_t {2 + rowsPerThread * (i + 1)}, gameState.board,
-                             positiveScale);
+        threads.emplace_back(&draw_playarea_rows, bb, 2 + (rowsPerThread * i),
+                             2 + rowsPerThread * (i + 1), gameState.board, positiveScale);
       }
-      threads.emplace_back(&draw_playarea_rows, bb,
-                           PositiveSize_t {2 + rowsPerThread * (threadCount - 1)},
-                           PositiveSize_t {Board::rows}, gameState.board, positiveScale);
+      threads.emplace_back(&draw_playarea_rows, bb, 2 + rowsPerThread * (threadCount - 1),
+                           Board::rows, gameState.board, positiveScale);
       join_all(threads);
     }
 
