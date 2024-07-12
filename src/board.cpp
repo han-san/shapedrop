@@ -1,5 +1,6 @@
 #include "board.hpp"
 
+#include "color.hpp"
 #include "geometry.hpp"
 #include "jint.h"
 #include "positive.hpp"
