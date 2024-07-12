@@ -10,8 +10,6 @@
 
 template <std::unsigned_integral BackingType>
 class Positive {
-  using ThisType = Positive<BackingType>;
-
 public:
   Positive() = default;
 
@@ -79,7 +77,7 @@ public:
 
   [[nodiscard]] constexpr explicit operator bool() const noexcept { return m_value; }
 
-  constexpr auto operator-=(const ThisType& rhs) -> ThisType& {
+  constexpr auto operator-=(const Positive& rhs) -> Positive& {
     if (rhs > *this) {
       throw std::underflow_error("Subtraction of PositiveGeneric underflowed");
     }
@@ -87,32 +85,32 @@ public:
     m_value -= BackingType {rhs};
     return *this;
   }
-  [[nodiscard]] friend constexpr auto operator-(ThisType lhs, const ThisType& rhs) -> ThisType {
+  [[nodiscard]] friend constexpr auto operator-(Positive lhs, const Positive& rhs) -> Positive {
     return lhs -= rhs;
   }
-  constexpr auto operator+=(const ThisType& rhs) -> ThisType& {
+  constexpr auto operator+=(const Positive& rhs) -> Positive& {
     m_value += BackingType {rhs};
     return *this;
   }
-  [[nodiscard]] friend constexpr auto operator+(ThisType lhs, const ThisType& rhs) -> ThisType {
+  [[nodiscard]] friend constexpr auto operator+(Positive lhs, const Positive& rhs) -> Positive {
     return lhs += rhs;
   }
-  constexpr auto operator*=(const ThisType& rhs) -> ThisType& {
+  constexpr auto operator*=(const Positive& rhs) -> Positive& {
     m_value *= BackingType {rhs};
     return *this;
   }
-  [[nodiscard]] friend constexpr auto operator*(ThisType lhs, const ThisType& rhs) -> ThisType {
+  [[nodiscard]] friend constexpr auto operator*(Positive lhs, const Positive& rhs) -> Positive {
     return lhs *= rhs;
   }
-  constexpr auto operator/=(const ThisType& rhs) -> ThisType& {
+  constexpr auto operator/=(const Positive& rhs) -> Positive& {
     m_value /= BackingType {rhs};
     return *this;
   }
-  [[nodiscard]] friend constexpr auto operator/(ThisType lhs, const ThisType& rhs) -> ThisType {
+  [[nodiscard]] friend constexpr auto operator/(Positive lhs, const Positive& rhs) -> Positive {
     return lhs /= rhs;
   }
 
-  friend constexpr auto operator<=>(const ThisType& lhs, const ThisType& rhs) = default;
+  friend constexpr auto operator<=>(const Positive& lhs, const Positive& rhs) = default;
 
 private:
   BackingType m_value {};
