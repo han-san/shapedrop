@@ -2,6 +2,7 @@
 
 #include "geometry.hpp"
 #include "jint.h"
+#include "positive.hpp"
 
 #include <algorithm>
 #include <cassert>

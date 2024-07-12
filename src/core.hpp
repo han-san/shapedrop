@@ -1,6 +1,7 @@
 #pragma once
 
 #include "board.hpp"
+#include "positive.hpp"
 #include "shape.hpp"
 #include "util.hpp"
 
