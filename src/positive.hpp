@@ -9,14 +9,14 @@
 #include <optional>
 
 template <std::unsigned_integral BackingType>
-class PositiveGeneric {
-  using ThisType = PositiveGeneric<BackingType>;
+class Positive {
+  using ThisType = Positive<BackingType>;
 
 public:
-  PositiveGeneric() = default;
+  Positive() = default;
 
   template <std::integral FromIntType>
-  constexpr explicit(std::is_signed_v<FromIntType>) PositiveGeneric(const FromIntType i)
+  constexpr explicit(std::is_signed_v<FromIntType>) Positive(const FromIntType i)
       : m_value {gsl::narrow_cast<BackingType>(i)} {
     static_assert(std::numeric_limits<BackingType>::min() == 0);
     constexpr auto lowerBoundIsUnsafe = std::numeric_limits<FromIntType>::min() < 0;
@@ -36,7 +36,7 @@ public:
   }
 
   template <std::floating_point Float>
-  constexpr explicit PositiveGeneric(const Float i) : m_value {gsl::narrow_cast<BackingType>(i)} {
+  constexpr explicit Positive(const Float i) : m_value {gsl::narrow_cast<BackingType>(i)} {
     // FIXME: Rounding error could cause an unintended exception.
     if (i < 0 or i > static_cast<Float>(std::numeric_limits<BackingType>::max())) {
       throw gsl::narrowing_error();
@@ -45,35 +45,35 @@ public:
 
   template <std::floating_point Float>
   [[nodiscard]] static constexpr auto try_construct(Float i)
-      -> std::optional<PositiveGeneric<BackingType>> {
+      -> std::optional<Positive<BackingType>> {
     // FIXME: Rounding error could cause an unintended failure.
     if (i < 0 or i > static_cast<Float>(std::numeric_limits<BackingType>::max())) {
       return std::nullopt;
     }
-    return PositiveGeneric<BackingType> {gsl::narrow_cast<BackingType>(i)};
+    return Positive<BackingType> {gsl::narrow_cast<BackingType>(i)};
   }
 
   template <std::integral FromType>
   [[nodiscard]] static constexpr auto try_construct(FromType from)
-      -> std::optional<PositiveGeneric<BackingType>> {
+      -> std::optional<Positive<BackingType>> {
     // TODO: How should max value narrowing work? Currently, in the contructor it's checked and an
     // exception is throw, but here we don't allow it at compile time.
     constexpr auto fromTypeMax = std::numeric_limits<FromType>::max();
     static_assert(fromTypeMax >= 0 and fromTypeMax <= std::numeric_limits<BackingType>::max());
 
     if constexpr (std::is_unsigned_v<FromType>) {
-      return PositiveGeneric<BackingType> {from};
+      return Positive<BackingType> {from};
     }
     if (from < 0) {
       return std::nullopt;
     }
-    return PositiveGeneric<BackingType> {gsl::narrow_cast<BackingType>(from)};
+    return Positive<BackingType> {gsl::narrow_cast<BackingType>(from)};
   }
 
   [[nodiscard]] constexpr explicit operator BackingType() const noexcept { return m_value; }
 
   template <typename U>
-  constexpr operator PositiveGeneric<U>() const noexcept {
+  constexpr operator Positive<U>() const noexcept {
     return m_value;
   }
 
@@ -118,16 +118,16 @@ private:
   BackingType m_value {};
 };
 
-using PositiveUChar = PositiveGeneric<uchar>;
-using PositiveUShort = PositiveGeneric<ushort>;
-using PositiveUInt = PositiveGeneric<uint>;
-using PositiveULong = PositiveGeneric<ulong>;
-using PositiveULLong = PositiveGeneric<ullong>;
-using PositiveU8 = PositiveGeneric<u8>;
-using PositiveU16 = PositiveGeneric<u16>;
-using PositiveU32 = PositiveGeneric<u32>;
-using PositiveU64 = PositiveGeneric<u64>;
-using PositiveSize_t = PositiveGeneric<std::size_t>;
+using PositiveUChar = Positive<uchar>;
+using PositiveUShort = Positive<ushort>;
+using PositiveUInt = Positive<uint>;
+using PositiveULong = Positive<ulong>;
+using PositiveULLong = Positive<ullong>;
+using PositiveU8 = Positive<u8>;
+using PositiveU16 = Positive<u16>;
+using PositiveU32 = Positive<u32>;
+using PositiveU64 = Positive<u64>;
+using PositiveSize_t = Positive<std::size_t>;
 
 static_assert(PositiveU8::try_construct(u8 {2}) == std::optional<PositiveU8>(2));
 static_assert(PositiveU8::try_construct(s8 {-1}) == std::nullopt);
