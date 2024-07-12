@@ -44,8 +44,8 @@ auto get_window_scale() -> int { return windowScale; }
 auto get_back_buffer() -> BackBuffer {
   auto bbuf = BackBuffer {};
   bbuf.memory = window.bbSurface->pixels;
-  bbuf.dimensions = {PositiveUInt {window.bbSurface->w}, PositiveUInt {window.bbSurface->h}};
-  bbuf.pitch = PositiveUInt {window.bbSurface->pitch};
+  bbuf.dimensions = {Positive<uint> {window.bbSurface->w}, Positive<uint> {window.bbSurface->h}};
+  bbuf.pitch = Positive<uint> {window.bbSurface->pitch};
   bbuf.bpp = window.bbSurface->format->BytesPerPixel;
 
   return bbuf;

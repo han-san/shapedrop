@@ -11,9 +11,9 @@
 
 struct BackBuffer {
   void* memory {};
-  Rect<PositiveUInt>::Size dimensions;
-  PositiveUInt pitch {};
-  PositiveU8 bpp {};
+  Rect<Positive<uint>>::Size dimensions;
+  Positive<uint> pitch {};
+  Positive<u8> bpp {};
 };
 
 constexpr auto gBorderSize = 1;

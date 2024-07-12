@@ -11,10 +11,10 @@
 
 namespace {
 
-[[nodiscard]] auto alpha_blend_channel(const PositiveU8 bg, const PositiveU8 fg,
-                                       const PositiveU8 alpha) -> PositiveU8 {
+[[nodiscard]] auto alpha_blend_channel(const Positive<u8> bg, const Positive<u8> fg,
+                                       const Positive<u8> alpha) -> Positive<u8> {
   const auto alphaRatio = u8 {alpha} / 255.;
-  return PositiveU8 {u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio)};
+  return Positive<u8> {u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio)};
 }
 
 auto draw_pixel(void* data, const Color::RGBA color) -> void {
@@ -52,8 +52,8 @@ auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharacter,
   }
 }
 
-auto draw_background_rows(BackBuffer bb, const PositiveSize_t startRow,
-                          const PositiveSize_t endRow) {
+auto draw_background_rows(BackBuffer bb, const Positive<std::size_t> startRow,
+                          const Positive<std::size_t> endRow) {
   for (std::size_t y {startRow}; y < endRow; ++y) {
     for (std::size_t x {0}; x < uint {bb.dimensions.w}; ++x) {
       const Color::RGBA color {
@@ -72,8 +72,9 @@ auto draw_background_rows(BackBuffer bb, const PositiveSize_t startRow,
   }
 }
 
-auto draw_playarea_rows(BackBuffer bb, const PositiveSize_t startRow, const PositiveSize_t endRow,
-                        const Board& board, const PositiveUInt positiveScale) {
+auto draw_playarea_rows(BackBuffer bb, const Positive<std::size_t> startRow,
+                        const Positive<std::size_t> endRow, const Board& board,
+                        const Positive<uint> positiveScale) {
   const uint scale {positiveScale};
   for (std::size_t y {startRow}; y < endRow; ++y) {
     for (std::size_t x {0}; x < Board::columns; ++x) {
@@ -253,7 +254,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
   case ProgramState::LevelType::Game: {
     // draw playarea
     {
-      const PositiveUInt positiveScale {scale};
+      const Positive<uint> positiveScale {scale};
       const auto rowsPerThread = (Board::rows - 2) / threadCount;
       for (std::size_t i {0}; i < threadCount - 1; ++i) {
         threads.emplace_back(&draw_playarea_rows, bb, 2 + (rowsPerThread * i),

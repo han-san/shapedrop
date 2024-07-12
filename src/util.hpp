@@ -15,10 +15,10 @@ struct RGBA {
     static constexpr u8 transparent {0};
   };
 
-  PositiveU8 r {0U};
-  PositiveU8 g {0U};
-  PositiveU8 b {0U};
-  PositiveU8 a {Alpha::opaque};
+  Positive<u8> r {0U};
+  Positive<u8> g {0U};
+  Positive<u8> b {0U};
+  Positive<u8> a {Alpha::opaque};
 };
 
 static constexpr RGBA red {RGBA::maxChannelValue, 0U, 0U};

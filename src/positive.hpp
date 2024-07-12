@@ -116,19 +116,8 @@ private:
   BackingType m_value {};
 };
 
-using PositiveUChar = Positive<uchar>;
-using PositiveUShort = Positive<ushort>;
-using PositiveUInt = Positive<uint>;
-using PositiveULong = Positive<ulong>;
-using PositiveULLong = Positive<ullong>;
-using PositiveU8 = Positive<u8>;
-using PositiveU16 = Positive<u16>;
-using PositiveU32 = Positive<u32>;
-using PositiveU64 = Positive<u64>;
-using PositiveSize_t = Positive<std::size_t>;
-
-static_assert(PositiveU8::try_construct(u8 {2}) == std::optional<PositiveU8>(2));
-static_assert(PositiveU8::try_construct(s8 {-1}) == std::nullopt);
-static_assert(PositiveU8::try_construct(float {2}) == std::optional<PositiveU8>(2));
-static_assert(PositiveU8::try_construct(double {-1}) == std::nullopt);
+static_assert(Positive<u8>::try_construct(u8 {2}) == std::optional<Positive<u8>>(2));
+static_assert(Positive<u8>::try_construct(s8 {-1}) == std::nullopt);
+static_assert(Positive<u8>::try_construct(float {2}) == std::optional<Positive<u8>>(2));
+static_assert(Positive<u8>::try_construct(double {-1}) == std::nullopt);
 

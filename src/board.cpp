@@ -115,7 +115,8 @@ auto Board::remove_full_rows() -> u8 {
     return 0;
   }
 
-  auto move_row_down = [this](const PositiveSize_t rowNumber, const PositiveSize_t distance) {
+  auto move_row_down = [this](const Positive<std::size_t> rowNumber,
+                              const Positive<std::size_t> distance) {
     assert(std::size_t {distance} != 0);
     assert(std::size_t {rowNumber} + std::size_t {distance} < rows);
     for (u8 x {0}; x < columns; ++x) {
@@ -156,7 +157,7 @@ auto Board::remove_full_rows() -> u8 {
   }
 
   // then move all rows above removed rows
-  const PositiveSize_t rowAboveRemovedRows {rowsCleared.front() - 1U};
+  const Positive<std::size_t> rowAboveRemovedRows {rowsCleared.front() - 1U};
   for (std::size_t y {0}; y <= rowAboveRemovedRows; ++y) {
     move_row_down(rowAboveRemovedRows - y, rowsCleared.size());
   }
