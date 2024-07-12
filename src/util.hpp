@@ -8,7 +8,9 @@
 #include <cassert>
 #include <concepts>
 #include <limits>
+#include <optional>
 #include <stdexcept>
+#include <type_traits>
 
 template <std::unsigned_integral BackingType>
 class PositiveGeneric {
@@ -43,6 +45,33 @@ public:
     if (i < 0 or i > static_cast<Float>(std::numeric_limits<BackingType>::max())) {
       throw gsl::narrowing_error();
     }
+  }
+
+  template <std::floating_point Float>
+  [[nodiscard]] static constexpr auto try_construct(Float i)
+      -> std::optional<PositiveGeneric<BackingType>> {
+    // FIXME: Rounding error could cause an unintended failure.
+    if (i < 0 or i > static_cast<Float>(std::numeric_limits<BackingType>::max())) {
+      return std::nullopt;
+    }
+    return PositiveGeneric<BackingType> {gsl::narrow_cast<BackingType>(i)};
+  }
+
+  template <std::integral FromType>
+  [[nodiscard]] static constexpr auto try_construct(FromType from)
+      -> std::optional<PositiveGeneric<BackingType>> {
+    // TODO: How should max value narrowing work? Currently, in the contructor it's checked and an
+    // exception is throw, but here we don't allow it at compile time.
+    constexpr auto fromTypeMax = std::numeric_limits<FromType>::max();
+    static_assert(fromTypeMax >= 0 and fromTypeMax <= std::numeric_limits<BackingType>::max());
+
+    if constexpr (std::is_unsigned_v<FromType>) {
+      return PositiveGeneric<BackingType> {from};
+    }
+    if (from < 0) {
+      return std::nullopt;
+    }
+    return PositiveGeneric<BackingType> {gsl::narrow_cast<BackingType>(from)};
   }
 
   [[nodiscard]] constexpr explicit operator BackingType() const noexcept { return m_value; }
@@ -103,6 +132,11 @@ using PositiveU16 = PositiveGeneric<u16>;
 using PositiveU32 = PositiveGeneric<u32>;
 using PositiveU64 = PositiveGeneric<u64>;
 using PositiveSize_t = PositiveGeneric<std::size_t>;
+
+static_assert(PositiveU8::try_construct(u8 {2}) == std::optional<PositiveU8>(2));
+static_assert(PositiveU8::try_construct(s8 {-1}) == std::nullopt);
+static_assert(PositiveU8::try_construct(float {2}) == std::optional<PositiveU8>(2));
+static_assert(PositiveU8::try_construct(double {-1}) == std::nullopt);
 
 namespace Color {
 struct RGBA {
