@@ -77,11 +77,11 @@ public:
   [[nodiscard]] constexpr explicit operator BackingType() const noexcept { return m_value; }
 
   template <typename U>
-  operator PositiveGeneric<U>() const noexcept {
+  constexpr operator PositiveGeneric<U>() const noexcept {
     return m_value;
   }
 
-  [[nodiscard]] explicit operator bool() const noexcept { return m_value; }
+  [[nodiscard]] constexpr explicit operator bool() const noexcept { return m_value; }
 
   constexpr auto operator-=(const ThisType& rhs) -> ThisType& {
     if (rhs > *this) {
