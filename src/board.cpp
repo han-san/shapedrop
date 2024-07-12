@@ -92,10 +92,10 @@ auto Board::check_for_tspin(const Shape& shape, const Shape::RotationType rotati
   return std::nullopt;
 }
 
-auto Board::get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight> {
+auto Board::get_cleared_rows() const -> StaticVector<u8, Shape::maxHeight> {
   using std::ranges::copy_if, std::ranges::all_of, std::views::iota, std::back_inserter, std::span;
 
-  ArrayStack<u8, Shape::maxHeight> rowsCleared;
+  StaticVector<u8, Shape::maxHeight> rowsCleared;
 
   const auto row_is_full = [this](auto y) {
     const auto rowStartIterator = std::next(m_data.cbegin(), y * columns);

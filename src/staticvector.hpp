@@ -5,7 +5,7 @@
 #include <iterator>
 
 template <typename T, std::size_t maxSize>
-class ArrayStack {
+class StaticVector {
   using ArrayType = std::array<T, maxSize>;
 
 public:

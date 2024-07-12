@@ -32,7 +32,7 @@ public:
 
   // All shapes are composed of 4 blocks.
   static constexpr std::size_t blockCount {4};
-  using BlockStack = ArrayStack<Point<int>, blockCount>;
+  using BlockStack = StaticVector<Point<int>, blockCount>;
 
   explicit Shape(Type type) noexcept;
 
@@ -456,7 +456,7 @@ class ShapePool {
 public:
   static constexpr std::size_t size {7};
   using DataType = std::array<Shape::Type, size>;
-  using PreviewStack = ArrayStack<Shape::Type, size * 2>;
+  using PreviewStack = StaticVector<Shape::Type, size * 2>;
 
   explicit ShapePool(const DataType& shapes);
 

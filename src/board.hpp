@@ -39,7 +39,7 @@ public:
   auto print_board() const -> void;
 
 private:
-  [[nodiscard]] auto get_cleared_rows() const -> ArrayStack<u8, Shape::maxHeight>;
+  [[nodiscard]] auto get_cleared_rows() const -> StaticVector<u8, Shape::maxHeight>;
 
   std::array<Block, std::size_t {rows} * columns> m_data {
       make_filled_array<Block, rows * columns>({Color::black, false})};
