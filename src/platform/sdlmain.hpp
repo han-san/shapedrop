@@ -3,7 +3,6 @@
 #include "../core.hpp"
 #include "../draw_opengl.hpp"
 #include "../input.hpp"
-#include "../util.hpp"
 
 #include "../jint.h"
 

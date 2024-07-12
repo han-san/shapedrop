@@ -2,7 +2,7 @@
 
 #include "color.hpp"
 #include "geometry.hpp"
-#include "util.hpp"
+#include "staticvector.hpp"
 
 #include "jint.h"
 

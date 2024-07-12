@@ -3,7 +3,6 @@
 #include "board.hpp"
 #include "positive.hpp"
 #include "shape.hpp"
-#include "util.hpp"
 
 #include <array>
 #include <chrono>

@@ -4,7 +4,6 @@
 #include "font.hpp"
 #include "geometry.hpp"
 #include "platform.hpp"
-#include "util.hpp"
 
 #include <string_view>
 

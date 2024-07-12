@@ -2,7 +2,6 @@
 
 #include "core.hpp"
 #include "input.hpp"
-#include "util.hpp"
 
 #include <string>
 #include <string_view>

@@ -6,7 +6,6 @@
 #include "../input.hpp"
 #include "../platform.hpp"
 #include "../positive.hpp"
-#include "../util.hpp"
 
 #include "../jint.h"
 

@@ -5,7 +5,6 @@
 #include "platform.hpp"
 #include "positive.hpp"
 #include "ui.hpp"
-#include "util.hpp"
 
 #include <thread>
 

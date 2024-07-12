@@ -4,7 +4,7 @@
 #include "geometry.hpp"
 #include "jint.h"
 #include "shape.hpp"
-#include "util.hpp"
+#include "staticvector.hpp"
 
 #include <array>
 #include <optional>

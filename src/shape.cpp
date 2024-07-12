@@ -2,7 +2,6 @@
 
 #include "board.hpp"
 #include "geometry.hpp"
-#include "util.hpp"
 
 #include <cassert>
 #include <random>

@@ -2,7 +2,6 @@
 
 #include "geometry.hpp"
 #include "jint.h"
-#include "util.hpp"
 
 #include "stb_truetype.h"
 

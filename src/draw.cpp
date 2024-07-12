@@ -3,7 +3,6 @@
 #include "core.hpp"
 #include "draw_opengl.hpp"
 #include "draw_software.hpp"
-#include "util.hpp"
 
 #include <string_view>
 
