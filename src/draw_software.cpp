@@ -42,23 +42,32 @@ auto to_positive_in_range(const std::integral auto n, const std::size_t min, con
 auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharacter,
                          const Point<int> characterCoords) -> void {
   for (int y {0}; y < fontCharacter.dimensions.h; ++y) {
-    const auto currY = characterCoords.y + y + fontCharacter.yoff +
-                       static_cast<int>(fontCharacter.ascent * fontCharacter.scale);
-    if (currY < 0 or static_cast<uint>(currY) >= uint {buf.dimensions.h}) {
+    const auto currYUnchecked = characterCoords.y + y + fontCharacter.yoff +
+                                static_cast<int>(fontCharacter.ascent * fontCharacter.scale);
+    auto maybeCurrY = to_positive_in_range<uint>(currYUnchecked, 0, uint {buf.dimensions.h});
+    if (not maybeCurrY.has_value()) {
       continue;
     }
+    const auto& currY = *maybeCurrY;
+
     for (int x {0}; x < fontCharacter.dimensions.w; ++x) {
-      const auto currX = characterCoords.x + x + fontCharacter.xoff;
-      if (currX < 0 or static_cast<uint>(currX) >= uint {buf.dimensions.w}) {
+      const auto currXUnchecked = characterCoords.x + x + fontCharacter.xoff;
+      auto maybeCurrX = to_positive_in_range<uint>(currXUnchecked, 0, uint {buf.dimensions.w});
+      if (not maybeCurrX.has_value()) {
         continue;
       }
 
-      const auto currbyteindex =
-          static_cast<uint>(currY) * uint {buf.dimensions.w} + static_cast<uint>(currX);
-      auto* currbyte = static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp});
+      const auto& currX = *maybeCurrX;
+      const auto currbyteindex = currY * buf.dimensions.w + currX;
+      auto* currbyte = std::next(static_cast<u8*>(buf.memory), uint {currbyteindex * u8 {buf.bpp}});
 
-      const auto relativeIndex = static_cast<std::size_t>(y * fontCharacter.dimensions.w + x);
-      const auto a = fontCharacter.bitmap[relativeIndex];
+      const auto relativeIndexUnchecked = (y * fontCharacter.dimensions.w) + x;
+      const auto maybeRelativeIndex = Positive<uint>::try_construct(relativeIndexUnchecked);
+      if (not maybeRelativeIndex.has_value()) {
+        std::unreachable();
+      }
+      const auto relativeIndex = *maybeRelativeIndex;
+      const auto a = fontCharacter.bitmap[uint {relativeIndex}];
 
       draw_pixel(currbyte, Color::RGBA {0u, 0u, 0u, a});
     }
