@@ -20,8 +20,8 @@
             nativeBuildInputs = with pkgs; [
               cmake
               ninja
-              clang-tools
-              clang
+              llvmPackages_21.clang-tools
+              clang_21
               pkg-config
             ];
 
