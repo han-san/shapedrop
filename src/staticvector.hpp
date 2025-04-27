@@ -4,6 +4,7 @@
 #include <cassert>
 #include <iterator>
 
+// TODO: Replace with std::inplace_vector when it gets implemented in compilers.
 template <typename T, std::size_t maxSize>
 class StaticVector {
   using ArrayType = std::array<T, maxSize>;
@@ -21,13 +22,15 @@ public:
 
   [[nodiscard]] constexpr auto begin() noexcept -> iterator { return m_data.begin(); }
   [[nodiscard]] constexpr auto begin() const noexcept -> const_iterator { return m_data.begin(); }
-  [[nodiscard]] constexpr auto end() noexcept -> iterator { return std::next(begin(), m_size); }
+  [[nodiscard]] constexpr auto end() noexcept -> iterator {
+    return std::next(begin(), static_cast<difference_type>(m_size));
+  }
   [[nodiscard]] constexpr auto end() const noexcept -> const_iterator {
-    return std::next(begin(), m_size);
+    return std::next(begin(), static_cast<difference_type>(m_size));
   }
   [[nodiscard]] constexpr auto cbegin() const noexcept -> const_iterator { return m_data.cbegin(); }
   [[nodiscard]] constexpr auto cend() const noexcept -> const_iterator {
-    return std::next(cbegin(), m_size);
+    return std::next(cbegin(), static_cast<difference_type>(m_size));
   }
   [[nodiscard]] constexpr auto front() -> reference { return m_data.front(); }
   [[nodiscard]] constexpr auto front() const -> const_reference { return m_data.front(); }
