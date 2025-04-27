@@ -6,6 +6,7 @@
 #include "positive.hpp"
 #include "ui.hpp"
 
+#include <concepts>
 #include <thread>
 
 namespace {
@@ -23,6 +24,19 @@ auto draw_pixel(void* data, const Color::RGBA color) -> void {
   *byte = u8 {alpha_blend_channel(*byte, color.g, color.a)};
   ++byte;
   *byte = u8 {alpha_blend_channel(*byte, color.r, color.a)};
+}
+
+
+template <std::unsigned_integral ToType>
+auto to_positive_in_range(const std::integral auto n, const std::size_t min, const std::size_t max)
+    -> std::optional<Positive<ToType>> {
+  return Positive<ToType>::try_construct(n).and_then(
+      [min, max](auto posVal) -> std::optional<Positive<ToType>> {
+        if (min <= posVal and max >= posVal) {
+          return posVal;
+        }
+        return std::nullopt;
+      });
 }
 
 auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharacter,
