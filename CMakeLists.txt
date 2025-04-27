@@ -44,10 +44,12 @@ target_compile_options(
           -Wno-c++98-compat
           -Wno-c++98-compat-pedantic
           -Wno-c++20-compat
-          -Wno-c++20-compat-pedantic>
+          -Wno-c++20-compat-pedantic
+          -Wno-switch-default>
           $<$<CXX_COMPILER_ID:GNU>:-Wall
           -Wextra
-          -Wpedantic>
+          -Wpedantic
+          -Wno-switch-default>
           $<$<CXX_COMPILER_ID:MSVC>:/W4
           /permissive->)
 
