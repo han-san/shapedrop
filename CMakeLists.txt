@@ -35,13 +35,16 @@ else()
   target_link_libraries(ShapeDrop PUBLIC OpenGL::GL)
 endif()
 
-target_compile_features(ShapeDrop PRIVATE cxx_std_20)
+target_compile_features(ShapeDrop PRIVATE cxx_std_26)
+set_target_properties(ShapeDrop PROPERTIES CXX_EXTENSIONS OFF)
 
 target_compile_options(
   ShapeDrop
   PRIVATE $<$<CXX_COMPILER_ID:Clang,AppleClang>:-Weverything
           -Wno-c++98-compat
-          -Wno-c++98-compat-pedantic>
+          -Wno-c++98-compat-pedantic
+          -Wno-c++20-compat
+          -Wno-c++20-compat-pedantic>
           $<$<CXX_COMPILER_ID:GNU>:-Wall
           -Wextra
           -Wpedantic>
