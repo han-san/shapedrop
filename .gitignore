@@ -2,5 +2,8 @@ build
 bin
 !bin/readme.md
 tags
-.vs
+compile_commands.json
+.*
+-.clang-format
+-.clang-tidy
 
