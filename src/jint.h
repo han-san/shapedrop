@@ -27,16 +27,16 @@ using sint = signed int;
 using slong = signed long;
 using sllong = signed long long;
 
-[[nodiscard]] constexpr auto operator"" _s8(ullong n) -> s8 { return static_cast<s8>(n); }
-[[nodiscard]] constexpr auto operator"" _s16(ullong n) -> s16 { return static_cast<s16>(n); }
-[[nodiscard]] constexpr auto operator"" _s32(ullong n) -> s32 { return static_cast<s32>(n); }
-[[nodiscard]] constexpr auto operator"" _s64(ullong n) -> s64 { return static_cast<s64>(n); }
+[[nodiscard]] constexpr auto operator""_s8(ullong n) -> s8 { return static_cast<s8>(n); }
+[[nodiscard]] constexpr auto operator""_s16(ullong n) -> s16 { return static_cast<s16>(n); }
+[[nodiscard]] constexpr auto operator""_s32(ullong n) -> s32 { return static_cast<s32>(n); }
+[[nodiscard]] constexpr auto operator""_s64(ullong n) -> s64 { return static_cast<s64>(n); }
 
-[[nodiscard]] constexpr auto operator"" _u8(ullong n) -> u8 { return static_cast<u8>(n); }
-[[nodiscard]] constexpr auto operator"" _u16(ullong n) -> u16 { return static_cast<u16>(n); }
-[[nodiscard]] constexpr auto operator"" _u32(ullong n) -> u32 { return static_cast<u32>(n); }
-[[nodiscard]] constexpr auto operator"" _u64(ullong n) -> u64 { return static_cast<u64>(n); }
+[[nodiscard]] constexpr auto operator""_u8(ullong n) -> u8 { return static_cast<u8>(n); }
+[[nodiscard]] constexpr auto operator""_u16(ullong n) -> u16 { return static_cast<u16>(n); }
+[[nodiscard]] constexpr auto operator""_u32(ullong n) -> u32 { return static_cast<u32>(n); }
+[[nodiscard]] constexpr auto operator""_u64(ullong n) -> u64 { return static_cast<u64>(n); }
 
-[[nodiscard]] constexpr auto operator"" _zu(ullong n) -> std::size_t {
+[[nodiscard]] constexpr auto operator""_zu(ullong n) -> std::size_t {
   return static_cast<std::size_t>(n);
 }
