@@ -17,6 +17,7 @@
 #include <cassert>
 #include <optional>
 #include <string_view>
+#include <vector>
 
 namespace platform::SDL {
 
@@ -243,8 +244,9 @@ auto get_opengl_render_context() -> const OpenGLRender::Context& { return *conte
 } // namespace platform::SDL
 
 auto main(int argc, char** argv) -> int {
-  for (int i = 1; i < argc; ++i) {
-    std::string_view arg {argv[i]};
+  const auto args = std::vector<std::string>(std::next(argv), std::next(argv, argc));
+
+  for (const auto& arg : args) {
     using namespace std::string_view_literals;
     if (arg == "-opengl"sv) {
       g_renderMode = RenderMode::opengl;
