@@ -2,8 +2,12 @@
 
 #include "platform.hpp"
 
+// FIXME: Check to see if GCC warnings can be disabled using -Wall etc as well.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
+#pragma clang diagnostic pop
 
 #include <string>
 #include <string_view>

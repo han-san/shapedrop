@@ -3,7 +3,11 @@
 #include "geometry.hpp"
 #include "jint.h"
 
+// FIXME: Check to see if GCC warnings can be disabled using -Wall etc as well.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
 #include "stb_truetype.h"
+#pragma clang diagnostic pop
 
 #include <array>
 #include <string>
