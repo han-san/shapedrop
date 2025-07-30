@@ -42,5 +42,5 @@ private:
   [[nodiscard]] auto get_cleared_rows() const -> StaticVector<u8, Shape::maxHeight>;
 
   std::array<Block, std::size_t {rows} * columns> m_data {
-      make_filled_array<Block, rows * columns>({Color::black, false})};
+      make_filled_array<Block, rows * columns>({.color = Color::black, .isActive = false})};
 };

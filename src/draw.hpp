@@ -9,12 +9,14 @@
 
 [[nodiscard]] inline auto to_screen_space(const Rect<double> square) -> Rect<double> {
   const auto dim = get_window_dimensions();
-  return {square.x * dim.w, square.y * dim.h, square.w * dim.w, square.h * dim.h};
+  return {
+      .x = square.x * dim.w, .y = square.y * dim.h, .w = square.w * dim.w, .h = square.h * dim.h};
 }
 
 [[nodiscard]] inline auto to_normalized(const Rect<double> square) -> Rect<double> {
   const auto dim = get_window_dimensions();
-  return {square.x / dim.w, square.y / dim.h, square.w / dim.w, square.h / dim.h};
+  return {
+      .x = square.x / dim.w, .y = square.y / dim.h, .w = square.w / dim.w, .h = square.h / dim.h};
 }
 
 [[nodiscard]] inline auto to_normalized_height(const double height) -> double {

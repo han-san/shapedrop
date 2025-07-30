@@ -75,15 +75,15 @@ public:
   [[nodiscard]] constexpr auto dimensions() const -> Rect<int>::Size {
     switch (m_type) {
     case Type::I:
-      return {4, 1};
+      return {.w = 4, .h = 1};
     case Type::O:
-      return {2, 2};
+      return {.w = 2, .h = 2};
     case Type::L:
     case Type::J:
     case Type::S:
     case Type::Z:
     case Type::T:
-      return {3, 2};
+      return {.w = 3, .h = 2};
     }
     // Unreachable.
     std::terminate();
@@ -142,7 +142,7 @@ public:
   }
 
 private:
-  static constexpr Rect<std::size_t>::Size layoutDimensions {4, 4};
+  static constexpr Rect<std::size_t>::Size layoutDimensions {.w = 4, .h = 4};
   using Layout = std::array<bool, layoutDimensions.w * layoutDimensions.h>;
   using RotationMap = std::array<Layout, 4>;
 

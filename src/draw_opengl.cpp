@@ -221,10 +221,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         glm::mat4 model {1};
         const auto scale = get_window_scale();
         const auto normalizedPlayArea = to_normalized({
-            static_cast<double>(gPlayAreaDim.x) * scale,
-            static_cast<double>(gPlayAreaDim.y) * scale,
-            static_cast<double>(gPlayAreaDim.w) * scale,
-            static_cast<double>(gPlayAreaDim.h) * scale,
+            .x = static_cast<double>(gPlayAreaDim.x) * scale,
+            .y = static_cast<double>(gPlayAreaDim.y) * scale,
+            .w = static_cast<double>(gPlayAreaDim.w) * scale,
+            .h = static_cast<double>(gPlayAreaDim.h) * scale,
         });
         model = glm::translate(model, glm::vec3 {normalizedPlayArea.x, normalizedPlayArea.y, 0.F});
         model = glm::scale(model, glm::vec3 {normalizedPlayArea.w, normalizedPlayArea.h, 0.F});
@@ -248,8 +248,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) {
           continue;
         }
-        Rect<int> square {(position.x + gPlayAreaDim.x) * scale,
-                          (actualYPosition + gPlayAreaDim.y) * scale, scale, scale};
+        Rect<int> square {.x = (position.x + gPlayAreaDim.x) * scale,
+                          .y = (actualYPosition + gPlayAreaDim.y) * scale,
+                          .w = scale,
+                          .h = scale};
 
         draw_solid_square(square, shape.color);
       }
@@ -265,9 +267,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
         const auto scale = static_cast<std::size_t>(get_window_scale());
 
-        Rect<int> square {static_cast<int>((x + gPlayAreaDim.x) * scale),
-                          static_cast<int>((y - 2 + gPlayAreaDim.y) * scale),
-                          static_cast<int>(scale), static_cast<int>(scale)};
+        Rect<int> square {.x = static_cast<int>((x + gPlayAreaDim.x) * scale),
+                          .y = static_cast<int>((y - 2 + gPlayAreaDim.y) * scale),
+                          .w = static_cast<int>(scale),
+                          .h = static_cast<int>(scale)};
         draw_solid_square(square, block.color);
       }
     }
@@ -287,7 +290,8 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         const int ySpacing {3};
         shape.pos.y = gSidebarDim.y + ySpacing * i;
         for (const auto& position : shape.get_absolute_block_positions()) {
-          Rect<int> square {position.x * scale, position.y * scale, scale, scale};
+          Rect<int> square {
+              .x = position.x * scale, .y = position.y * scale, .w = scale, .h = scale};
           draw_solid_square(square, shape.color);
         }
         ++i;
@@ -310,9 +314,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         const auto yOffset = is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5;
 
         for (auto& position : shape.get_absolute_block_positions()) {
-          Rect<int> square {static_cast<int>((position.x + gHoldShapeDim.x + xOffset) * scale),
-                            static_cast<int>((position.y + gHoldShapeDim.y + yOffset) * scale),
-                            scale, scale};
+          Rect<int> square {.x = static_cast<int>((position.x + gHoldShapeDim.x + xOffset) * scale),
+                            .y = static_cast<int>((position.y + gHoldShapeDim.y + yOffset) * scale),
+                            .w = scale,
+                            .h = scale};
           draw_solid_square(square, shape.color);
         }
       }
@@ -355,10 +360,10 @@ auto draw_solid_square_normalized(Rect<double> sqr, Color::RGBA color) -> void {
 auto draw_solid_square(Rect<int> sqr, Color::RGBA color) -> void {
   const auto& renderContext = get_opengl_render_context();
   auto normalized = to_normalized({
-      static_cast<double>(sqr.x),
-      static_cast<double>(sqr.y),
-      static_cast<double>(sqr.w),
-      static_cast<double>(sqr.h),
+      .x = static_cast<double>(sqr.x),
+      .y = static_cast<double>(sqr.y),
+      .w = static_cast<double>(sqr.w),
+      .h = static_cast<double>(sqr.h),
   });
   draw_solid_square_normalized(normalized, color);
 }

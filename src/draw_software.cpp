@@ -26,7 +26,6 @@ auto draw_pixel(void* data, const Color::RGBA color) -> void {
   *byte = u8 {alpha_blend_channel(*byte, color.r, color.a)};
 }
 
-
 template <std::unsigned_integral ToType>
 auto to_positive_in_range(const std::integral auto n, const std::size_t min, const std::size_t max)
     -> std::optional<Positive<ToType>> {
@@ -69,7 +68,7 @@ auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharacter,
       const auto relativeIndex = *maybeRelativeIndex;
       const auto a = fontCharacter.bitmap[uint {relativeIndex}];
 
-      draw_pixel(currbyte, Color::RGBA {0u, 0u, 0u, a});
+      draw_pixel(currbyte, Color::RGBA {.r = 0u, .g = 0u, .b = 0u, .a = a});
     }
   }
 }
@@ -79,17 +78,19 @@ auto draw_background_rows(BackBuffer bb, const Positive<std::size_t> startRow,
   for (std::size_t y {startRow}; y < endRow; ++y) {
     for (std::size_t x {0}; x < uint {bb.dimensions.w}; ++x) {
       const Color::RGBA color {
-          static_cast<u8>(Color::RGBA::maxChannelValue *
-                          (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w}))),
-          static_cast<u8>(
+          .r = static_cast<u8>(
+              Color::RGBA::maxChannelValue *
+              (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w}))),
+          .g = static_cast<u8>(
               Color::RGBA::maxChannelValue *
               (1 - (static_cast<double>(x) / static_cast<double>(uint {bb.dimensions.w})) *
                        (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h})))),
-          static_cast<u8>(Color::RGBA::maxChannelValue *
-                          (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h}))),
+          .b = static_cast<u8>(
+              Color::RGBA::maxChannelValue *
+              (static_cast<double>(y) / static_cast<double>(uint {bb.dimensions.h}))),
       };
-      SoftwareRender::draw_solid_square(bb, {static_cast<int>(x), static_cast<int>(y), 1, 1},
-                                        color);
+      SoftwareRender::draw_solid_square(
+          bb, {.x = static_cast<int>(x), .y = static_cast<int>(y), .w = 1, .h = 1}, color);
     }
   }
 }
@@ -103,9 +104,10 @@ auto draw_playarea_rows(BackBuffer bb, const Positive<std::size_t> startRow,
       auto currindex = gsl::narrow_cast<gsl::index>(y * Board::columns + x);
       const auto& block = board.block_at(currindex);
       auto color = block.isActive ? block.color : Color::black;
-      Rect<int> square {static_cast<int>((x + gPlayAreaDim.x) * scale),
-                        static_cast<int>((y - 2 + gPlayAreaDim.y) * scale), static_cast<int>(scale),
-                        static_cast<int>(scale)};
+      Rect<int> square {.x = static_cast<int>((x + gPlayAreaDim.x) * scale),
+                        .y = static_cast<int>((y - 2 + gPlayAreaDim.y) * scale),
+                        .w = static_cast<int>(scale),
+                        .h = static_cast<int>(scale)};
       SoftwareRender::draw_solid_square(bb, square, color);
     }
   }
@@ -125,8 +127,8 @@ auto draw_font_string(BackBuffer& buf, const FontString& fontString, Point<int> 
 auto draw_font_string_normalized(BackBuffer& buf, const FontString& fontString,
                                  const Point<double> relativeCoords) -> void {
   const Point<int> realCoords {
-      static_cast<int>(relativeCoords.x * uint {buf.dimensions.w}),
-      static_cast<int>(relativeCoords.y * uint {buf.dimensions.h}),
+      .x = static_cast<int>(relativeCoords.x * uint {buf.dimensions.w}),
+      .y = static_cast<int>(relativeCoords.y * uint {buf.dimensions.h}),
   };
   draw_font_string(buf, fontString, realCoords);
 }
@@ -140,8 +142,8 @@ auto draw_text(BackBuffer& buf, const std::string_view text, const Point<int> co
 auto draw_text_normalized(BackBuffer& buf, const std::string_view text,
                           const Point<double> relativeCoords, const double pixelHeight) -> void {
   const Point<int> realCoords {
-      static_cast<int>(relativeCoords.x * uint {buf.dimensions.w}),
-      static_cast<int>(relativeCoords.y * uint {buf.dimensions.h}),
+      .x = static_cast<int>(relativeCoords.x * uint {buf.dimensions.w}),
+      .y = static_cast<int>(relativeCoords.y * uint {buf.dimensions.h}),
   };
   draw_text(buf, text, realCoords, pixelHeight * uint {buf.dimensions.h});
 }
@@ -168,10 +170,10 @@ auto draw_solid_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA c
 
 auto draw_solid_square_normalized(BackBuffer& buf, Rect<double> sqr, const Color::RGBA color)
     -> void {
-  Rect<int> newSqr {static_cast<int>(sqr.x * uint {buf.dimensions.w}),
-                    static_cast<int>(sqr.y * uint {buf.dimensions.h}),
-                    static_cast<int>(sqr.w * uint {buf.dimensions.w}),
-                    static_cast<int>(sqr.h * uint {buf.dimensions.h})};
+  Rect<int> newSqr {.x = static_cast<int>(sqr.x * uint {buf.dimensions.w}),
+                    .y = static_cast<int>(sqr.y * uint {buf.dimensions.h}),
+                    .w = static_cast<int>(sqr.w * uint {buf.dimensions.w}),
+                    .h = static_cast<int>(sqr.h * uint {buf.dimensions.h})};
 
   draw_solid_square(buf, newSqr, color);
 }
@@ -190,9 +192,12 @@ auto draw_hollow_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA 
       }
 
       // check if pixel is part of border
-      if (not point_is_in_rect(Point<int> {x, y}, {0, 0, sqr.w, sqr.h}) or
-          point_is_in_rect(Point<int> {x, y}, {borderSize, borderSize, sqr.w - borderSize * 2,
-                                               sqr.h - borderSize * 2})) {
+      if (not point_is_in_rect(Point<int> {.x = x, .y = y},
+                               {.x = 0, .y = 0, .w = sqr.w, .h = sqr.h}) or
+          point_is_in_rect(Point<int> {.x = x, .y = y}, {.x = borderSize,
+                                                         .y = borderSize,
+                                                         .w = sqr.w - borderSize * 2,
+                                                         .h = sqr.h - borderSize * 2})) {
         continue;
       }
 
@@ -206,10 +211,10 @@ auto draw_hollow_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA 
 
 auto draw_hollow_square_normalized(BackBuffer& buf, Rect<double> sqr, const Color::RGBA color,
                                    const int borderSize) -> void {
-  Rect<int> newSqr {static_cast<int>(sqr.x * uint {buf.dimensions.w}),
-                    static_cast<int>(sqr.y * uint {buf.dimensions.h}),
-                    static_cast<int>(sqr.w * uint {buf.dimensions.w}),
-                    static_cast<int>(sqr.h * uint {buf.dimensions.h})};
+  Rect<int> newSqr {.x = static_cast<int>(sqr.x * uint {buf.dimensions.w}),
+                    .y = static_cast<int>(sqr.y * uint {buf.dimensions.h}),
+                    .w = static_cast<int>(sqr.w * uint {buf.dimensions.w}),
+                    .h = static_cast<int>(sqr.h * uint {buf.dimensions.h})};
 
   draw_hollow_square(buf, newSqr, color, borderSize);
 }
@@ -298,8 +303,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
         if (actualYPosition + gPlayAreaDim.y < gPlayAreaDim.y) {
           continue;
         }
-        Rect<int> square {(position.x + gPlayAreaDim.x) * scale,
-                          (actualYPosition + gPlayAreaDim.y) * scale, scale, scale};
+        Rect<int> square {.x = (position.x + gPlayAreaDim.x) * scale,
+                          .y = (actualYPosition + gPlayAreaDim.y) * scale,
+                          .w = scale,
+                          .h = scale};
 
         draw_solid_square(bb, square, shape.color);
       }
@@ -317,7 +324,8 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
       const auto ySpacing = 3; // max height of a shape is 2 + 1 for a block of space
       shape.pos.y = gSidebarDim.y + ySpacing * i;
       for (auto& position : shape.get_absolute_block_positions()) {
-        Rect<int> square {(position.x) * scale, (position.y) * scale, scale, scale};
+        Rect<int> square {
+            .x = (position.x) * scale, .y = (position.y) * scale, .w = scale, .h = scale};
         draw_solid_square(bb, square, shape.color);
       }
       ++i;
@@ -337,9 +345,10 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
       const auto yOffset = is_even(gHoldShapeDim.h - shapeDimensions.h) ? 0.0 : 0.5;
 
       for (auto& position : shape.get_absolute_block_positions()) {
-        Rect<int> square {static_cast<int>((position.x + gHoldShapeDim.x + xOffset) * scale),
-                          static_cast<int>((position.y + gHoldShapeDim.y + yOffset) * scale), scale,
-                          scale};
+        Rect<int> square {.x = static_cast<int>((position.x + gHoldShapeDim.x + xOffset) * scale),
+                          .y = static_cast<int>((position.y + gHoldShapeDim.y + yOffset) * scale),
+                          .w = scale,
+                          .h = scale};
         draw_solid_square(bb, square, shape.color);
       }
     }

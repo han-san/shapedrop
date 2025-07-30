@@ -81,8 +81,8 @@ FontString::FontString(const std::string_view string, const double pixelHeight) 
 
   const auto windim = get_window_dimensions();
   normalizedDimensions = {
-      w / windim.w,
-      pixelHeight / windim.h,
+      .w = w / windim.w,
+      .h = pixelHeight / windim.h,
   };
 }
 

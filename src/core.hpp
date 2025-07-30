@@ -17,11 +17,15 @@ struct BackBuffer {
 
 constexpr auto gBorderSize = 1;
 
-constexpr Rect<int> gHoldShapeDim {gBorderSize, gBorderSize, 5, 3};
-constexpr Rect<int> gPlayAreaDim {gBorderSize, (gBorderSize + gHoldShapeDim.h + gBorderSize),
-                                  Board::columns, Board::visibleRows};
-constexpr Rect<int> gSidebarDim {(gBorderSize + gPlayAreaDim.w + gBorderSize), gBorderSize, 4,
-                                 (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)};
+constexpr Rect<int> gHoldShapeDim {.x = gBorderSize, .y = gBorderSize, .w = 5, .h = 3};
+constexpr Rect<int> gPlayAreaDim {.x = gBorderSize,
+                                  .y = (gBorderSize + gHoldShapeDim.h + gBorderSize),
+                                  .w = Board::columns,
+                                  .h = Board::visibleRows};
+constexpr Rect<int> gSidebarDim {.x = (gBorderSize + gPlayAreaDim.w + gBorderSize),
+                                 .y = gBorderSize,
+                                 .w = 4,
+                                 .h = (gHoldShapeDim.h + gBorderSize + gPlayAreaDim.h)};
 
 constexpr auto gBaseWindowWidth =
     gBorderSize + gPlayAreaDim.w + gBorderSize + gSidebarDim.w + gBorderSize;

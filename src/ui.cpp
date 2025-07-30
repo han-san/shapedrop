@@ -40,11 +40,11 @@ struct Background {
 static std::vector<Background> backgrounds {};
 
 [[nodiscard]] static auto to_squaref(const WindowScaleRect rect) -> Rect<double> {
-  return {double {rect.x}, double {rect.y}, double {rect.w}, double {rect.h}};
+  return {.x = double {rect.x}, .y = double {rect.y}, .w = double {rect.w}, .h = double {rect.h}};
 }
 
 [[nodiscard]] static auto to_point_double(const Point<WindowScale> point) -> Point<double> {
-  return {double {point.x}, double {point.y}};
+  return {.x = double {point.x}, .y = double {point.y}};
 }
 
 [[nodiscard]] static auto get_current_ui_region() -> WindowScaleRect {
@@ -116,7 +116,7 @@ static auto add_region_as_child_of_current_menu(const WindowScaleRect region) {
 // FontString.
 static auto label(std::string text, const WindowScaleRect region) {
   add_region_as_child_of_current_menu(region);
-  textToDraw.push_back({std::move(text), region.h, {region.x, region.y}});
+  textToDraw.push_back({std::move(text), region.h, {.x = region.x, .y = region.y}});
 }
 
 auto label(std::string text, const WindowScale fontHeight, const XAlignment xAlign,

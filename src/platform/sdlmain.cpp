@@ -44,7 +44,8 @@ auto get_window_scale() -> int { return windowScale; }
 auto get_back_buffer() -> BackBuffer {
   auto bbuf = BackBuffer {};
   bbuf.memory = window.bbSurface->pixels;
-  bbuf.dimensions = {Positive<uint> {window.bbSurface->w}, Positive<uint> {window.bbSurface->h}};
+  bbuf.dimensions = {.w = Positive<uint> {window.bbSurface->w},
+                     .h = Positive<uint> {window.bbSurface->h}};
   bbuf.pitch = Positive<uint> {window.bbSurface->pitch};
   bbuf.bpp = window.bbSurface->format->BytesPerPixel;
 
@@ -78,7 +79,7 @@ auto change_window_scale(int newScale) -> void {
     return;
   }
   windowScale = newScale;
-  resize_window({gBaseWindowWidth * windowScale, gBaseWindowHeight * windowScale});
+  resize_window({.w = gBaseWindowWidth * windowScale, .h = gBaseWindowHeight * windowScale});
 }
 
 auto swap_buffer() -> void {
@@ -153,7 +154,7 @@ auto get_event() -> Event {
     } else if (e.type == SDL_MOUSEBUTTONDOWN) {
       if (e.button.button == SDL_BUTTON_LEFT) {
         event.type = Event::Type::Mousebuttondown;
-        event.mouseCoords = {e.button.x, e.button.y};
+        event.mouseCoords = {.x = e.button.x, .y = e.button.y};
       }
     }
   }
@@ -171,7 +172,7 @@ auto init_window_opengl() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
   windowScale = 30;
-  window.dimensions = {gBaseWindowWidth * windowScale, gBaseWindowHeight * windowScale};
+  window.dimensions = {.w = gBaseWindowWidth * windowScale, .h = gBaseWindowHeight * windowScale};
 
   window.handle = SDL_CreateWindow("Tetris", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                    window.dimensions.w, window.dimensions.h,
@@ -198,7 +199,7 @@ auto init_window_software() {
     Rect<int>::Size dim {};
     do {
       ++newScale;
-      dim = {gBaseWindowWidth * newScale, gBaseWindowHeight * newScale};
+      dim = {.w = gBaseWindowWidth * newScale, .h = gBaseWindowHeight * newScale};
     } while (window_fits_on_screen(dim));
   }
   --newScale;

@@ -56,7 +56,7 @@ auto Board::rotate_shape(Shape& shape, const Shape::RotationDirection dir) const
 }
 
 auto Board::is_valid_spot(const Point<int> pos) const -> bool {
-  if (point_is_in_rect(pos, {0, 0, columns, rows})) {
+  if (point_is_in_rect(pos, {.x = 0, .y = 0, .w = columns, .h = rows})) {
     const gsl::index index {pos.y * columns + pos.x};
     return not block_at(index).isActive;
   }
@@ -80,7 +80,8 @@ auto Board::is_valid_shape(const Shape& shape) const -> bool {
 auto Board::check_for_tspin(const Shape& shape, const Shape::RotationType rotationType) const
     -> std::optional<TspinType> {
   if (shape.type() == Shape::Type::T) {
-    static constexpr std::array<V2, 4> cornerOffsets {V2 {0, 0}, {2, 0}, {0, 2}, {2, 2}};
+    static constexpr std::array<V2, 4> cornerOffsets {
+        {{.x = 0, .y = 0}, {.x = 2, .y = 0}, {.x = 0, .y = 2}, {.x = 2, .y = 2}}};
     const auto cornersOccupied =
         std::ranges::count_if(cornerOffsets, [this, &shape](const auto& offset) {
           return not is_valid_spot(shape.pos + offset);

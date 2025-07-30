@@ -120,4 +120,3 @@ static_assert(Positive<u8>::try_construct(u8 {2}) == std::optional<Positive<u8>>
 static_assert(Positive<u8>::try_construct(s8 {-1}) == std::nullopt);
 static_assert(Positive<u8>::try_construct(float {2}) == std::optional<Positive<u8>>(2));
 static_assert(Positive<u8>::try_construct(double {-1}) == std::nullopt);
-
