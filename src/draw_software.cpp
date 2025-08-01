@@ -14,7 +14,7 @@ namespace {
 [[nodiscard]] auto alpha_blend_channel(const Positive<u8> bg, const Positive<u8> fg,
                                        const Positive<u8> alpha) -> Positive<u8> {
   const auto alphaRatio = u8 {alpha} / 255.;
-  return Positive<u8> {u8 {fg} * alphaRatio + u8 {bg} * (1 - alphaRatio)};
+  return Positive<u8> {(u8 {fg} * alphaRatio) + (u8 {bg} * (1 - alphaRatio))};
 }
 
 auto draw_pixel(void* data, const Color::RGBA color) -> void {
@@ -101,7 +101,7 @@ auto draw_playarea_rows(BackBuffer bb, const Positive<std::size_t> startRow,
   const uint scale {positiveScale};
   for (std::size_t y {startRow}; y < endRow; ++y) {
     for (std::size_t x {0}; x < Board::columns; ++x) {
-      auto currindex = gsl::narrow_cast<gsl::index>(y * Board::columns + x);
+      auto currindex = gsl::narrow_cast<gsl::index>((y * Board::columns) + x);
       const auto& block = board.block_at(currindex);
       auto color = block.isActive ? block.color : Color::black;
       Rect<int> square {.x = static_cast<int>((x + gPlayAreaDim.x) * scale),
@@ -160,7 +160,7 @@ auto draw_solid_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA c
         continue;
       }
 
-      const auto currbyteindex = pixely * uint {buf.dimensions.w} + pixelx;
+      const auto currbyteindex = (pixely * uint {buf.dimensions.w}) + pixelx;
       auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
       draw_pixel(currbyte, color);
@@ -196,12 +196,12 @@ auto draw_hollow_square(BackBuffer& buf, const Rect<int> sqr, const Color::RGBA 
                                {.x = 0, .y = 0, .w = sqr.w, .h = sqr.h}) or
           point_is_in_rect(Point<int> {.x = x, .y = y}, {.x = borderSize,
                                                          .y = borderSize,
-                                                         .w = sqr.w - borderSize * 2,
-                                                         .h = sqr.h - borderSize * 2})) {
+                                                         .w = sqr.w - (borderSize * 2),
+                                                         .h = sqr.h - (borderSize * 2)})) {
         continue;
       }
 
-      const auto currbyteindex = pixely * uint {buf.dimensions.w} + pixelx;
+      const auto currbyteindex = (pixely * uint {buf.dimensions.w}) + pixelx;
       auto* currbyte {static_cast<u8*>(buf.memory) + (currbyteindex * u8 {buf.bpp})};
 
       draw_pixel(currbyte, color);
@@ -285,9 +285,9 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
       const auto rowsPerThread = (Board::rows - 2) / threadCount;
       for (std::size_t i {0}; i < threadCount - 1; ++i) {
         threads.emplace_back(&draw_playarea_rows, bb, 2 + (rowsPerThread * i),
-                             2 + rowsPerThread * (i + 1), gameState.board, positiveScale);
+                             2 + (rowsPerThread * (i + 1)), gameState.board, positiveScale);
       }
-      threads.emplace_back(&draw_playarea_rows, bb, 2 + rowsPerThread * (threadCount - 1),
+      threads.emplace_back(&draw_playarea_rows, bb, 2 + (rowsPerThread * (threadCount - 1)),
                            Board::rows, gameState.board, positiveScale);
       join_all(threads);
     }

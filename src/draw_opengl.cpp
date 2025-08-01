@@ -259,7 +259,7 @@ auto draw(ProgramState& programState, GameState& gameState) -> void {
 
     for (std::size_t y = 2; y < Board::rows; ++y) {
       for (std::size_t x = 0; x < Board::columns; ++x) {
-        const auto currIndex = gsl::narrow_cast<gsl::index>(y * Board::columns + x);
+        const auto currIndex = gsl::narrow_cast<gsl::index>((y * Board::columns) + x);
         const auto& block = gameState.board.block_at(currIndex);
         if (not block.isActive) {
           continue;

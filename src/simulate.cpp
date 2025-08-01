@@ -205,7 +205,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
   // fix currentBlocks position on board
   for (const auto position : shapePositions) {
     assert(gameState.board.is_valid_spot(position));
-    gsl::index index {position.y * gameState.board.columns + position.x};
+    gsl::index index {(position.y * gameState.board.columns) + position.x};
     gameState.board.block_at(index) = {.color = gameState.currentShape.color, .isActive = true};
   }
 
@@ -299,7 +299,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
       static_cast<int>(calculate_score(clearType, gameState.level) * backToBackModifier);
   gameState.score += clearScore;
 
-  gameState.level = gameState.linesCleared / 10 + gameState.startingLevel;
+  gameState.level = (gameState.linesCleared / 10) + gameState.startingLevel;
 
   gameState.currentShape = gameState.shapePool.next_shape();
   // update shape shadow

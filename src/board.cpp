@@ -57,7 +57,7 @@ auto Board::rotate_shape(Shape& shape, const Shape::RotationDirection dir) const
 
 auto Board::is_valid_spot(const Point<int> pos) const -> bool {
   if (point_is_in_rect(pos, {.x = 0, .y = 0, .w = columns, .h = rows})) {
-    const gsl::index index {pos.y * columns + pos.x};
+    const gsl::index index {(pos.y * columns) + pos.x};
     return not block_at(index).isActive;
   }
   return false;

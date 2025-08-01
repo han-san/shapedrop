@@ -153,7 +153,7 @@ private:
     const auto& layout = get_layout();
     for (std::size_t y {0}; y < layoutDimensions.h; ++y) {
       for (std::size_t x {0}; x < layoutDimensions.w; ++x) {
-        const auto index = gsl::narrow_cast<gsl::index>(y * layoutDimensions.w + x);
+        const auto index = gsl::narrow_cast<gsl::index>((y * layoutDimensions.w) + x);
         if (gsl::at(layout, index)) {
           positions.push_back({static_cast<int>(x), static_cast<int>(y)});
           if (positions.size() == positions.max_size()) {
