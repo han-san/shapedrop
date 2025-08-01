@@ -104,7 +104,7 @@ static auto window_fits_on_screen(Rect<int>::Size windowDimensions) -> bool {
 auto get_event() -> Event {
   Event event {};
   SDL_Event e;
-  if (SDL_PollEvent(&e)) {
+  if (SDL_PollEvent(&e) != 0) {
     if (e.type == SDL_QUIT) {
       event.type = Event::Type::Quit;
     } else if (e.type == SDL_KEYDOWN) {

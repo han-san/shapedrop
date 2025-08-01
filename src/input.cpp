@@ -96,7 +96,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
         gameState.droppedRows = droppedRows;
 
         // hard drop overrides soft drop
-        if (droppedRows) {
+        if (droppedRows != 0) {
           gameState.softDropRowCount = 0;
         }
       } else if (event.type == Event::Type::Rotate_left) {

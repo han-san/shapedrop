@@ -250,7 +250,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
     ++gameState.comboCounter;
     const auto comboScore = 50 * gameState.comboCounter * gameState.level;
     gameState.score += comboScore;
-    if (comboScore) {
+    if (comboScore != 0) {
       fmt::print(stderr, "Combo {}! {} pts.\n", gameState.comboCounter, comboScore);
     }
   } break;

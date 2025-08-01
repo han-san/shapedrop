@@ -24,7 +24,7 @@ BakedCharsBitmap bakedCharsBitmap {};
 auto init_font(const std::string& fontName) -> bool {
   const auto filePath = get_font_path() + fontName;
   auto* file {fopen(filePath.data(), "rb")};
-  if (!file) {
+  if (file == nullptr) {
     return false;
   }
   fread(ttf_buffer, 1, 1 << 25, file);
