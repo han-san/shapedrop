@@ -5,10 +5,9 @@
 #include "font.hpp"
 #include "geometry.hpp"
 
-#include "fmt/core.h"
-
 #include <cassert>
 #include <exception>
+#include <format>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -177,7 +176,7 @@ struct SpinBox {
   SpinBox(const std::string_view name, const WindowScale fontHeight, const WindowScalePoint offset,
           int& vvalue, const int mminValue, const int mmaxValue)
       : value {vvalue}, minValue {mminValue}, maxValue {mmaxValue},
-        text {fmt::format("{} {}: ", buttonsString, name)} {
+        text {std::format("{} {}: ", buttonsString, name)} {
     const auto textWidth = get_text_window_scale_width(text, fontHeight);
     const auto maxValueWidth = get_text_window_scale_width(std::to_string(maxValue), fontHeight);
     const auto fullTextWidth = textWidth + maxValueWidth;

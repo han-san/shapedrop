@@ -6,9 +6,8 @@
 
 #include "jint.h"
 
-#include "fmt/core.h"
-
 #include <exception>
+#include <format>
 #include <stdexcept>
 
 class Shape {
@@ -163,7 +162,7 @@ private:
       }
     }
     throw std::logic_error(
-        fmt::format("Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.",
+        std::format("Rotation map ({}) with rotation ({}) has fewer than 4 blocks active.",
                     static_cast<int>(m_type), static_cast<int>(m_rotation)));
   }
 

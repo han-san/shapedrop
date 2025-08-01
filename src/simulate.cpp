@@ -3,12 +3,12 @@
 #include "core.hpp"
 #include "ui.hpp"
 
-#include "fmt/core.h"
-
 #include <algorithm>
 #include <cassert>
 #include <exception>
+#include <format>
 #include <iostream>
+#include <print>
 #include <stdexcept>
 #include <string_view>
 
@@ -134,7 +134,7 @@ static auto to_string_view(const ClearType c) -> std::string_view {
 [[nodiscard]] static auto get_clear_type(const int rowsCleared,
                                          const std::optional<TspinType> tspin) {
   auto bad_row_count_msg = [rowsCleared](std::size_t min, std::size_t max) {
-    return fmt::format("The amount of rows cleared should be between {} and "
+    return std::format("The amount of rows cleared should be between {} and "
                        "{}, but is currently {}",
                        min, max, rowsCleared);
   };
@@ -219,7 +219,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
   const auto clearType = get_clear_type(rowsCleared, tspin);
   const auto clearName = to_string_view(clearType);
   if (not clearName.empty()) {
-    std::cout << clearName << std::endl;
+    std::println("{}", clearName);
   }
 
   // only regular clears count, but if it's a t-spin then
@@ -251,7 +251,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
     const auto comboScore = 50 * gameState.comboCounter * gameState.level;
     gameState.score += comboScore;
     if (comboScore != 0) {
-      fmt::print(stderr, "Combo {}! {} pts.\n", gameState.comboCounter, comboScore);
+      std::println(stderr, "Combo {}! {} pts.", gameState.comboCounter, comboScore);
     }
   } break;
     // These aren't technically clears and will reset your combo
@@ -267,7 +267,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
   switch (clearType) {
   case ClearType::Tetris: {
     if (gameState.backToBackType == BackToBackType::Tetris) {
-      std::cerr << "Back to back Tetris\n";
+      std::println(stderr, "Back to back Tetris");
       backToBackModifier = 1.5;
     } else {
       gameState.backToBackType = BackToBackType::Tetris;
@@ -281,7 +281,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
   case ClearType::Tspin_mini_double:
   case ClearType::Tspin_triple: {
     if (gameState.backToBackType == BackToBackType::Tspin) {
-      std::cerr << "Back to back T-Spin\n";
+      std::println(stderr, "Back to back T-Spin");
       backToBackModifier = 1.5;
     } else {
       gameState.backToBackType = BackToBackType::Tspin;
@@ -315,7 +315,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
   }
 
   if (gameOver) {
-    std::cout << "Game Over!\n";
+    std::println("Game Over!");
     programState.highScore = std::max(gameState.score, programState.highScore);
     programState.levelType = ProgramState::LevelType::Menu;
   }
@@ -360,13 +360,13 @@ static auto simulate_game(ProgramState& programState, GameState& gameState) -> v
 
   {
     const auto fontSize = 0.048;
-    UI::label(fmt::format("Score: {}", gameState.score), fontSize, UI::XAlignment::Right);
+    UI::label(std::format("Score: {}", gameState.score), fontSize, UI::XAlignment::Right);
 
     // Round up linesCleared to nearest 10
     const auto linesRequired = (gameState.linesCleared / 10 + 1) * 10;
     // Not const since it's later moved
     auto levelString =
-        fmt::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired);
+        std::format("Level: {} ({}/{})", gameState.level, gameState.linesCleared, linesRequired);
     UI::label(std::move(levelString), fontSize, UI::XAlignment::Right, fontSize);
   }
 
@@ -395,7 +395,7 @@ static auto simulate_game(ProgramState& programState, GameState& gameState) -> v
 static auto simulate_menu(ProgramState& programState, GameState& gameState, MenuState& menuState)
     -> void {
   const auto highScoreFontSize = 0.048;
-  UI::label(fmt::format("High Score: {}", programState.highScore), highScoreFontSize,
+  UI::label(std::format("High Score: {}", programState.highScore), highScoreFontSize,
             UI::XAlignment::Right);
 
   const auto menuY = 1. / 10.;
