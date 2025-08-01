@@ -14,6 +14,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
+#include <algorithm>
 #include <cassert>
 #include <optional>
 #include <string_view>
@@ -72,9 +73,7 @@ static auto resize_window(const Rect<int>::Size dimensions) {
 }
 
 auto change_window_scale(int newScale) -> void {
-  if (newScale < 1) {
-    newScale = 1;
-  }
+  newScale = std::max(newScale, 1);
   if (windowScale == newScale) {
     return;
   }

@@ -316,9 +316,7 @@ static auto lock_current_shape(GameState& gameState, ProgramState& programState)
 
   if (gameOver) {
     std::cout << "Game Over!\n";
-    if (gameState.score > programState.highScore) {
-      programState.highScore = gameState.score;
-    }
+    programState.highScore = std::max(gameState.score, programState.highScore);
     programState.levelType = ProgramState::LevelType::Menu;
   }
 }
