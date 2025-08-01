@@ -24,7 +24,6 @@ add_subdirectory("deps/glad")
 find_package(OpenGL REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(glm REQUIRED)
-find_package(fmt REQUIRED)
 find_package(Microsoft.GSL REQUIRED)
 
 if(OpenGL_EGL_FOUND)
@@ -53,7 +52,7 @@ target_compile_options(
           $<$<CXX_COMPILER_ID:MSVC>:/W4
           /permissive->)
 
-target_link_libraries(ShapeDrop PUBLIC SDL2::Main fmt::fmt glad glm::glm
+target_link_libraries(ShapeDrop PUBLIC SDL2::Main glad glm::glm
                                        Microsoft.GSL::GSL)
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/font/DejaVuSans.ttf
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
