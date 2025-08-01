@@ -68,7 +68,7 @@ auto draw_font_character(BackBuffer& buf, const FontCharacter& fontCharacter,
       const auto relativeIndex = *maybeRelativeIndex;
       const auto a = fontCharacter.bitmap[uint {relativeIndex}];
 
-      draw_pixel(currbyte, Color::RGBA {.r = 0u, .g = 0u, .b = 0u, .a = a});
+      draw_pixel(currbyte, Color::RGBA {.r = 0U, .g = 0U, .b = 0U, .a = a});
     }
   }
 }
