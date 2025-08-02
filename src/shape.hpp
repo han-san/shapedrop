@@ -264,188 +264,190 @@ private:
     static constexpr auto o = false;
     static constexpr auto X = true;
 
+    // clang-format off
     static constexpr RotationMap I {
         Layout {
-            o, o, o, o, //
-            X, X, X, X, //
-            o, o, o, o, //
-            o, o, o, o, //
+            o, o, o, o,
+            X, X, X, X,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, o, X, o, //
-            o, o, X, o, //
-            o, o, X, o, //
-            o, o, X, o, //
+            o, o, X, o,
+            o, o, X, o,
+            o, o, X, o,
+            o, o, X, o,
         },
         Layout {
-            o, o, o, o, //
-            o, o, o, o, //
-            X, X, X, X, //
-            o, o, o, o, //
+            o, o, o, o,
+            o, o, o, o,
+            X, X, X, X,
+            o, o, o, o,
         },
         Layout {
-            o, X, o, o, //
-            o, X, o, o, //
-            o, X, o, o, //
-            o, X, o, o, //
+            o, X, o, o,
+            o, X, o, o,
+            o, X, o, o,
+            o, X, o, o,
         },
     };
     static constexpr RotationMap L {
         Layout {
-            o, o, X, o, //
-            X, X, X, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            o, o, X, o,
+            X, X, X, o,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, o, o, //
-            o, X, o, o, //
-            o, X, X, o, //
-            o, o, o, o, //
+            o, X, o, o,
+            o, X, o, o,
+            o, X, X, o,
+            o, o, o, o,
         },
         Layout {
-            o, o, o, o, //
-            X, X, X, o, //
-            X, o, o, o, //
-            o, o, o, o, //
+            o, o, o, o,
+            X, X, X, o,
+            X, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            X, X, o, o, //
-            o, X, o, o, //
-            o, X, o, o, //
-            o, o, o, o, //
+            X, X, o, o,
+            o, X, o, o,
+            o, X, o, o,
+            o, o, o, o,
         },
     };
     static constexpr RotationMap J {
         Layout {
-            X, o, o, o, //
-            X, X, X, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            X, o, o, o,
+            X, X, X, o,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, X, o, //
-            o, X, o, o, //
-            o, X, o, o, //
-            o, o, o, o, //
+            o, X, X, o,
+            o, X, o, o,
+            o, X, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, o, o, o, //
-            X, X, X, o, //
-            o, o, X, o, //
-            o, o, o, o, //
+            o, o, o, o,
+            X, X, X, o,
+            o, o, X, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, o, o, //
-            o, X, o, o, //
-            X, X, o, o, //
-            o, o, o, o, //
+            o, X, o, o,
+            o, X, o, o,
+            X, X, o, o,
+            o, o, o, o,
         },
     };
     static constexpr RotationMap O {
         Layout {
-            o, X, X, o, //
-            o, X, X, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            o, X, X, o,
+            o, X, X, o,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, X, o, //
-            o, X, X, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            o, X, X, o,
+            o, X, X, o,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, X, o, //
-            o, X, X, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            o, X, X, o,
+            o, X, X, o,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, X, o, //
-            o, X, X, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            o, X, X, o,
+            o, X, X, o,
+            o, o, o, o,
+            o, o, o, o,
         },
     };
     static constexpr RotationMap S {
         Layout {
-            o, X, X, o, //
-            X, X, o, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            o, X, X, o,
+            X, X, o, o,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, o, o, //
-            o, X, X, o, //
-            o, o, X, o, //
-            o, o, o, o, //
+            o, X, o, o,
+            o, X, X, o,
+            o, o, X, o,
+            o, o, o, o,
         },
         Layout {
-            o, o, o, o, //
-            o, X, X, o, //
-            X, X, o, o, //
-            o, o, o, o, //
+            o, o, o, o,
+            o, X, X, o,
+            X, X, o, o,
+            o, o, o, o,
         },
         Layout {
-            X, o, o, o, //
-            X, X, o, o, //
-            o, X, o, o, //
-            o, o, o, o, //
+            X, o, o, o,
+            X, X, o, o,
+            o, X, o, o,
+            o, o, o, o,
         },
     };
     static constexpr RotationMap Z {
         Layout {
-            X, X, o, o, //
-            o, X, X, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            X, X, o, o,
+            o, X, X, o,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, o, X, o, //
-            o, X, X, o, //
-            o, X, o, o, //
-            o, o, o, o, //
+            o, o, X, o,
+            o, X, X, o,
+            o, X, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, o, o, o, //
-            X, X, o, o, //
-            o, X, X, X, //
-            o, o, o, o, //
+            o, o, o, o,
+            X, X, o, o,
+            o, X, X, X,
+            o, o, o, o,
         },
         Layout {
-            o, X, o, o, //
-            X, X, o, o, //
-            X, o, o, o, //
-            o, o, o, o, //
+            o, X, o, o,
+            X, X, o, o,
+            X, o, o, o,
+            o, o, o, o,
         },
     };
     static constexpr RotationMap T {
         Layout {
-            o, X, o, o, //
-            X, X, X, o, //
-            o, o, o, o, //
-            o, o, o, o, //
+            o, X, o, o,
+            X, X, X, o,
+            o, o, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, o, o, //
-            o, X, X, o, //
-            o, X, o, o, //
-            o, o, o, o, //
+            o, X, o, o,
+            o, X, X, o,
+            o, X, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, o, o, o, //
-            X, X, X, o, //
-            o, X, o, o, //
-            o, o, o, o, //
+            o, o, o, o,
+            X, X, X, o,
+            o, X, o, o,
+            o, o, o, o,
         },
         Layout {
-            o, X, o, o, //
-            X, X, o, o, //
-            o, X, o, o, //
-            o, o, o, o, //
+            o, X, o, o,
+            X, X, o, o,
+            o, X, o, o,
+            o, o, o, o,
         },
     };
+    // clang-format on
   };
 
   Type m_type;
