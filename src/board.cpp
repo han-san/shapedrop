@@ -4,9 +4,15 @@
 #include "geometry.hpp"
 #include "jint.h"
 #include "positive.hpp"
+#include "shape.hpp"
+#include "staticvector.hpp"
+
+#include <gsl/util>
 
 #include <algorithm>
+#include <array>
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 #include <optional>
 #include <ranges>

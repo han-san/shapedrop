@@ -1,15 +1,18 @@
 #include "ui.hpp"
 
+#include "color.hpp"
 #include "core.hpp"
 #include "draw.hpp"
 #include "font.hpp"
 #include "geometry.hpp"
+#include "input.hpp"
 
 #include <cassert>
 #include <exception>
 #include <format>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 using namespace std::string_literals;

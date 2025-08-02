@@ -1,8 +1,12 @@
 #include "draw.hpp"
 
+#include "color.hpp"
 #include "core.hpp"
 #include "draw_opengl.hpp"
 #include "draw_software.hpp"
+#include "font.hpp"
+#include "geometry.hpp"
+#include "platform.hpp"
 
 #include <string_view>
 

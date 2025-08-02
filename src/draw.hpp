@@ -1,5 +1,6 @@
 #pragma once
 
+#include "color.hpp"
 #include "core.hpp"
 #include "font.hpp"
 #include "geometry.hpp"

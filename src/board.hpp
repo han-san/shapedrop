@@ -6,8 +6,11 @@
 #include "shape.hpp"
 #include "staticvector.hpp"
 
+#include <gsl/util>
+
 #include <array>
 #include <cstdint>
+#include <cstddef>
 #include <optional>
 
 struct Block {

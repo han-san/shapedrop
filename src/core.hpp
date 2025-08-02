@@ -1,8 +1,11 @@
 #pragma once
 
 #include "board.hpp"
+#include "geometry.hpp"
 #include "positive.hpp"
 #include "shape.hpp"
+
+#include "jint.h"
 
 #include <array>
 #include <chrono>

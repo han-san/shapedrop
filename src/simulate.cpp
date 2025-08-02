@@ -1,5 +1,6 @@
 #include "simulate.hpp"
 
+#include "color.hpp"
 #include "core.hpp"
 #include "ui.hpp"
 
