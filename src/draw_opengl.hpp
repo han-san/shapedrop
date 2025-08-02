@@ -7,6 +7,7 @@
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/mat4x4.hpp"
 
+#include <cstdint>
 #include <exception>
 #include <utility>
 
@@ -48,7 +49,7 @@ public:
 
   [[nodiscard]] auto handle() const noexcept { return m_handle; }
 
-  enum class Uniform {
+  enum class Uniform : std::uint8_t {
     color,
     model,
     projection,

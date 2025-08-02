@@ -6,25 +6,26 @@
 
 #include "jint.h"
 
+#include <cstdint>
 #include <exception>
 #include <format>
 #include <stdexcept>
 
 class Shape {
 public:
-  enum class RotationType {
+  enum class RotationType : std::uint8_t {
     Wallkick,
     Regular,
   };
 
-  enum class Type { I, O, L, J, S, Z, T };
+  enum class Type : std::uint8_t { I, O, L, J, S, Z, T };
 
   // The shape with the maximum height is the I shape (4 blocks tall).
   static constexpr u8 maxHeight {4};
 
-  enum class RotationDirection { Left, Right };
+  enum class RotationDirection : std::uint8_t { Left, Right };
 
-  enum class Rotation { r0, r90, r180, r270 };
+  enum class Rotation : std::uint8_t { r0, r90, r180, r270 };
 
   Color::RGBA color {Color::invalid};
   Point<int> pos;

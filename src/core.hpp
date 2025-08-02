@@ -6,6 +6,7 @@
 
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <optional>
 
 struct BackBuffer {
@@ -37,7 +38,7 @@ static constexpr ShapePool::DataType initialShapes {
     Shape::Type::S, Shape::Type::Z, Shape::Type::T,
 };
 
-enum class BackToBackType { Tetris, Tspin };
+enum class BackToBackType : std::uint8_t { Tetris, Tspin };
 
 constexpr auto gMinLevel = 1;
 constexpr auto gMaxLevel = 99;
@@ -47,7 +48,7 @@ struct MenuState {
 };
 
 struct ProgramState {
-  enum class LevelType {
+  enum class LevelType : std::uint8_t {
     Menu,
     Game,
   };

@@ -2,8 +2,10 @@
 
 #include "core.hpp"
 
+#include <cstdint>
+
 struct Event {
-  enum class Type {
+  enum class Type : std::uint8_t {
     None,
     Quit,
     Reset,

@@ -6,12 +6,13 @@
 
 #include "../jint.h"
 
+#include <cstdint>
 #include <string_view>
 #include <vector>
 
 namespace platform::SDL {
 
-enum class RenderMode { software, opengl };
+enum class RenderMode : std::uint8_t { software, opengl };
 
 auto swap_buffer() -> void;
 auto get_back_buffer() -> BackBuffer;

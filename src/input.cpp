@@ -4,6 +4,8 @@
 #include "platform.hpp"
 #include "ui.hpp"
 
+#include <cstdint>
+
 auto handle_input(ProgramState& programState, GameState& gameState) -> void {
   Event event;
   while ((event = get_event()).type != Event::Type::None) {
@@ -27,7 +29,7 @@ auto handle_input(ProgramState& programState, GameState& gameState) -> void {
         }
       };
 
-      enum class HorDir { Left, Right };
+      enum class HorDir : std::uint8_t { Left, Right };
 
       auto move_horizontal = [&](const HorDir dir) {
         // if currentShape is on top of a block before move,

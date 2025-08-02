@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <exception>
 #include <format>
 #include <iostream>
@@ -40,7 +41,7 @@ using namespace std::string_view_literals;
 //     If the shape is moved when it's grounded or is rotated with a kick while
 //     grounded If the shape is hard dropped (and actually moves from it)
 
-enum class ClearType {
+enum class ClearType : std::uint8_t {
   None,
   Single,
   Double,

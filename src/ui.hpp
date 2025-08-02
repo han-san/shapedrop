@@ -3,6 +3,7 @@
 #include "core.hpp"
 #include "input.hpp"
 
+#include <cstdint>
 #include <string>
 #include <string_view>
 
@@ -102,7 +103,7 @@ using WindowScaleRect = Rect<WindowScale>;
 using RelativeScalePoint = Point<RelativeScale>;
 using RelativeScaleRect = Rect<RelativeScale>;
 
-enum class XAlignment { Left, Center, Right };
+enum class XAlignment : std::uint8_t { Left, Center, Right };
 
 auto label(std::string text, WindowScale fontHeight, RelativeScalePoint offset) -> void;
 auto label(std::string text, WindowScale fontHeight, XAlignment xAlign, RelativeScale yOffset = 0.)

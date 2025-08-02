@@ -7,6 +7,7 @@
 #include "staticvector.hpp"
 
 #include <array>
+#include <cstdint>
 #include <optional>
 
 struct Block {
@@ -14,7 +15,7 @@ struct Block {
   bool isActive {false};
 };
 
-enum class TspinType { Regular, Mini };
+enum class TspinType : std::uint8_t { Regular, Mini };
 
 class Board {
 public:
